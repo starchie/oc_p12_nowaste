@@ -1,0 +1,10 @@
+.DS_Store
+Nowaste/.DS_Store
+Nowaste/Controller/.DS_Store
+Nowaste/View/.DS_Store
+Nowaste/Model/.DS_Store
+Nowaste/Supporting Files/.DS_Store
+Nowaste/GoogleService-Info.plist
+*.xcuserstate
+Nowaste.xcodeproj/project.xcworkspace/
+Nowaste.xcodeproj/xcuserdata/
