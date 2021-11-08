@@ -60,14 +60,25 @@ class ListCell: UITableViewCell {
     }
     
     func anim(h:CGFloat) {
+        
+        var delay = 0.0
 
         if circleView.frame.height >= 50 {
             self.circleView.frame = CGRect(x: 4, y: 4, width: 40, height: h - 5)
         }else {
-            self.circleView.frame = CGRect(x: 4, y: 4, width: 40, height: h - 5)
-            /*
+            //self.circleView.frame = CGRect(x: 4, y: 4, width: 40, height: h - 5)
+            
             UIView.animate(withDuration: 0.5, delay: 0.0, options: [.curveLinear], animations: { self.circleView.frame = CGRect(x: 4, y: 4, width: 40, height: h - 5) }, completion: nil)
-            */
+            
+        }
+        
+        for item in list {
+            Timer.scheduledTimer(withTimeInterval: 0.3 * delay, repeats: false) { (timer) in
+                UIView.animate(withDuration: 0.5, delay: 0.0, options: [.curveLinear], animations: {
+                    item.center.x -= self.frame.width }, completion: nil)
+            }
+            delay += 1.0
+            
         }
     
     }

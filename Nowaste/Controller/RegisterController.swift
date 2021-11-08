@@ -15,16 +15,21 @@ class RegisterController: UIViewController {
     
     
     var topBarHeight:CGFloat {
-        let window = UIApplication.shared.windows.filter {$0.isKeyWindow}.first
+        let scene = UIApplication.shared.connectedScenes.first as! UIWindowScene
+        let window = scene.windows.first
         let frameWindow = window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
         let frameNavigationBar = self.navigationController?.navigationBar.frame.height ?? 0
         return frameWindow + frameNavigationBar
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        navigationController?.navigationBar.isHidden = false
-        navigationController?.navigationBar.barTintColor =  UIColor(red: 80/255, green: 140/255, blue: 80/255, alpha: 1.0)
-        navigationController?.navigationBar.tintColor =  UIColor(red: 80/255, green: 140/255, blue: 80/255, alpha: 1.0)
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor(red: 80/255, green: 140/255, blue: 80/255, alpha: 1.0)
+        navigationController?.navigationBar.standardAppearance = appearance;
+        navigationController?.navigationBar.scrollEdgeAppearance = navigationController?.navigationBar.standardAppearance
+        
+       
         navigationController?.navigationBar.isTranslucent = false
         navigationController?.navigationBar.tintColor = .white
     }

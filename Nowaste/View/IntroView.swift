@@ -7,238 +7,153 @@
 
 import UIKit
 
+
+
 class IntroView: UIView {
+    
+    var animator = UIDynamicAnimator()
+    var gravity = UIGravityBehavior()
+    var collision = UICollisionBehavior()
+    var fruits = ["🍎","🍏","🍐","🍋","🍊"]
+
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+    }
     
     override init(frame: CGRect) {
         super.init(frame: frame)
         
-        layerPurple()
-        layerPink()
-        layerGreen()
-        layerYellow()
-        
-        layerCircleOrange()
-        layerCircleGreen()
-        layerCirclePurple()
         
         
-        for layer in self.layer.sublayers! {
-            if layer.name == "yellow" {
-                layer.transform = CATransform3DMakeScale(0.8, 0.8, 0.8)
+        let fruit = UILabel()
+        fruit.frame = CGRect(x: 100, y: 0, width: 50, height: 50)
+        let size = Int.random(in: Range(30...60))
+        fruit.text = "🍎"
+        fruit.font = UIFont(name: "Helvetica", size: CGFloat(size))
+        fruit.sizeToFit()
+        
+        self.addSubview(fruit)
+        
+        
+        let wall = UIView()
+        wall.frame = CGRect(x: 50, y: self.frame.midY - 5, width: self.frame.width - 120, height: 100)
+        wall.backgroundColor = .blue
+        
+        
+        
+        animator = UIDynamicAnimator(referenceView: self)
+        gravity = UIGravityBehavior(items: [fruit])
+        collision = UICollisionBehavior(items: [fruit])
+        collision.addBoundary(withIdentifier:"textView" as NSCopying , for: UIBezierPath(rect: wall.frame))
+        collision.translatesReferenceBoundsIntoBoundary = true
+        
+        
+        var delay = 0
+        
+        for _ in 0..<100 {
+            Timer.scheduledTimer(withTimeInterval: TimeInterval(6 * delay), repeats: false) { (timer) in
+                self.animator.removeAllBehaviors()
+                let size = Int.random(in: Range(24...50))
+                let index = Int.random(in: Range(0...4))
+                fruit.text = self.fruits[index]
+                fruit.font = UIFont(name: "Helvetica", size: CGFloat(size))
+                fruit.sizeToFit()
+                fruit.center.x = CGFloat( Int.random(in: Range(0...Int(self.frame.width) )  )    )
+                fruit.center.y = 0
+                self.animator.addBehavior(self.gravity)
+                self.animator.addBehavior(self.collision)
+                
             }
+            delay += 1
             
-            if layer.name == "pink" {
-                layer.transform = CATransform3DMakeScale(0.7, 0.7, 0.7)
-            }
-            
-            if layer.name == "green" {
-                layer.transform = CATransform3DMakeTranslation(-40, -10, 0)
-            }
-            
-            if layer.name == "purple" {
-                layer.transform = CATransform3DMakeTranslation( 0, -60, 0)
-            }
-   
         }
-  
-    }
-     
-    required init?(coder aDecoder: NSCoder) {
-        super.init(coder: aDecoder)
-    }
-    
-    func layerYellow() {
-        // Initialize the path.
-        
-        let shape = CAShapeLayer()
-        let path = UIBezierPath()
-        
-        path.move(to: CGPoint(x: 40, y: self.frame.height - 160) )
-        path.addLine(to: CGPoint(x: self.frame.width - 180, y:  160) )
-        
-        path.move(to: CGPoint(x: 140, y: self.frame.height - 100) )
-        path.addLine(to: CGPoint(x: self.frame.width - 80, y:  220) )
-        
-        path.move(to: CGPoint(x: 220, y: self.frame.height - 160) )
-        path.addLine(to: CGPoint(x: self.frame.width - 0, y:  160) )
-        
-        shape.path = path.cgPath
-        shape.lineCap = .round
-        shape.lineWidth = 10
-        shape.strokeColor = UIColor(red: 223/255, green: 165/255, blue: 66/255, alpha: 1.0).cgColor
-        shape.name = "yellow"
-        
-        self.layer.addSublayer(shape)
-     
-        path.stroke()
-        
- 
-    }
-    
-    func layerPink() {
-        // Initialize the path.
-        
-        let shape = CAShapeLayer()
-        let path = UIBezierPath()
-    
-        path.move(to: CGPoint(x: 40, y: self.frame.height - 160) )
-        path.addLine(to: CGPoint(x: self.frame.width - 180, y:  160) )
-        
-        path.move(to: CGPoint(x: 140, y: self.frame.height - 100) )
-        path.addLine(to: CGPoint(x: self.frame.width - 80, y:  220) )
-        
-        path.move(to: CGPoint(x: 220, y: self.frame.height - 160) )
-        path.addLine(to: CGPoint(x: self.frame.width - 0, y:  160) )
-        
-        shape.path = path.cgPath
-        shape.lineCap = .round
-        shape.lineWidth = 30
-        shape.strokeColor = UIColor(red: 220/255, green: 82/255, blue: 150/255, alpha: 1.0).cgColor
-        shape.name = "pink"
-        self.layer.addSublayer(shape)
-     
-        path.stroke()
-        
- 
-    }
-    
-    func layerGreen() {
-        // Initialize the path.
-        
-        let shape = CAShapeLayer()
-        let path = UIBezierPath()
-    
-        path.move(to: CGPoint(x: 40, y: self.frame.height - 160) )
-        path.addLine(to: CGPoint(x: self.frame.width - 180, y:  160) )
-        
-        path.move(to: CGPoint(x: 140, y: self.frame.height - 100) )
-        path.addLine(to: CGPoint(x: self.frame.width - 80, y:  220) )
-        
-        path.move(to: CGPoint(x: 220, y: self.frame.height - 160) )
-        path.addLine(to: CGPoint(x: self.frame.width - 0, y:  160) )
-        
-        shape.path = path.cgPath
-        shape.lineCap = .round
-        shape.lineWidth = 20
-        shape.strokeColor =  UIColor(red: 80/255, green: 140/255, blue: 80/255, alpha: 1.0).cgColor
-        shape.name = "green"
-        self.layer.addSublayer(shape)
-     
-        path.stroke()
-        
- 
-    }
-    
-    func layerPurple() {
-        // Initialize the path.
-        
-        let shape = CAShapeLayer()
-        let path = UIBezierPath()
-    
-        path.move(to: CGPoint(x: 40, y: self.frame.height - 160) )
-        path.addLine(to: CGPoint(x: self.frame.width - 180, y:  160) )
-        
-        path.move(to: CGPoint(x: 140, y: self.frame.height - 100) )
-        path.addLine(to: CGPoint(x: self.frame.width - 80, y:  220) )
-        
-        path.move(to: CGPoint(x: 220, y: self.frame.height - 160) )
-        path.addLine(to: CGPoint(x: self.frame.width - 0, y:  160) )
-        
-        shape.path = path.cgPath
-        shape.lineCap = .round
-        shape.lineWidth = 20
-        shape.strokeColor = UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0).cgColor
-        shape.name = "purple"
-        self.layer.addSublayer(shape)
-     
-        path.stroke()
-
-    }
-    
-    func layerCircleOrange() {
-        
-        let shape = CAShapeLayer()
-        var path = UIBezierPath()
-        
-        path = UIBezierPath(ovalIn: CGRect(x: self.frame.midX - 20,
-                                           y: self.frame.midY - 140,
-                                           width: 30,
-                                           height: 30) )
-        
-        shape.path = path.cgPath
-        shape.fillColor =  UIColor(red: 223/255, green: 165/255, blue: 66/255, alpha: 1.0).cgColor
-        self.layer.addSublayer(shape)
-        
-        let animation = CABasicAnimation(keyPath: "position")
-        animation.fromValue = CGPoint(x: 0, y: 0)
-        animation.toValue = CGPoint(x: 30, y: 60)
-        animation.autoreverses = true
-        animation.duration = 5
-        animation.repeatCount = .infinity
-        animation.timingFunction = CAMediaTimingFunction(name: CAMediaTimingFunctionName.easeInEaseOut)
-     
-        
-        shape.add(animation, forKey: nil)
-        
+         
         
         
     }
     
-    func layerCircleGreen() {
-        
-        let shape = CAShapeLayer()
-        var path = UIBezierPath()
-        
-        path = UIBezierPath(ovalIn: CGRect(x: self.frame.midX - 20,
-                                           y: self.frame.midY - 140,
-                                           width: 20,
-                                           height: 20) )
-        
-        shape.path = path.cgPath
-        shape.fillColor =  UIColor(red: 80/255, green: 140/255, blue: 80/255, alpha: 1.0).cgColor
-        self.layer.addSublayer(shape)
-        
-        let animation = CABasicAnimation(keyPath: "position")
-        animation.fromValue = CGPoint(x: -30, y: 60)
-        animation.toValue = CGPoint(x: -40, y: 0)
-        animation.autoreverses = true
-        animation.duration = 5
-        animation.repeatCount = .infinity
-     
-        
-        shape.add(animation, forKey: nil)
-        
-        
-        
-    }
+   
     
-    func layerCirclePurple() {
+}
+/*
+class IntroView: UIView {
+    
+    var tree:UIImageView!
+    var apples:[UILabel]!
+    var wall:UIView!
+    
+    var animators = [UIDynamicAnimator]()
+    var gravities = [UIGravityBehavior]()
+    var collisions = [UICollisionBehavior]()
+    
+    override init(frame: CGRect) {
+        super.init(frame: frame)
         
-        let shape = CAShapeLayer()
-        var path = UIBezierPath()
+        tree = UIImageView()
+        tree.image = UIImage(named: "tree")
+        tree.sizeToFit()
+        tree.center = self.center
+        tree.center.y = 160
+        self.addSubview(tree)
+        print (tree.frame)
         
-        path = UIBezierPath(ovalIn: CGRect(x: self.frame.midX - 20,
-                                           y: self.frame.midY - 140,
-                                           width: 50,
-                                           height: 50) )
-        
-        shape.path = path.cgPath
-        shape.fillColor = UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0).cgColor
-        self.layer.addSublayer(shape)
-        
-        let animation = CABasicAnimation(keyPath: "position")
-        animation.fromValue = CGPoint(x: 150, y: 200)
-        animation.toValue = CGPoint(x: 50, y: 220)
-        animation.autoreverses = true
-        animation.duration = 5
-        animation.repeatCount = .infinity
-     
-        
-        shape.add(animation, forKey: nil)
+        apples = [UILabel]()
+        for i in 0...10 {
+            let apple = UILabel()
+            apple.frame = CGRect(x: 0, y: 0, width: 50, height: 50)
+            let x = Int.random(in: Range(0...80)) + 20
+            let y = Int.random(in: Range(0...80)) + 20
+            let size = Int.random(in: Range(3...12)) 
+            apple.text = "🍎"
+            apple.font = UIFont(name: "Helvetica", size: CGFloat(size))
+            apple.sizeToFit()
+            
+            apple.center = CGPoint(x: x,
+                                   y: y)
+           // apple.frame.size = CGSize(width: x / 10, height: x / 10)
+            
+            apples.append(apple)
+            self.tree.addSubview(apples[i])
            
+        }
+        
+        wall = UIView()
+        wall.frame = CGRect(x: 0, y: self.frame.midY - 5, width: self.frame.width, height: 100)
+        
+        for apple in apples {
+            let animator = UIDynamicAnimator(referenceView: self)
+            let gravity = UIGravityBehavior(items: [apple])
+            let collision = UICollisionBehavior(items: [apple])
+            collision.addBoundary(withIdentifier:"textView" as NSCopying , for: UIBezierPath(rect: wall.frame))
+            collision.translatesReferenceBoundsIntoBoundary = true
+            
+            gravities.append(gravity)
+            collisions.append(collision)
+            animators.append(animator)
+        }
+        var delay = 1.0
+        
+        for i in 0..<apples.count {
+            Timer.scheduledTimer(withTimeInterval: 3 * delay, repeats: false) { (timer) in
+                self.animators[i].addBehavior(self.gravities[i])
+                self.animators[i].addBehavior(self.collisions[i])
+            }
+            delay += 1
+            
+        }
+        
     }
     
- 
+    
+    
+    required init?(coder: NSCoder) {
+        super.init(coder: coder)
+        fatalError("init(coder:) has not been implemented")
+        
+    }
+    
     
 
 }
+*/

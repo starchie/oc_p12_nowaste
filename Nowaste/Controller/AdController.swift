@@ -13,7 +13,8 @@ class AdController: UIViewController{
     var adView:AdView!
     
     var topBarHeight:CGFloat {
-        let window = UIApplication.shared.windows.filter {$0.isKeyWindow}.first
+        let scene = UIApplication.shared.connectedScenes.first as! UIWindowScene
+        let window = scene.windows.first
         let frameWindow = window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
         let frameNavigationBar = self.navigationController?.navigationBar.frame.height ?? 0
         return frameWindow + frameNavigationBar

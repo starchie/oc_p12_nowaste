@@ -27,7 +27,7 @@ class LogInView: UIView {
         let rect = CGRect(x: 0, y: 0, width: inView.frame.width, height: inView.frame.height)
         self.init(frame: rect)
         
-        let color = UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0)
+        let color =  UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0)
         
         self.frame = rect
         self.backgroundColor = color

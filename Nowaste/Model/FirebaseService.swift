@@ -319,9 +319,7 @@ class FirebaseService {
     // GET ADS FROM A USER
     func querryAds(filter:String, completionHandler: @escaping ((Bool, String? ) -> Void)){
         let selection:Query = db.collection("ads").whereField("addedByUser", isEqualTo: filter)
-        
         listener = selection.addSnapshotListener { (querySnapshot, err) in
-            print(" 🍅 Listener ... ")
             if let err = err {
                 print("Error getting documents: \(err)")
                 completionHandler(false, err.localizedDescription)

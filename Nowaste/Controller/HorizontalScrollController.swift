@@ -20,30 +20,34 @@ class HorizontalScrollController: UIViewController {
     var stars: StarView!
     
     var topBarHeight:CGFloat {
-        let window = UIApplication.shared.windows.filter {$0.isKeyWindow}.first
+        let scene = UIApplication.shared.connectedScenes.first as! UIWindowScene
+        let window = scene.windows.first
         let frameWindow = window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
         let frameNavigationBar = self.navigationController?.navigationBar.frame.height ?? 0
         return frameWindow + frameNavigationBar
     }
 
     override func viewWillAppear(_ animated: Bool) {
-        navigationController?.navigationBar.isHidden = false
-        navigationController?.navigationBar.barTintColor =  UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0)
-        navigationController?.navigationBar.tintColor =  UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0)
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0)
+        navigationController?.navigationBar.standardAppearance = appearance;
+        navigationController?.navigationBar.scrollEdgeAppearance = navigationController?.navigationBar.standardAppearance
         navigationController?.navigationBar.isTranslucent = false
         navigationController?.navigationBar.tintColor = .white
-        
-        self.navigationItem.setHidesBackButton(true, animated: false)
         
     }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = .clear
-        
         // BACKGROUND (COPY OF PREVIOUS CONTROLLER)
+        view.backgroundColor = .clear
         view.addSubview(backgroundView)
+        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapTopView)))
+        backgroundView.isUserInteractionEnabled = true
+       
         
         // VIEW
         let width: CGFloat = view.frame.width
@@ -91,6 +95,7 @@ class HorizontalScrollController: UIViewController {
         backButton.addTarget(self, action:#selector(backFunction), for: .touchUpInside)
         
         
+        
         // PROFILE BUTTON
         profileButton = UIButton()
         view.addSubview(profileButton)
@@ -101,9 +106,12 @@ class HorizontalScrollController: UIViewController {
                                      y: view.frame.maxY -  topBarHeight - 40 - 20,
                                      width: 40,
                                      height: 40)
+        
+        profileButton.isHidden = true
         // STAR
         stars = StarView(frame: CGRect(x: view.frame.midX - 37.5, y: profileButton.frame.minY - 15, width: 75, height: 30))
         view.addSubview(stars)
+        stars.isHidden = true
 
     }
     
@@ -131,11 +139,14 @@ class HorizontalScrollController: UIViewController {
         }else {
             navigationController?.popViewController(animated: false)
         }
-
-        
-      
-        
+  
     }
+    
+    @objc func didTapTopView(_ tap: UITapGestureRecognizer) {
+        navigationController?.popViewController(animated: false)
+    }
+    
+    
     
     @objc func didTapImageView(_ tap: UITapGestureRecognizer) {
         let index = tap.view!.tag

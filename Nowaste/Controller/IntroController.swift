@@ -30,13 +30,11 @@ class IntroController: UIViewController {
         introView = IntroView(frame: view.frame)
         view.addSubview(introView)
         
-
-        
         titleLabel = UITextField()
-        titleLabel.font = UIFont(name: "Helvetica-Bold", size: 60)
+        titleLabel.font = UIFont(name: "ArialRoundedMTBold", size: 60)
         titleLabel.textColor = .white
         titleLabel.frame = CGRect(x: 0, y: 0, width: view.frame.width, height: 60)
-        titleLabel.text = "N🍅Waste."
+        titleLabel.text = "n🍎 waste."
         titleLabel.textAlignment = .center
         titleLabel.center = view.center
         
@@ -45,7 +43,7 @@ class IntroController: UIViewController {
         
         titleLabel.text = ""
         var charIndex = 0.0
-        let titleText = "N🍅Waste."
+        let titleText = "no waste."
         for letter in titleText {
             Timer.scheduledTimer(withTimeInterval: 0.1 * charIndex, repeats: false) { (timer) in
                 self.titleLabel.text?.append(letter)
@@ -53,12 +51,12 @@ class IntroController: UIViewController {
             charIndex += 1
         }
         
-        register.frame = CGRect(x: 10, y: view.frame.maxY - 50, width: view.frame.width - 20, height: 50)
+        register.frame = CGRect(x: 30, y: view.frame.maxY - 50, width: view.frame.width - 60, height: 50)
         register.layer.cornerRadius = register.frame.height / 2
         register.setTitle("Register", for: .normal)
         register.setTitleColor(.white, for: .normal)
         register.backgroundColor =  UIColor(red: 80/255, green: 140/255, blue: 80/255, alpha: 1.0)
-        register.titleLabel?.font = UIFont(name: "Helvetica", size: 20)
+        register.titleLabel?.font = UIFont(name: "ArialRoundedMTBold", size: 20)
         view.addSubview(register)
         
         logIn.frame = register.frame.offsetBy(dx: 0, dy: -55)
@@ -66,20 +64,20 @@ class IntroController: UIViewController {
         logIn.setTitle("Log In", for: .normal)
         logIn.setTitleColor(.white, for: .normal)
         logIn.backgroundColor =  UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0)
-        logIn.titleLabel?.font = UIFont(name: "Helvetica", size: 20)
+        logIn.titleLabel?.font = UIFont(name: "ArialRoundedMTBold", size: 20)
         view.addSubview(logIn)
         
         register.addTarget(self, action:#selector(goRegister(_:)), for: .touchUpInside)
         logIn.addTarget(self, action:#selector(goLogIn(_:)), for: .touchUpInside)
         
-        /*
+        
         Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { (timer) in
             if FirebaseService.shared.currentUser != nil {
                 let vc = ListController()
                 self.navigationController?.pushViewController(vc, animated: false)
             }
         }
-        */
+        
            
     }
     

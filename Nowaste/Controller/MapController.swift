@@ -21,16 +21,24 @@ class MapController: UIViewController {
     var searchButton:UIButton!
     
     var topBarHeight:CGFloat {
-        let window = UIApplication.shared.windows.filter {$0.isKeyWindow}.first
+        let scene = UIApplication.shared.connectedScenes.first as! UIWindowScene
+        let window = scene.windows.first
         let frameWindow = window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
         let frameNavigationBar = self.navigationController?.navigationBar.frame.height ?? 0
         return frameWindow + frameNavigationBar
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        
         navigationController?.navigationBar.isHidden = false
-        navigationController?.navigationBar.barTintColor =  UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0)
-        navigationController?.navigationBar.tintColor =  UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0)
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0)
+        navigationController?.navigationBar.standardAppearance = appearance;
+        navigationController?.navigationBar.scrollEdgeAppearance = navigationController?.navigationBar.standardAppearance
+        
+       
         navigationController?.navigationBar.isTranslucent = false
         navigationController?.navigationBar.tintColor = .white
         
@@ -56,12 +64,17 @@ class MapController: UIViewController {
     }
     
     override func viewWillDisappear(_ animated: Bool) {
+        guard FirebaseService.shared.listener != nil else {return}
         FirebaseService.shared.removeListener()
     }
 
+    // MARK: - PREPARE CONTROLLER
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        
+        self.overrideUserInterfaceStyle = .dark
         
         // SEARCHVIEW
         searchView = SearchView(frame: view.frame)
@@ -72,27 +85,34 @@ class MapController: UIViewController {
         searchView.slider.addTarget(self, action: #selector(changeRadius), for: .touchUpInside)
 
         // MAP INIT
-        self.overrideUserInterfaceStyle = .dark
-        mapView = MapView(frame: CGRect(x: 0,
-                                        y: 0,
-                                        width: view.frame.width,
-                                        height: view.frame.height))
-    
+        mapView = MapView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height))
         view.addSubview(mapView)
         view.sendSubviewToBack(mapView)
         
         mapView.mapType = .standard
+        
         mapView.showsCompass = false
+        mapView.showsTraffic = false
         
         // DELEGATE
         mapView.delegate = self
         
         // LOAD DATA FIRST
         
+        // PLACE CAMERA - USER GEO LOCATION -
+        FirebaseService.shared.querryProfile(filter: FirebaseService.shared.currentUser!.uid) {success, error in
+            if success {
+                self.mapView.location = CLLocationCoordinate2D(latitude: FirebaseService.shared.profile.latitude, longitude: FirebaseService.shared.profile.longitude)
+            }else {
+                print("error")
+            }
+            
+        }
+        
+        // GET ALL USER ON THE MAP
         FirebaseService.shared.getProfiles(){success,error in
             if success {
                 for document in FirebaseService.shared.profiles {
-                    print(document.activeAds)
                     // CREATE ANNOTATIONS
                     let customAnnotation = Annotation(with: document)
                     self.mapView.addAnnotation(customAnnotation)
@@ -105,7 +125,7 @@ class MapController: UIViewController {
 
     }
     
-    //MARK: - ACTION
+    //MARK: - ACTIONS
     
     @objc func addFunction(_ sender:UIButton) {
         let vc = AdController()
@@ -183,12 +203,27 @@ class MapController: UIViewController {
         }
     }
     
-
-
-
+    
 }
 
+// MARK: EXTENSION MAP DELEGATE
+
 extension MapController: MKMapViewDelegate {
+    
+    // MARK: - PLACE ANNOTATIONS
+    
+    func mapView(_ mapView: MKMapView,viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        let annotation = annotation as! Annotation
+        let identifier = "Annotation"
+        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
+        annotationView = AnnotationView(annotation: annotation, reuseIdentifier: identifier)
+        annotationView!.canShowCallout = false
+        
+        return annotationView
+        
+    }
+    
+    // MARK: - DID SELECT AN ANNOTATION
     
     func mapView(_ mapView: MKMapView, didSelect view: MKAnnotationView) {
         
@@ -216,17 +251,6 @@ extension MapController: MKMapViewDelegate {
             }
             
         }
-    }
-    
-    func mapView(_ mapView: MKMapView,viewFor annotation: MKAnnotation) -> MKAnnotationView? {
-        let annotation = annotation as! Annotation
-        let identifier = "Annotation"
-        var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
-        annotationView = AnnotationView(annotation: annotation, reuseIdentifier: identifier)
-        annotationView!.canShowCallout = false
-        
-        return annotationView
-        
     }
 
 }

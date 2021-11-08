@@ -24,7 +24,8 @@ class ListController: UIViewController {
     var sizeForDefaultRow: CGFloat = 44
     
     var topBarHeight:CGFloat {
-        let window = UIApplication.shared.windows.filter {$0.isKeyWindow}.first
+        let scene = UIApplication.shared.connectedScenes.first as! UIWindowScene
+        let window = scene.windows.first
         let frameWindow = window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
         let frameNavigationBar = self.navigationController?.navigationBar.frame.height ?? 0
         return frameWindow + frameNavigationBar
@@ -36,8 +37,12 @@ class ListController: UIViewController {
         
         // NAVIGATION BAR
         navigationController?.navigationBar.isHidden = false
-        navigationController?.navigationBar.barTintColor = UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0)
-        navigationController?.navigationBar.tintColor =  UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0)
+        
+        let appearance = UINavigationBarAppearance()
+        appearance.configureWithOpaqueBackground()
+        appearance.backgroundColor = UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0)
+        navigationController?.navigationBar.standardAppearance = appearance;
+        navigationController?.navigationBar.scrollEdgeAppearance = navigationController?.navigationBar.standardAppearance
         navigationController?.navigationBar.isTranslucent = false
         navigationController?.navigationBar.tintColor = .white
         
@@ -59,6 +64,11 @@ class ListController: UIViewController {
         
         self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: mapButton),UIBarButtonItem(customView: addButton),UIBarButtonItem(customView: searchButton)]
 
+    }
+    
+    override func viewWillDisappear(_ animated: Bool) {
+        guard FirebaseService.shared.listener != nil else {return}
+        FirebaseService.shared.removeListener()
     }
   
 //MARK: - PREPARE
@@ -256,7 +266,7 @@ extension ListController:UITableViewDataSource {
                                         width: cell.frame.width - 40,
                                         height: cell.cellTitle.frame.height)
                     
-                
+                viewToAdd.center.x += view.frame.width
               
                 list.append(viewToAdd)
             }
