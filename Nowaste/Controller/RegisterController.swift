@@ -71,19 +71,24 @@ class RegisterController: UIViewController {
         let adress:String = "\(registerView.street.text!)" + "\(registerView.code.text!)" + "\(registerView.city.text!)"
         
         var coordinate = CLLocationCoordinate2D()
+        var geohash = String()
         
         getCoordinate(from: adress) { location in
             if location != nil {
                 coordinate = location!
+                geohash = FirebaseService.shared.locationToHash(location: location!)
             }else{
                 self.presentUIAlertController(title: "Adress", message: "Can't find your adress")
             }
             
         }
+        
+        
+        
         // ... CREATE USER
         FirebaseService.shared.register(mail: registerView.mail.text!, pwd: registerView.password.text!) { success, error in
             if success {
-                self.saveProfile(with: coordinate)
+                self.saveProfile(coordinate: coordinate, geohash: geohash)
             }else{
                 self.presentUIAlertController(title: "Enregistrement", message: error!)
             }
@@ -94,8 +99,14 @@ class RegisterController: UIViewController {
     
     // 2
     // CREATE PROFILE TO FIRESTORE WITH GEO CODE
-    func saveProfile(with coordinate:CLLocationCoordinate2D){
-        FirebaseService.shared.saveProfile(userName: registerView.userName.text!, latitude: coordinate.latitude, longitude: coordinate.longitude, imageURL: "images/\(FirebaseService.shared.currentUser!.uid)/profil_img.png", activeAds: 0) { success,error in
+    func saveProfile(coordinate:CLLocationCoordinate2D, geohash:String){
+        guard FirebaseService.shared.currentUser != nil else {
+            self.presentUIAlertController(title: "Enregistrement", message: "you are not logged")
+            return
+        }
+        let documentName = FirebaseService.shared.currentUser!.uid + "_profile"
+        let date = Date().timeIntervalSince1970
+        FirebaseService.shared.saveProfile(documentName: documentName, userName: registerView.userName.text!,id: FirebaseService.shared.currentUser!.uid, date: date, latitude: coordinate.latitude, longitude: coordinate.longitude, imageURL: "images/\(FirebaseService.shared.currentUser!.uid)/profil_img.png", activeAds: 0, geohash: geohash) { success,error in
             if success {
                 self.saveImageProfile()
             }else{

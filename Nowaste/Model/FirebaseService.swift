@@ -16,9 +16,10 @@ class FirebaseService {
     private init(){}
     
     var db = Firestore.firestore()
-    var storage = Storage.storage().reference()
+    var storage =  Storage.storage()
     
     var currentUser : User? { return Auth.auth().currentUser}
+  
     var profile : Profile!
     
     var ads = [Ad]()
@@ -33,9 +34,9 @@ class FirebaseService {
     
     //MARK: - GEO HASH
     
-    func locationToHash (location: CLLocationCoordinate2D){
+    func locationToHash (location: CLLocationCoordinate2D) -> String{
         let hash = GFUtils.geoHash(forLocation: location)
-        print (hash)
+        return hash
     }
     
     func getGeoHash (center: CLLocationCoordinate2D, radiusInM: Double, completionHandler: @escaping ((Bool, String? ) -> Void) ) {
@@ -78,8 +79,6 @@ class FirebaseService {
         
     }
     
-
-    
     // Collect all the query results together into a single list
     func getDocumentsCompletion( snapshot: QuerySnapshot?, error: Error?) -> () {
         guard let documents = snapshot?.documents else {
@@ -121,7 +120,7 @@ class FirebaseService {
     func saveImage(PNG: Data, location:String, completionHandler: @escaping ((Bool, String? ) -> Void)) {
         
         // Create a reference to the file you want to upload
-        let imageRef = storage.child(location)
+        let imageRef = storage.reference().child(location)
         
         let uploadTask = imageRef.putData(PNG, metadata: nil) { (metadata, error) in
             guard metadata != nil else {
@@ -151,7 +150,7 @@ class FirebaseService {
     }
     
     func loadImage(_ image:String, completionHandler: @escaping ((Bool, String?, Data? ) -> Void)){
-        let imageRef = storage.child("\(image)")
+        let imageRef = storage.reference().child("\(image)")
         
         imageRef.getData(maxSize: 1 * 1024 * 1024 * 1024) { data, error in
             if let error = error {
@@ -166,8 +165,8 @@ class FirebaseService {
     
     // LOGIN
     func login(mail:String, pwd:String, completionHandler: @escaping ((Bool, String? ) -> Void)){
-        Auth.auth().signIn(withEmail: mail, password: pwd) { (user, error) in
-            guard let _ = user, error == nil else {
+        Auth.auth().signIn(withEmail: mail, password: pwd) { (result, error) in
+            guard let _ = result, error == nil else {
                 completionHandler(false, error?.localizedDescription)
                 return
             }
@@ -189,14 +188,14 @@ class FirebaseService {
     
     // REGISTER
     func register(mail:String, pwd:String, completionHandler: @escaping ((Bool, String? ) -> Void)) {
-        Auth.auth().createUser(withEmail: mail, password: pwd) { _, error in
-            if error == nil {
+        Auth.auth().createUser(withEmail: mail, password: pwd) { (result, error) in
+            guard let _ = result, error == nil else {
+                completionHandler(false,error?.localizedDescription)
+                return
+                
+            }
                 Auth.auth().signIn(withEmail: mail, password: pwd)
                 completionHandler(true,nil)
-            } else {
-                print("Error in createUser: \(error?.localizedDescription ?? "")")
-                completionHandler(false,error?.localizedDescription)
-            }
         }
         
     }
@@ -204,133 +203,105 @@ class FirebaseService {
     //MARK: - USER PROFILE
     
     // SAVE
-    func saveProfile (userName:String, latitude:Double, longitude:Double, imageURL:String, activeAds: Int, completionHandler: @escaping ((Bool, String? ) -> Void)){
-
-        db.collection("users").document("\(currentUser!.uid)").setData(["userName":userName, "latitude":latitude, "longitude":longitude, "imageURL":imageURL, "activeAds":activeAds]) { error in
-                if error == nil {
-                    completionHandler(true,nil)
-                } else {
-                    completionHandler(false,error?.localizedDescription)
-                }
-            
+    
+    func saveProfile (documentName:String, userName:String,id:String, date:Double, latitude:Double, longitude:Double, imageURL:String, activeAds: Int, geohash: String, completionHandler: @escaping ((Bool, String? ) -> Void)){
+        
+        db.collection("users").document("\(documentName)").setData(["userName":userName,"id":id, "dateField":date, "latitude":latitude, "longitude":longitude, "imageURL":imageURL, "activeAds":activeAds, "geohash":geohash]) { error in
+            guard error == nil else {
+                completionHandler(false,error?.localizedDescription)
+                return
             }
+            completionHandler(true,nil)
+        }
         
     }
     
     // UPDATE
-    func updateProfile (field:String, by value:Any, completionHandler: @escaping ((Bool, String? ) -> Void)){
-        db.collection("users").document("\(currentUser!.uid)").updateData(["\(field)": value]) { error in
-                if error == nil {
-                    completionHandler(true,nil)
-                } else {
-                    completionHandler(false,error?.localizedDescription)
-                }
-                
+    
+    func updateProfile (user:String, field:String, by value:Any, completionHandler: @escaping ((Bool, String? ) -> Void)){
+        db.collection("users").document("\(user)").updateData(["\(field)": value]) { error in
+            guard error == nil else {
+                completionHandler(false,error?.localizedDescription)
+                return
             }
+            completionHandler(true,nil)
+        }
         
     }
     
     // GET ALL USERS
+    
     func getProfiles(completionHandler: @escaping ((Bool, String? ) -> Void)){
         db.collection("users").getDocuments { (snapshot, error) in
-            if let error = error {
-                print("Error getting documents")
-                completionHandler(false, error.localizedDescription)
-            } else {
-                self.profiles.removeAll()
-                for document in snapshot!.documents {
-                    let newItem = Profile(snapshot: document.data())
-                    self.profiles.append(newItem!)
-                    
-                }
-                completionHandler(true, nil)
+            guard let snapshot = snapshot, error == nil else {
+                completionHandler(false, error?.localizedDescription)
+                return
+            }
+            self.profiles.removeAll()
+            
+            for document in snapshot.documents {
+                print (document.data())
+                let newItem = Profile(snapshot: document.data())
+                self.profiles.append(newItem!)
                 
             }
+            completionHandler(true, nil)
         }
+        
     }
     
     // GET ONE USER
+    
     func querryProfile(filter:String, completionHandler: @escaping ((Bool, String? ) -> Void)){
         let selection:Query = db.collection("users").whereField("id", isEqualTo: filter)
-        selection.getDocuments(completion: { (querySnapshot, err) in
-                                
-            if let err = err {
-                print("Error getting documents: \(err)")
-                completionHandler(false, err.localizedDescription)
-            } else {
-                for document in querySnapshot!.documents {
-                    let profile = Profile(snapshot: document.data())
-                    self.profile = profile
-                }
-                completionHandler(true, nil)
-            } })
-    }
-    
-    // UPDATE PASSWORD
-    func updatePassword(_ password:String, completionHandler: @escaping ((Bool, String?)-> Void)){
-        currentUser?.updatePassword(to: password){  error in
-            if let error = error {
-                completionHandler(false,error.localizedDescription)
-            } else {
-                completionHandler(true,nil)
-                
-            }
-            
-        }
         
-    }
-    
-    // UPDATE EMAIL
-    func updateEmail(_ mail:String, completionHandler: @escaping ((Bool, String?)-> Void)){
-        currentUser?.updateEmail(to: mail){  error in
-            if let error = error {
-                completionHandler(false,error.localizedDescription)
-            } else {
-                completionHandler(true,nil)
-                
-            }
+        selection.getDocuments(completion: { (querySnapshot, error) in
             
-        }
-        
+            guard let querySnapshot = querySnapshot, error == nil else {
+                completionHandler(false, error?.localizedDescription)
+                return
+            }
+            for document in querySnapshot.documents {
+                let profile = Profile(snapshot: document.data())
+                self.profile = profile
+            }
+            completionHandler(true, nil)
+        } )
     }
     
     
     //MARK: - ADVERT
     
     // CREATE
-    func setAd(id:NSUUID, title:String, description:String, imageURL:String, date:Double,likes:Int, completionHandler: @escaping ((Bool, String? ) -> Void)) {
-        db.collection("ads")
-            .document("\(id.uuidString)")
-            .setData(["title": title,
-                      "description": description,
-                      "imageURL": imageURL,
-                      "addedByUser": "\(currentUser!.uid)",
-                      "dateField": date,
-                      "likes": likes]) { error in
-                if error == nil {
-                    completionHandler(true,nil)
-                } else {
-                    completionHandler(false,error?.localizedDescription)
-                }
-                
+    
+    func setAd(userUID:String, id:String, title:String, description:String, imageURL:String, date:Double,likes:Int, completionHandler: @escaping ((Bool, String? ) -> Void)) {
+        db.collection("ads").document("\(id)").setData(["title": title, "description": description, "imageURL": imageURL, "addedByUser": "\(userUID)", "dateField": date, "likes": likes, "id":id]) { error in
+            guard error == nil else {
+                completionHandler(false,error?.localizedDescription)
+                return
             }
+            completionHandler(true,nil)
+            
+        }
     }
     
     // GET ADS FROM A USER
+    
     func querryAds(filter:String, completionHandler: @escaping ((Bool, String? ) -> Void)){
         let selection:Query = db.collection("ads").whereField("addedByUser", isEqualTo: filter)
-        listener = selection.addSnapshotListener { (querySnapshot, err) in
-            if let err = err {
-                print("Error getting documents: \(err)")
-                completionHandler(false, err.localizedDescription)
-            } else {
-                self.ads.removeAll()
-                for document in querySnapshot!.documents {
-                    let newAd = Ad(snapshot: document.data())
-                    self.ads.append(newAd!)
-                }
-                completionHandler(true, nil)
-            } }
+        listener = selection.addSnapshotListener { (querySnapshot, error) in
+            guard let querySnapshot = querySnapshot, error == nil else {
+                completionHandler(false, error?.localizedDescription)
+                return
+            }
+            self.ads.removeAll()
+            for document in querySnapshot.documents {
+                print(document.data())
+                let newAd = Ad(snapshot: document.data())
+                self.ads.append(newAd!)
+            }
+            completionHandler(true, nil)
+        }
     }
     
     func removeListener(){
@@ -339,35 +310,33 @@ class FirebaseService {
 
     // GET ALL ADS
     func getAds(completionHandler: @escaping ((Bool, String? ) -> Void)){
-        
         db.collection("ads")
             .getDocuments { (querySnapshot, error) in
-                if let error = error {
-                    print("Error getting documents: \(error)")
-                    completionHandler(false, error.localizedDescription)
-                } else {
-                    self.ads.removeAll()
-                    for document in querySnapshot!.documents {
-                        //DispatchQueue.main.async {
-                        let newItem = Ad(snapshot: document.data())
-                        self.ads.append(newItem!)
-                        //}
-                    }
-                    self.ads.reverse()
-                    completionHandler(true, nil)
+                guard  error == nil else {
+                    completionHandler(false, error?.localizedDescription)
+                    return
                 }
+                
+                self.ads.removeAll()
+                
+                for document in querySnapshot!.documents {
+                    let newItem = Ad(snapshot: document.data())
+                    self.ads.append(newItem!)
+                }
+                self.ads.reverse()
+                completionHandler(true, nil)
+                
             }
     }
     
     func updateAd (field:String,id:String, by value:Any, completionHandler: @escaping ((Bool, String? ) -> Void)){
         db.collection("ads").document("\(id)").updateData(["\(field)": value]) { error in
-                if error == nil {
-                    completionHandler(true,nil)
-                } else {
-                    completionHandler(false,error?.localizedDescription)
-                }
-                
+            guard error == nil  else {
+                completionHandler(false,error?.localizedDescription)
+                return
             }
+            completionHandler(true,nil)
+        }
         
     }
     

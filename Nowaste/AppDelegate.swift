@@ -17,6 +17,21 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         
         FirebaseApp.configure()
+        //Firestore.firestore().settings.isPersistenceEnabled = false
+        
+        // Checking if unit tests are running
+        
+        if ProcessInfo.processInfo.environment["unit_tests"] == "true" {
+            print("🍎 Setting up Firebase emulator localhost:8080")
+            let settingsFirestore = Firestore.firestore().settings
+            settingsFirestore.host = "localhost:8080"
+            settingsFirestore.isPersistenceEnabled = false
+            settingsFirestore.isSSLEnabled = false
+            Firestore.firestore().settings = settingsFirestore
+            
+            Auth.auth().useEmulator(withHost:"localhost", port:9099)
+            Storage.storage().useEmulator(withHost:"localhost", port:9199)
+        }
         
         
         return true

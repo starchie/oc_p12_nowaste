@@ -11,10 +11,10 @@ import UIKit
 
 class IntroView: UIView {
     
-    var animator = UIDynamicAnimator()
-    var gravity = UIGravityBehavior()
-    var collision = UICollisionBehavior()
-    var fruits = ["🍎","🍏","🍐","🍋","🍊"]
+    //var animator = UIDynamicAnimator()
+    //var gravity = UIGravityBehavior()
+    //var collision = UICollisionBehavior()
+    //var fruits = ["🍎","🍏","🍐","🍋","🍊"]
 
     
     required init?(coder: NSCoder) {
@@ -25,7 +25,7 @@ class IntroView: UIView {
         super.init(frame: frame)
         
         
-        
+        /*
         let fruit = UILabel()
         fruit.frame = CGRect(x: 100, y: 0, width: 50, height: 50)
         let size = Int.random(in: Range(30...60))
@@ -68,6 +68,7 @@ class IntroView: UIView {
             delay += 1
             
         }
+         */
          
         
         

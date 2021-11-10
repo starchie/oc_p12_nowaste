@@ -74,7 +74,7 @@ class MapController: UIViewController {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
         
-        self.overrideUserInterfaceStyle = .dark
+        //self.overrideUserInterfaceStyle = .light
         
         // SEARCHVIEW
         searchView = SearchView(frame: view.frame)

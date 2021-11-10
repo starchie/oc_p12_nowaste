@@ -48,10 +48,15 @@ class AdController: UIViewController{
     //MARK: - ACTION
     
     @objc func saveAd(_ sender:UIButton) {
-        let uniqueName:NSUUID = NSUUID()
+        guard FirebaseService.shared.currentUser != nil else {
+            self.presentUIAlertController(title: "Enregistrement", message: "You are not connected")
+            return
+        }
+        let userUID = FirebaseService.shared.currentUser!.uid
+        let uniqueName:String = NSUUID().uuidString
         let storageURL = "images/\(FirebaseService.shared.currentUser!.uid)/\(uniqueName).png"
         let date = Date().timeIntervalSince1970
-        FirebaseService.shared.setAd(id: uniqueName, title: adView.adTitle.text!, description: adView.adDescription.text!, imageURL: storageURL, date: date, likes: 0) { success, error in
+        FirebaseService.shared.setAd(userUID: userUID, id: uniqueName, title: adView.adTitle.text!, description: adView.adDescription.text!, imageURL: storageURL, date: date, likes: 0) { success, error in
             if success {
                 self.saveImage(url: storageURL, uniqueName: uniqueName)
             }else {
@@ -62,7 +67,7 @@ class AdController: UIViewController{
         
     }
     
-    func saveImage(url:String, uniqueName:NSUUID) {
+    func saveImage(url:String, uniqueName:String) {
         
         let imageToSave = asImage(view: adView.adImage)
         
@@ -86,8 +91,14 @@ class AdController: UIViewController{
     }
     
    func updateActiveAdsForUser() {
+       
+       guard FirebaseService.shared.currentUser != nil else {
+           presentUIAlertController(title: "message", message: "your are not logged")
+           return}
         let value = FieldValue.increment(Int64(-1))
-        FirebaseService.shared.updateProfile(field: "activeAds", by: value){success,error in
+       
+       
+       FirebaseService.shared.updateProfile(user: FirebaseService.shared.currentUser!.uid, field: "activeAds", by: value){success,error in
             if success {
                 self.navigationController?.popViewController(animated: false)
             }else {

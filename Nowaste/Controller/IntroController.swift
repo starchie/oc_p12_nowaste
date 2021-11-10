@@ -14,7 +14,7 @@ class IntroController: UIViewController {
     var titleLabel = UITextField()
     var register = UIButton()
     var logIn = UIButton()
-    var introView: IntroView!
+    //var introView: IntroView!
 
     
     override func viewWillAppear(_ animated: Bool) {
@@ -26,9 +26,9 @@ class IntroController: UIViewController {
         // Do any additional setup after loading the view.
 
         view.backgroundColor = UIColor(red: 8/255, green: 16/255, blue: 76/255, alpha: 1.0)
-        
-        introView = IntroView(frame: view.frame)
-        view.addSubview(introView)
+        print (FirebaseService.shared.storage)
+        //introView = IntroView(frame: view.frame)
+        //view.addSubview(introView)
         
         titleLabel = UITextField()
         titleLabel.font = UIFont(name: "ArialRoundedMTBold", size: 60)
@@ -67,26 +67,27 @@ class IntroController: UIViewController {
         logIn.titleLabel?.font = UIFont(name: "ArialRoundedMTBold", size: 20)
         view.addSubview(logIn)
         
-        register.addTarget(self, action:#selector(goRegister(_:)), for: .touchUpInside)
-        logIn.addTarget(self, action:#selector(goLogIn(_:)), for: .touchUpInside)
+        register.addTarget(self, action:#selector(goRegister), for: .touchUpInside)
+        logIn.addTarget(self, action:#selector(goLogIn), for: .touchUpInside)
         
-        
+        /*
         Timer.scheduledTimer(withTimeInterval: 3, repeats: false) { (timer) in
             if FirebaseService.shared.currentUser != nil {
                 let vc = ListController()
                 self.navigationController?.pushViewController(vc, animated: false)
             }
         }
+         */
         
            
     }
     
-    @objc func goLogIn(_ sender:UIButton) {
+    @objc func goLogIn() {
         let vc = LogInController()
         self.navigationController?.pushViewController(vc, animated: false)
     }
     
-    @objc func goRegister(_ sender:UIButton) {
+    @objc func goRegister() {
         let vc = RegisterController()
         self.navigationController?.pushViewController(vc, animated: false)
     }
