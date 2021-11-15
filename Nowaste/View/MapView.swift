@@ -54,10 +54,12 @@ class MapView: MKMapView {
         
         setCameraBoundary(MKMapView.CameraBoundary(coordinateRegion: region),animated: true)
         
+        
        let zoomRange = MKMapView.CameraZoomRange(maxCenterCoordinateDistance: 2000)
         setCameraZoomRange(zoomRange, animated: true)
         
         centerToLocation(location, regionRadius: CLLocationDistance(distance))
+        
         
     }
 

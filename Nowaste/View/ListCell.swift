@@ -27,11 +27,11 @@ class ListCell: UITableViewCell {
     override init(style: UITableViewCell.CellStyle, reuseIdentifier: String?) {
         super.init(style: style, reuseIdentifier: reuseIdentifier)
         
-        self.backgroundColor = UIColor(red: 8/255, green: 16/255, blue: 76/255, alpha: 1.0)
+        self.backgroundColor =  UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
         
         circleView = UIView()
         circleView.frame = CGRect(x: 4, y: 4, width: 40, height: 40)
-        circleView.backgroundColor = UIColor(red: 80/255, green: 140/255, blue: 80/255, alpha: 1.0)
+        circleView.backgroundColor = .white
         circleView.layer.cornerRadius = 20
         self.addSubview(circleView)
         

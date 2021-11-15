@@ -20,12 +20,9 @@ class LogInController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0)
-        navigationController?.navigationBar.standardAppearance = appearance;
-        navigationController?.navigationBar.scrollEdgeAppearance = navigationController?.navigationBar.standardAppearance
-        navigationController?.navigationBar.isTranslucent = false
+      
+        navigationController?.navigationBar.isHidden = false
+      
         navigationController?.navigationBar.tintColor = .white
     }
     
@@ -60,6 +57,8 @@ class LogInController: UIViewController {
     
     
     @objc func login () {
+        self.goMap()
+        /*
         FirebaseService.shared.login(mail: logInView.mail.text!, pwd: logInView.password.text!) { success, error in
             if success {
                 self.goMap()
@@ -68,6 +67,7 @@ class LogInController: UIViewController {
             }
  
         }
+         */
     }
     
     

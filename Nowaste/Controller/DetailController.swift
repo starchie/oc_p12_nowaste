@@ -9,6 +9,74 @@ import UIKit
 
 class DetailController: UIViewController {
     
+ 
+    var index:Int!
+    var detailView:DetailView!
+    
+    override func viewDidLoad() {
+        super.viewDidLoad()
+        
+        let selectedItem = FirebaseService.shared.ads[index]
+        
+        detailView = DetailView(frame: CGRect(x: 20.0, y: 467.0, width: 335.0, height: 160.0) )
+
+        self.view.addSubview(detailView)
+        
+        self.detailView.itemTitle.text = FirebaseService.shared.ads[self.index].title
+        /*
+        let attribText = NSMutableAttributedString(string: detailView.itemTitle.text!)
+        attribText.setAttributes([NSAttributedString.Key.backgroundColor: UIColor.cyan],
+                                 range: NSMakeRange(0, detailView.itemTitle.text!.count))
+        
+        detailView.itemTitle.attributedText = attribText
+         */
+        FirebaseService.shared.loadImage(selectedItem.imageURL) { success,error,image in
+            if success {
+                self.detailView.itemImage.image = UIImage(data: image!)
+                
+            }else {
+                self.presentUIAlertController(title: "erreur", message: error!)
+            }
+            
+        }
+        
+        UIView.animate(withDuration: 1, delay: 0, usingSpringWithDamping: 0.4, initialSpringVelocity: 0.3, options: [], animations: {
+            
+            self.detailView.frame = self.view.frame
+        }, completion: { (finished: Bool) in
+            self.detailView.updateViews()
+            
+            self.detailView.itemDescription.text = FirebaseService.shared.ads[self.index].description
+            self.detailView.countView.text = String(FirebaseService.shared.ads[self.index].likes)
+            
+        
+            
+        })
+        
+        
+        
+    }
+    
+   
+    
+    //MARK: -  ALERT CONTROLLER
+    
+    private func presentUIAlertController(title:String, message:String) {
+        let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+        present(ac, animated: true, completion: nil)
+    }
+    
+   
+    
+}
+
+
+
+
+/*
+class DetailController: UIViewController {
+    
     var dynamicView:DynamicView!
     var detailview: DetailView!
     var index:Int!
@@ -22,13 +90,7 @@ class DetailController: UIViewController {
     }
 
     override func viewWillAppear(_ animated: Bool) {
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0)
-        navigationController?.navigationBar.standardAppearance = appearance;
-        navigationController?.navigationBar.scrollEdgeAppearance = navigationController?.navigationBar.standardAppearance
-        navigationController?.navigationBar.isTranslucent = false
-        navigationController?.navigationBar.tintColor = .white
+
         
     }
     
@@ -104,4 +166,4 @@ class DetailController: UIViewController {
     }
     
 }
-    
+*/

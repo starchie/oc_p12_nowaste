@@ -29,14 +29,6 @@ class HorizontalScrollController: UIViewController {
 
     override func viewWillAppear(_ animated: Bool) {
         
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0)
-        navigationController?.navigationBar.standardAppearance = appearance;
-        navigationController?.navigationBar.scrollEdgeAppearance = navigationController?.navigationBar.standardAppearance
-        navigationController?.navigationBar.isTranslucent = false
-        navigationController?.navigationBar.tintColor = .white
-        
     }
     
     override func viewDidLoad() {
@@ -45,15 +37,15 @@ class HorizontalScrollController: UIViewController {
         // BACKGROUND (COPY OF PREVIOUS CONTROLLER)
         view.backgroundColor = .clear
         view.addSubview(backgroundView)
-        view.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapTopView)))
+        view.addGestureRecognizer(UIPanGestureRecognizer(target: self, action: #selector(didTapTopView(_:))))
         backgroundView.isUserInteractionEnabled = true
        
         
         // VIEW
         let width: CGFloat = view.frame.width
-        let height: CGFloat = view.frame.height - topBarHeight - 200
+        let height: CGFloat = view.frame.height
         
-        dynamicView = DynamicView(frame: CGRect(x: 0, y: 200, width: width, height: height) )
+        dynamicView = DynamicView(frame: CGRect(x: 0, y: 0, width: width, height: height) )
         dynamicView.alpha = 0.8
        
         view.addSubview(dynamicView)
@@ -71,8 +63,10 @@ class HorizontalScrollController: UIViewController {
                                 y: (view.frame.maxY - topBarHeight) - 150,
                                 width: width,
                                 height: 130)
-        //listView.backgroundColor = .blue
+        listView.backgroundColor = .blue
         view.addSubview(self.listView)
+        
+   
         
         // CREATE LIST SUBVIEWS
         if listView.subviews.count < FirebaseService.shared.ads.count {
@@ -129,7 +123,7 @@ class HorizontalScrollController: UIViewController {
         
         if backButton.center.y < self.view.center.y {
             detailview.isHidden = true
-            dynamicView.animReversse()
+            dynamicView.animReturnToStart()
             listView.isHidden = false
             backButton.frame = CGRect(x: view.frame.midX - 10,
                                       y: (view.frame.maxY - topBarHeight) - 150 - 20,
@@ -142,8 +136,13 @@ class HorizontalScrollController: UIViewController {
   
     }
     
-    @objc func didTapTopView(_ tap: UITapGestureRecognizer) {
-        navigationController?.popViewController(animated: false)
+    @objc func didTapTopView(_ sender: UIPanGestureRecognizer) {
+        if sender.state == .began {
+            print("🔴ksdbqhsdhjq")
+            navigationController?.popViewController(animated: false)
+           }
+        
+       
     }
     
     

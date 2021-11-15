@@ -23,14 +23,15 @@ class RegisterController: UIViewController {
     }
     
     override func viewWillAppear(_ animated: Bool) {
+        /*
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = UIColor(red: 80/255, green: 140/255, blue: 80/255, alpha: 1.0)
         navigationController?.navigationBar.standardAppearance = appearance;
         navigationController?.navigationBar.scrollEdgeAppearance = navigationController?.navigationBar.standardAppearance
-        
-       
         navigationController?.navigationBar.isTranslucent = false
+         */
+        navigationController?.navigationBar.isHidden = false
         navigationController?.navigationBar.tintColor = .white
     }
 

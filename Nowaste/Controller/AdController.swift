@@ -48,14 +48,18 @@ class AdController: UIViewController{
     //MARK: - ACTION
     
     @objc func saveAd(_ sender:UIButton) {
+       
         guard FirebaseService.shared.currentUser != nil else {
+            
             self.presentUIAlertController(title: "Enregistrement", message: "You are not connected")
             return
         }
+        
         let userUID = FirebaseService.shared.currentUser!.uid
         let uniqueName:String = NSUUID().uuidString
         let storageURL = "images/\(FirebaseService.shared.currentUser!.uid)/\(uniqueName).png"
         let date = Date().timeIntervalSince1970
+        
         FirebaseService.shared.setAd(userUID: userUID, id: uniqueName, title: adView.adTitle.text!, description: adView.adDescription.text!, imageURL: storageURL, date: date, likes: 0) { success, error in
             if success {
                 self.saveImage(url: storageURL, uniqueName: uniqueName)

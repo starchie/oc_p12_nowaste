@@ -10,9 +10,9 @@ import UIKit
 class DynamicView: UIView {
 
 
-    var pathStart: UIBezierPath!
-    var pathEnd: UIBezierPath!
-    var pathInit: UIBezierPath!
+    var pathMiddle: UIBezierPath!
+    var pathFull: UIBezierPath!
+    var pathLow: UIBezierPath!
     
     let shapeLayer = CAShapeLayer()
     let animation = CASpringAnimation(keyPath: "path")
@@ -22,15 +22,15 @@ class DynamicView: UIView {
         super.init(frame: frame)
         self.backgroundColor = .clear
         
-        self.shapeInit()
-        self.shapeStart()
-        self.shapeEnd()
+        self.shapeLow()
+        self.shapeMiddle()
+        self.shapeFull()
         
-        shapeLayer.path = self.pathInit.cgPath
-        shapeLayer.fillColor = UIColor.white.cgColor
+        shapeLayer.path = self.pathLow.cgPath
+        shapeLayer.fillColor =  UIColor(red: 80/255, green: 140/255, blue: 80/255, alpha: 1.0).cgColor
         
         self.layer.addSublayer(shapeLayer)
-        self.animInit()
+        
         
     }
      
@@ -40,49 +40,49 @@ class DynamicView: UIView {
        
     }
     
-    func shapeInit() {
+    func shapeLow() {
         // Initialize the path.
-        pathInit = UIBezierPath()
+        pathLow = UIBezierPath()
   
-        pathInit.move(to: CGPoint(x: 0.0, y: self.frame.height - 50) )
+        pathLow.move(to: CGPoint(x: 0.0, y: self.frame.height - 0) )
         
-        pathInit.addLine(to: CGPoint(x: self.frame.width, y: self.frame.height - 50) )
+        pathLow.addLine(to: CGPoint(x: self.frame.width, y: self.frame.height - 0) )
         
-        pathInit.addLine(to: CGPoint(x: self.frame.width, y: self.frame.height))
-        pathInit.addLine(to: CGPoint(x: 0, y: self.frame.size.height))
-        pathInit.close()
+        pathLow.addLine(to: CGPoint(x: self.frame.width, y: self.frame.height))
+        pathLow.addLine(to: CGPoint(x: 0, y: self.frame.size.height))
+        pathLow.close()
  
     }
     
 
-    func shapeStart() {
+    func shapeMiddle() {
         // Initialize the path.
-        pathStart = UIBezierPath()
+        pathMiddle = UIBezierPath()
   
-        pathStart.move(to: CGPoint(x: 0.0, y: self.frame.height - 200) )
+        pathMiddle.move(to: CGPoint(x: 0.0, y: self.frame.height - 200) )
         //pathStart.addLine(to: CGPoint(x: self.frame.width, y: 50) )
-        pathStart.addCurve(to: CGPoint(x: self.frame.width, y: self.frame.height - 200),
+        pathMiddle.addCurve(to: CGPoint(x: self.frame.width, y: self.frame.height - 200),
                       controlPoint1: CGPoint(x: self.frame.width / 4, y: self.frame.height - 150),
                       controlPoint2:CGPoint(x: self.frame.width - self.frame.width / 4, y: self.frame.height - 150))
         
-        pathStart.addLine(to: CGPoint(x: self.frame.width, y: self.frame.size.height))
-        pathStart.addLine(to: CGPoint(x: 0, y: self.frame.size.height))
-        pathStart.close()
+        pathMiddle.addLine(to: CGPoint(x: self.frame.width, y: self.frame.size.height))
+        pathMiddle.addLine(to: CGPoint(x: 0, y: self.frame.size.height))
+        pathMiddle.close()
  
     }
     
-    func shapeEnd() {
+    func shapeFull() {
         // Initialize the path.
-        pathEnd = UIBezierPath()
+        pathFull = UIBezierPath()
   
-        pathEnd.move(to: CGPoint(x: 0.0, y: 50) )
-        pathEnd.addCurve(to: CGPoint(x: self.frame.width, y: 50),
+        pathFull.move(to: CGPoint(x: 0.0, y: 50) )
+        pathFull.addCurve(to: CGPoint(x: self.frame.width, y: 50),
                       controlPoint1: CGPoint(x: self.frame.width / 4, y: 0),
                       controlPoint2:CGPoint(x: self.frame.width - self.frame.width / 4, y: 0))
         
-        pathEnd.addLine(to: CGPoint(x: self.frame.width, y: self.frame.height))
-        pathEnd.addLine(to: CGPoint(x: 0, y: self.frame.height))
-        pathEnd.close()
+        pathFull.addLine(to: CGPoint(x: self.frame.width, y: self.frame.height))
+        pathFull.addLine(to: CGPoint(x: 0, y: self.frame.height))
+        pathFull.close()
  
     }
     
@@ -92,7 +92,7 @@ class DynamicView: UIView {
         animation.initialVelocity = 1
         animation.stiffness = 800
         animation.duration =  animation.settlingDuration
-        animation.toValue = pathStart.cgPath
+        animation.toValue = pathMiddle.cgPath
         
         animation.isRemovedOnCompletion = false
         animation.fillMode = CAMediaTimingFillMode.forwards;
@@ -112,7 +112,7 @@ class DynamicView: UIView {
         animation.initialVelocity = 1
         animation.stiffness = 800
         animation.duration =  animation.settlingDuration
-        animation.toValue = pathEnd.cgPath
+        animation.toValue = pathFull.cgPath
         
         animation.isRemovedOnCompletion = false
         animation.fillMode = CAMediaTimingFillMode.forwards;
@@ -125,20 +125,21 @@ class DynamicView: UIView {
         
     }
     
-    func animReversse() {
+    func animReturnToStart() {
         CATransaction.begin()
         animation.damping = 20
         animation.initialVelocity = 1
         animation.stiffness = 800
         animation.duration =  animation.settlingDuration
-        animation.toValue = pathStart.cgPath
+        animation.toValue = pathLow.cgPath
         
         animation.isRemovedOnCompletion = false
         animation.fillMode = CAMediaTimingFillMode.forwards;
         
         CATransaction.setCompletionBlock {
-            self.shapeLayer.path = self.pathStart.cgPath
+            self.shapeLayer.path = self.pathLow.cgPath
             self.shapeLayer.removeAllAnimations()
+            self.isHidden = true
         }
     
         shapeLayer.add(animation, forKey: nil)

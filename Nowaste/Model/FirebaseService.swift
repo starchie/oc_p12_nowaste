@@ -240,7 +240,6 @@ class FirebaseService {
             self.profiles.removeAll()
             
             for document in snapshot.documents {
-                print (document.data())
                 let newItem = Profile(snapshot: document.data())
                 self.profiles.append(newItem!)
                 
@@ -254,9 +253,8 @@ class FirebaseService {
     
     func querryProfile(filter:String, completionHandler: @escaping ((Bool, String? ) -> Void)){
         let selection:Query = db.collection("users").whereField("id", isEqualTo: filter)
-        
+       
         selection.getDocuments(completion: { (querySnapshot, error) in
-            
             guard let querySnapshot = querySnapshot, error == nil else {
                 completionHandler(false, error?.localizedDescription)
                 return
@@ -264,6 +262,12 @@ class FirebaseService {
             for document in querySnapshot.documents {
                 let profile = Profile(snapshot: document.data())
                 self.profile = profile
+
+            }
+            guard self.profile != nil else {
+                completionHandler(false, error?.localizedDescription)
+                return
+                
             }
             completionHandler(true, nil)
         } )
@@ -280,6 +284,7 @@ class FirebaseService {
                 completionHandler(false,error?.localizedDescription)
                 return
             }
+           
             completionHandler(true,nil)
             
         }
@@ -296,7 +301,6 @@ class FirebaseService {
             }
             self.ads.removeAll()
             for document in querySnapshot.documents {
-                print(document.data())
                 let newAd = Ad(snapshot: document.data())
                 self.ads.append(newAd!)
             }

@@ -37,7 +37,7 @@ class ListController: UIViewController {
         
         // NAVIGATION BAR
         navigationController?.navigationBar.isHidden = false
-        
+        /*
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
         appearance.backgroundColor = UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0)
@@ -45,22 +45,32 @@ class ListController: UIViewController {
         navigationController?.navigationBar.scrollEdgeAppearance = navigationController?.navigationBar.standardAppearance
         navigationController?.navigationBar.isTranslucent = false
         navigationController?.navigationBar.tintColor = .white
-        
+        */
         // BUTTON TO ADD AN ADVERT
         addButton = UIButton(type: .system)
+        addButton.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
         addButton.setBackgroundImage(UIImage(systemName: "plus.circle"), for: .normal)
+        //addButton.backgroundColor = .white
+        addButton.layer.cornerRadius = addButton.frame.width / 2
         addButton.addTarget(self, action:#selector(addFunction), for: .touchUpInside)
         addButton.tintColor = .init(white: 1.0, alpha: 1.0)
         
         mapButton = UIButton(type: .system)
-        mapButton.setBackgroundImage(UIImage(systemName: "map"), for: .normal)
+        mapButton.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+        mapButton.setBackgroundImage(UIImage(systemName: "map.circle"), for: .normal)
+        //mapButton.backgroundColor = .white
+        mapButton.layer.cornerRadius = mapButton.frame.width / 2
         mapButton.addTarget(self, action:#selector(mapFunction), for: .touchUpInside)
         mapButton.tintColor = .init(white: 1.0, alpha: 1.0)
         
         searchButton = UIButton(type: .system)
+        searchButton.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
         searchButton.setBackgroundImage(UIImage(systemName: "magnifyingglass.circle"), for: .normal)
+        //searchButton.backgroundColor = .white
+        searchButton.layer.cornerRadius = searchButton.frame.width / 2
         searchButton.tintColor = .init(white: 1.0, alpha: 1.0)
         searchButton.addTarget(self, action:#selector(displaySearchToggle), for: .touchUpInside)
+
         
         self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: mapButton),UIBarButtonItem(customView: addButton),UIBarButtonItem(customView: searchButton)]
 
@@ -76,23 +86,23 @@ class ListController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        view.backgroundColor = UIColor(red: 8/255, green: 16/255, blue: 76/255, alpha: 1.0)
-        
+        //view.backgroundColor = UIColor(red: 8/255, green: 16/255, blue: 76/255, alpha: 1.0)
+        view.backgroundColor = UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
         // SEARCHVIEW
         searchView = SearchView(frame: view.frame)
         view.addSubview(searchView)
         searchView.isHidden = true
         
-        searchView.searchButton.addTarget(self, action:#selector(searchFunction), for: .touchUpInside)
+        searchView.goButton.addTarget(self, action:#selector(searchFunction), for: .touchUpInside)
         searchView.slider.addTarget(self, action: #selector(changeRadius), for: .touchUpInside)
         
         // TABLEVIEW
         tableView = UITableView()
-        tableView.backgroundColor = UIColor(red: 8/255, green: 16/255, blue: 76/255, alpha: 1.0)
+        tableView.backgroundColor =  UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
         tableView.frame = CGRect(x: 0,
-                                 y: searchView.frame.maxY,
+                                 y: 0,
                                  width: view.frame.width,
-                                 height: view.frame.height - searchView.frame.height)
+                                 height: view.frame.height)
         
         tableView.delegate = self
         tableView.dataSource = self
@@ -141,15 +151,25 @@ class ListController: UIViewController {
     @objc func displaySearchToggle(_ sender:UIButton) {
         if searchView.isHidden {
             searchView.isHidden = false
+            searchView.animPlay()
+        
+            UIView.animate(withDuration: 0.5, delay: 0,usingSpringWithDamping: 0.3, initialSpringVelocity: 0.4, options: [.curveLinear], animations: {
+                self.tableView.frame = CGRect(x: 0, y: 200, width: self.view.frame.width, height: self.view.frame.height - 200)
+            }, completion: nil)
+            
         }else{
-            searchView.isHidden = true
+            searchView.animReturnToStart()
+            UIView.animate(withDuration: 0.5, delay: 0,usingSpringWithDamping: 0.3, initialSpringVelocity: 0.4, options: [.curveLinear], animations: {
+                self.tableView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height)
+            }, completion: nil)
+          
         }
     }
     
     @objc func searchFunction(_ sender:UIButton) {
         selectedRow = nil
         selectedProfiles.removeAll()
-        search(searchView.searchText.text)
+        search(searchView.searchText.text ?? "")
     }
     
     @objc func changeRadius(_ sender:UIButton) {
