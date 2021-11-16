@@ -20,6 +20,7 @@ class MapController: UIViewController {
     var addButton: UIButton!
     var listButton:UIButton!
     var searchButton:UIButton!
+    var profileButton:UIButton!
     
     var dynamicView:DynamicView!
     
@@ -54,9 +55,17 @@ class MapController: UIViewController {
         searchButton.layer.cornerRadius = searchButton.frame.width / 2
         searchButton.tintColor = .init(white: 1.0, alpha: 1.0)
         searchButton.addTarget(self, action:#selector(displaySearchToggle), for: .touchUpInside)
+        
+        profileButton = UIButton(type: .system)
+        profileButton.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+        profileButton.setBackgroundImage(UIImage(systemName: "person.circle"), for: .normal)
+        //searchButton.backgroundColor = .white
+        profileButton.layer.cornerRadius = profileButton.frame.width / 2
+        profileButton.tintColor = .init(white: 1.0, alpha: 1.0)
+        profileButton.addTarget(self, action:#selector(profileFunction), for: .touchUpInside)
 
 
-        self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: listButton),UIBarButtonItem(customView: addButton),UIBarButtonItem(customView: searchButton) ]
+        self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: listButton),UIBarButtonItem(customView: addButton),UIBarButtonItem(customView: searchButton), UIBarButtonItem(customView: profileButton) ]
  
     }
     
@@ -160,6 +169,11 @@ class MapController: UIViewController {
     
     @objc func listFunction(_ sender:UIButton) {
         let vc = ListController()
+        self.navigationController?.pushViewController(vc, animated: false)
+    }
+    
+    @objc func profileFunction(_ sender:UIButton) {
+        let vc = ProfileController()
         self.navigationController?.pushViewController(vc, animated: false)
     }
     

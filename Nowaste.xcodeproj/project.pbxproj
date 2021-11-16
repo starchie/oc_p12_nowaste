@@ -43,8 +43,9 @@
 		CA51225B27328FAB0063D5A1 /* IntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA51225A27328FAB0063D5A1 /* IntroView.swift */; };
 		CA86F51527399B4F00280393 /* NowasteUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA86F51427399B4F00280393 /* NowasteUITests.swift */; };
 		CA86F51727399B4F00280393 /* NowasteUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA86F51627399B4F00280393 /* NowasteUITestsLaunchTests.swift */; };
+		CAA4E149274312AE007A33F4 /* ProfileController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA4E148274312AE007A33F4 /* ProfileController.swift */; };
+		CAA4E14B2743DE28007A33F4 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA4E14A2743DE28007A33F4 /* ProfileView.swift */; };
 		CAA9A2F9273953E7009BD14D /* NowasteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA9A2F8273953E7009BD14D /* NowasteTests.swift */; };
-		CAD3FD4C2730746B00D01CA9 /* HorizontalScrollController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD3FD4B2730746B00D01CA9 /* HorizontalScrollController.swift */; };
 		CAD3FD4E273082E900D01CA9 /* HorizontalScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD3FD4D273082E900D01CA9 /* HorizontalScrollView.swift */; };
 		CAD3FD502730972000D01CA9 /* DetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD3FD4F2730972000D01CA9 /* DetailController.swift */; };
 		CAD3FD52273128F300D01CA9 /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD3FD51273128F300D01CA9 /* DetailView.swift */; };
@@ -101,9 +102,10 @@
 		CA86F51227399B4F00280393 /* NowasteUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NowasteUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA86F51427399B4F00280393 /* NowasteUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowasteUITests.swift; sourceTree = "<group>"; };
 		CA86F51627399B4F00280393 /* NowasteUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowasteUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		CAA4E148274312AE007A33F4 /* ProfileController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileController.swift; sourceTree = "<group>"; };
+		CAA4E14A2743DE28007A33F4 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		CAA9A2F6273953E7009BD14D /* NowasteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NowasteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAA9A2F8273953E7009BD14D /* NowasteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowasteTests.swift; sourceTree = "<group>"; };
-		CAD3FD4B2730746B00D01CA9 /* HorizontalScrollController.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontalScrollController.swift; sourceTree = "<group>"; };
 		CAD3FD4D273082E900D01CA9 /* HorizontalScrollView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontalScrollView.swift; sourceTree = "<group>"; };
 		CAD3FD4F2730972000D01CA9 /* DetailController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailController.swift; sourceTree = "<group>"; };
 		CAD3FD51273128F300D01CA9 /* DetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
@@ -195,8 +197,8 @@
 				CA4AE31F272B45CD00C444D8 /* IntroController.swift */,
 				CA4AE321272B473300C444D8 /* LogInController.swift */,
 				CA4AE323272B473C00C444D8 /* RegisterController.swift */,
+				CAA4E148274312AE007A33F4 /* ProfileController.swift */,
 				CA4AE2FA272B2EDD00C444D8 /* MapController.swift */,
-				CAD3FD4B2730746B00D01CA9 /* HorizontalScrollController.swift */,
 				CA4AE336272E777100C444D8 /* ListController.swift */,
 				CAD3FD4F2730972000D01CA9 /* DetailController.swift */,
 				CA4AE332272C341700C444D8 /* AdController.swift */,
@@ -210,6 +212,7 @@
 				CA51225A27328FAB0063D5A1 /* IntroView.swift */,
 				CA4AE327272B478400C444D8 /* LogInView.swift */,
 				CA4AE326272B478400C444D8 /* RegisterView.swift */,
+				CAA4E14A2743DE28007A33F4 /* ProfileView.swift */,
 				CA4AE348272F34A000C444D8 /* SearchView.swift */,
 				CA4AE32A272BFDC500C444D8 /* MapView.swift */,
 				CA4AE32E272BFDE700C444D8 /* AnnotationView.swift */,
@@ -395,15 +398,16 @@
 				CA5122552731624F0063D5A1 /* DynamicView.swift in Sources */,
 				CA4AE32B272BFDC500C444D8 /* MapView.swift in Sources */,
 				CA5122592731EA6B0063D5A1 /* LikesView.swift in Sources */,
+				CAA4E14B2743DE28007A33F4 /* ProfileView.swift in Sources */,
 				CA4AE2FB272B2EDD00C444D8 /* MapController.swift in Sources */,
 				CA4AE319272B38A200C444D8 /* Profile.swift in Sources */,
-				CAD3FD4C2730746B00D01CA9 /* HorizontalScrollController.swift in Sources */,
 				CA4AE32F272BFDE700C444D8 /* AnnotationView.swift in Sources */,
 				CA512257273180070063D5A1 /* StarsView.swift in Sources */,
 				CA4AE349272F34A100C444D8 /* SearchView.swift in Sources */,
 				CA4AE329272B478400C444D8 /* LogInView.swift in Sources */,
 				CA4AE333272C341700C444D8 /* AdController.swift in Sources */,
 				CA4AE331272C336D00C444D8 /* AdView.swift in Sources */,
+				CAA4E149274312AE007A33F4 /* ProfileController.swift in Sources */,
 				CA4AE322272B473300C444D8 /* LogInController.swift in Sources */,
 				CA51225B27328FAB0063D5A1 /* IntroView.swift in Sources */,
 				CA4AE2F7272B2EDD00C444D8 /* AppDelegate.swift in Sources */,

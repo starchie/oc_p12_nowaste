@@ -17,7 +17,7 @@ class AppDelegate: UIResponder, UIApplicationDelegate {
         // Override point for customization after application launch.
         
         FirebaseApp.configure()
-        //Firestore.firestore().settings.isPersistenceEnabled = false
+        Firestore.firestore().settings.isPersistenceEnabled = false
         
         // Checking if unit tests are running
         

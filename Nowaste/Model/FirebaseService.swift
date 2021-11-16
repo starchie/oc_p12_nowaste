@@ -161,6 +161,7 @@ class FirebaseService {
         }
     }
     
+    
     //MARK: - AUTHENTICATION
     
     // LOGIN
@@ -342,6 +343,17 @@ class FirebaseService {
             completionHandler(true,nil)
         }
         
+    }
+    
+    func deleteAd (id:String, completionHandler: @escaping ((Bool, String? ) -> Void)){
+        db.collection("ads").document(id).delete() { error in
+            guard error == nil  else {
+                completionHandler(false,error?.localizedDescription)
+                return
+            }
+            completionHandler(true,nil)
+            
+        }
     }
     
 
