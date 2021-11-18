@@ -40,7 +40,7 @@ class SearchView: UIView {
         self.shapeFull()
         
         shapeLayer.path = self.pathLow.cgPath
-        shapeLayer.fillColor =  UIColor(white: 1.0, alpha: 0.3).cgColor
+        shapeLayer.fillColor =  UIColor(white: 0.5, alpha: 1.0).cgColor
         
         self.layer.addSublayer(shapeLayer)
         

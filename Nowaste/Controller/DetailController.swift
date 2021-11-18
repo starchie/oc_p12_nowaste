@@ -10,19 +10,34 @@ import UIKit
 class DetailController: UIViewController {
     
  
-    var index:Int!
+    var currentAd: Ad!
     var detailView:DetailView!
+    var favoriteButton:UIButton!
+    var trashButton:UIButton!
+    var isFavorite = false
+    var isUserCreation = false
+
+    
+    
+    override func viewWillAppear(_ animated: Bool) {
+        
+        // NAVIGATION BAR
+        navigationController?.navigationBar.isHidden = false
+    
+        self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: favoriteButton),UIBarButtonItem(customView: trashButton)]
+
+        
+
+    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
-        let selectedItem = FirebaseService.shared.ads[index]
         
         detailView = DetailView(frame: CGRect(x: 20.0, y: 467.0, width: 335.0, height: 160.0) )
 
         self.view.addSubview(detailView)
         
-        self.detailView.itemTitle.text = FirebaseService.shared.ads[self.index].title
+        self.detailView.itemTitle.text = currentAd.title
         /*
         let attribText = NSMutableAttributedString(string: detailView.itemTitle.text!)
         attribText.setAttributes([NSAttributedString.Key.backgroundColor: UIColor.cyan],
@@ -30,7 +45,7 @@ class DetailController: UIViewController {
         
         detailView.itemTitle.attributedText = attribText
          */
-        FirebaseService.shared.loadImage(selectedItem.imageURL) { success,error,image in
+        FirebaseService.shared.loadImage(currentAd.imageURL) { success,error,image in
             if success {
                 self.detailView.itemImage.image = UIImage(data: image!)
                 
@@ -46,12 +61,40 @@ class DetailController: UIViewController {
         }, completion: { (finished: Bool) in
             self.detailView.updateViews()
             
-            self.detailView.itemDescription.text = FirebaseService.shared.ads[self.index].description
-            self.detailView.countView.text = String(FirebaseService.shared.ads[self.index].likes)
+            self.detailView.itemDescription.text = self.currentAd.description
+            self.detailView.countView.text = String(self.currentAd.likes)
             
         
             
         })
+        
+        // BUTTONS
+        favoriteButton = UIButton(type: .system)
+        favoriteButton.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+        favoriteButton.setBackgroundImage(UIImage(systemName: "star"), for: .normal)
+        favoriteButton.layer.cornerRadius = favoriteButton.frame.width / 2
+        favoriteButton.tintColor = .init(white: 1.0, alpha: 1.0)
+        favoriteButton.addTarget(self, action:#selector(toggleFavorite), for: .touchUpInside)
+        
+        trashButton = UIButton(type: .system)
+        trashButton.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
+        trashButton.setBackgroundImage(UIImage(systemName: "trash"), for: .normal)
+        trashButton.layer.cornerRadius = favoriteButton.frame.width / 2
+        trashButton.tintColor = .init(white: 1.0, alpha: 1.0)
+        //trashButton.addTarget(self, action:#selector(toggleFavorite), for: .touchUpInside)
+        
+        if isFavorite {
+            favoriteButton.setImage(UIImage(systemName: "star.fill"), for: .normal)
+        }else {
+            favoriteButton.setImage(UIImage(systemName: "star"), for: .normal)
+        }
+        
+        if isUserCreation {
+            trashButton.isHidden = false
+        }
+        else {
+            trashButton.isHidden = true
+        }
         
         
         
@@ -67,9 +110,66 @@ class DetailController: UIViewController {
         present(ac, animated: true, completion: nil)
     }
     
+    
+    //MARK: -  ACTION
+    
+    func addToFavorite() {
+        
+        FavoriteAd.saveAdToFavorite (userUID: currentAd.addedByUser, id: currentAd.id, title: currentAd.title, description: currentAd.description, imageURL: currentAd.imageURL, date: currentAd.dateField, likes: currentAd.likes)
+
+        presentUIAlertController(title: "Info", message: "Recipe saved")
+        
+        print("🍏 adding ...")
+        print(FavoriteAd.all.count)
+        
+    }
+        
+    func deleteFromFavorite() {
+    
+        FavoriteAd.deleteAd(id: currentAd.id)
+        presentUIAlertController(title: "Info", message: "Recipe deleted")
+     
+        print("🍎 deleting ...")
+        print(FavoriteAd.all.count)
+    }
+    
+    @objc func toggleFavorite() {
+        // Attempt to customize navigation controller...
+        
+        if isFavorite {
+            favoriteButton.setImage(UIImage(systemName: "star"), for: .normal)
+            isFavorite = false
+            deleteFromFavorite()
+        }
+        else {
+            favoriteButton.setImage(UIImage(systemName: "star.fill"), for: .normal)
+            isFavorite = true
+            addToFavorite()
+        }
+
+
+  
+    }
+    
+ 
+    
    
     
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

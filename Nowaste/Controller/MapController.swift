@@ -30,6 +30,7 @@ class MapController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         
         navigationController?.navigationBar.isHidden = false
+        self.navigationItem.hidesBackButton = true
   
         // BUTTON TO ADD AN ADVERT
         addButton = UIButton(type: .system)
@@ -257,7 +258,8 @@ class MapController: UIViewController {
         let index = tap.view!.tag
     
         let vc = DetailController()
-        vc.index = index
+        vc.currentAd = FirebaseService.shared.ads[index]
+        vc.isFavorite = false
         navigationController?.pushViewController(vc, animated: false)
          
         

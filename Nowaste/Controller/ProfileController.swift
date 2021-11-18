@@ -14,6 +14,8 @@ class ProfileController: UIViewController {
     var tableView: UITableView!
     var ads = [Ad]()
     var selection: UILabel!
+    var control:UISegmentedControl!
+    var favorites:[Ad]!
     
     var topBarHeight:CGFloat {
         let scene = UIApplication.shared.connectedScenes.first as! UIWindowScene
@@ -26,6 +28,8 @@ class ProfileController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        favorites = FavoriteAd.all
+        
         view.backgroundColor =  UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
         
         profileView = ProfileView(frame: CGRect(x: 10, y: topBarHeight, width: view.frame.width, height: 60))
@@ -34,11 +38,22 @@ class ProfileController: UIViewController {
          
         profileView.userName.text = FirebaseService.shared.profile.userName
         
+        let items: [String] = ["✍︎","✮"]
+        control = UISegmentedControl(items: items)
+        control.frame = CGRect(x: 10, y: profileView.frame.maxY + 30, width: view.frame.width - 20, height: 30)
+        control.addTarget(self, action: #selector(didChange(_:)), for: .valueChanged)
+        control.backgroundColor = .clear
+        control.selectedSegmentTintColor = .darkGray
+        control.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.white, NSAttributedString.Key.font: UIFont(name: "Helvetica", size: 30.0)!], for: .normal)
+      
+      
+        view.addSubview(control)
+        
         
         selection = UILabel()
         selection.text = " Vos annonces sur NoWaste "
         selection.textColor = .white
-        selection.frame = CGRect(x: 10, y: profileView.frame.maxY + 30, width: view.frame.width, height: 30)
+        selection.frame = CGRect(x: 10, y: control.frame.maxY + 30, width: view.frame.width, height: 30)
         selection.font = UIFont(name: "Chalkduster", size: 18)
         view.addSubview(selection)
         
@@ -65,7 +80,14 @@ class ProfileController: UIViewController {
         // Do any additional setup after loading the view.
     }
     
+    
+    
+    @objc func didChange(_ sender: UISegmentedControl){
+        tableView.reloadData()
+    }
+    
     override func viewWillAppear(_ animated: Bool) {
+        
         FirebaseService.shared.querryAds(filter: FirebaseService.shared.currentUser!.uid) {success, error in
             if success {
                 self.ads = FirebaseService.shared.ads
@@ -77,6 +99,10 @@ class ProfileController: UIViewController {
             }
             
         }
+        
+        favorites = FavoriteAd.all
+        
+        tableView.reloadData()
     }
     
     //MARK: -  ALERT CONTROLLER
@@ -96,7 +122,7 @@ class ProfileController: UIViewController {
         
         FirebaseService.shared.updateProfile(user: FirebaseService.shared.currentUser!.uid, field: "activeAds", by: value){success,error in
              if success {
-                 self.navigationController?.popViewController(animated: false)
+                 self.presentUIAlertController(title: "Suppression", message: "post supprimé avec succés")
              }else {
                  self.presentUIAlertController(title: "Enregistrement", message: error!)
              }
@@ -113,7 +139,11 @@ extension ProfileController:UITableViewDataSource {
     
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return ads.count
+        if control.selectedSegmentIndex == 0 {
+            return ads.count
+        }else{
+            return favorites.count
+        }
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -123,9 +153,16 @@ extension ProfileController:UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
         cell.backgroundColor = UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
-        cell.textLabel?.text = ads[indexPath.row].title
         cell.textLabel?.textColor = .white
         cell.backgroundColor = UIColor(red: 8/255, green: 16/255, blue: 76/255, alpha: 1.0)
+        if control.selectedSegmentIndex == 0 {
+            cell.textLabel?.text = ads[indexPath.row].title
+        }
+        else {
+            cell.textLabel?.text = favorites[indexPath.row].title
+            
+        }
+        
         return cell
     }
     
@@ -146,6 +183,24 @@ extension ProfileController:UITableViewDataSource {
                 }
             }
         
+        
+    }
+    
+    
+    func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        let vc = DetailController()
+        if control.selectedSegmentIndex == 0 {
+            vc.currentAd = FirebaseService.shared.ads[indexPath.row]
+            vc.isUserCreation = true
+            vc.isFavorite = false
+        }
+        else {
+            vc.currentAd = FavoriteAd.all[indexPath.row]
+            vc.isUserCreation = false
+            vc.isFavorite = true
+        }
+       
+        navigationController?.pushViewController(vc, animated: false)
         
     }
 

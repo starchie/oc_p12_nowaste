@@ -38,6 +38,7 @@ class ListController: UIViewController {
         
         // NAVIGATION BAR
         navigationController?.navigationBar.isHidden = false
+        self.navigationItem.hidesBackButton = true
         /*
         let appearance = UINavigationBarAppearance()
         appearance.configureWithOpaqueBackground()
@@ -157,7 +158,8 @@ class ListController: UIViewController {
     // DISPLAY SELECTED AD
     @objc func test(_ sender:UIButton) {
         let vc = DetailController()
-        vc.index = sender.tag - 100
+        vc.currentAd = FirebaseService.shared.ads[sender.tag - 100]
+        vc.isFavorite = false
         navigationController?.pushViewController(vc, animated: false)
         
     }

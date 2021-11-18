@@ -42,10 +42,13 @@
 		CA5122592731EA6B0063D5A1 /* LikesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA5122582731EA6B0063D5A1 /* LikesView.swift */; };
 		CA51225B27328FAB0063D5A1 /* IntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA51225A27328FAB0063D5A1 /* IntroView.swift */; };
 		CA86F51527399B4F00280393 /* NowasteUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA86F51427399B4F00280393 /* NowasteUITests.swift */; };
-		CA86F51727399B4F00280393 /* NowasteUITestsLaunchTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA86F51627399B4F00280393 /* NowasteUITestsLaunchTests.swift */; };
+		CA9B4C8A27444F250025012E /* Nowaste.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = CA9B4C8827444F250025012E /* Nowaste.xcdatamodeld */; };
+		CA9B4C8C274450FF0025012E /* ContainerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9B4C8B274450FF0025012E /* ContainerManager.swift */; };
+		CA9B4C8E274453B00025012E /* FavoriteAd.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9B4C8D274453B00025012E /* FavoriteAd.swift */; };
+		CA9B4C90274541710025012E /* FavoriteAdTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9B4C8F274541710025012E /* FavoriteAdTests.swift */; };
 		CAA4E149274312AE007A33F4 /* ProfileController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA4E148274312AE007A33F4 /* ProfileController.swift */; };
 		CAA4E14B2743DE28007A33F4 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA4E14A2743DE28007A33F4 /* ProfileView.swift */; };
-		CAA9A2F9273953E7009BD14D /* NowasteTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA9A2F8273953E7009BD14D /* NowasteTests.swift */; };
+		CAA9A2F9273953E7009BD14D /* FirebaseServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA9A2F8273953E7009BD14D /* FirebaseServiceTests.swift */; };
 		CAD3FD4E273082E900D01CA9 /* HorizontalScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD3FD4D273082E900D01CA9 /* HorizontalScrollView.swift */; };
 		CAD3FD502730972000D01CA9 /* DetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD3FD4F2730972000D01CA9 /* DetailController.swift */; };
 		CAD3FD52273128F300D01CA9 /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD3FD51273128F300D01CA9 /* DetailView.swift */; };
@@ -101,11 +104,14 @@
 		CA51225A27328FAB0063D5A1 /* IntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = IntroView.swift; path = Nowaste/View/IntroView.swift; sourceTree = SOURCE_ROOT; };
 		CA86F51227399B4F00280393 /* NowasteUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NowasteUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA86F51427399B4F00280393 /* NowasteUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowasteUITests.swift; sourceTree = "<group>"; };
-		CA86F51627399B4F00280393 /* NowasteUITestsLaunchTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowasteUITestsLaunchTests.swift; sourceTree = "<group>"; };
+		CA9B4C8927444F250025012E /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
+		CA9B4C8B274450FF0025012E /* ContainerManager.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = ContainerManager.swift; sourceTree = "<group>"; };
+		CA9B4C8D274453B00025012E /* FavoriteAd.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteAd.swift; sourceTree = "<group>"; };
+		CA9B4C8F274541710025012E /* FavoriteAdTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteAdTests.swift; sourceTree = "<group>"; };
 		CAA4E148274312AE007A33F4 /* ProfileController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileController.swift; sourceTree = "<group>"; };
 		CAA4E14A2743DE28007A33F4 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		CAA9A2F6273953E7009BD14D /* NowasteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NowasteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
-		CAA9A2F8273953E7009BD14D /* NowasteTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowasteTests.swift; sourceTree = "<group>"; };
+		CAA9A2F8273953E7009BD14D /* FirebaseServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseServiceTests.swift; sourceTree = "<group>"; };
 		CAD3FD4D273082E900D01CA9 /* HorizontalScrollView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontalScrollView.swift; sourceTree = "<group>"; };
 		CAD3FD4F2730972000D01CA9 /* DetailController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailController.swift; sourceTree = "<group>"; };
 		CAD3FD51273128F300D01CA9 /* DetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
@@ -172,6 +178,7 @@
 				CA4AE301272B2EE000C444D8 /* LaunchScreen.storyboard */,
 				CA4AE2FC272B2EDD00C444D8 /* Main.storyboard */,
 				CA4AE2F6272B2EDD00C444D8 /* AppDelegate.swift */,
+				CA9B4C8B274450FF0025012E /* ContainerManager.swift */,
 				CA4AE2F8272B2EDD00C444D8 /* SceneDelegate.swift */,
 				CA4AE304272B2EE000C444D8 /* Info.plist */,
 				CA4AE313272B30B400C444D8 /* GoogleService-Info.plist */,
@@ -183,6 +190,8 @@
 			isa = PBXGroup;
 			children = (
 				CA4AE32C272BFDDF00C444D8 /* Annotation.swift */,
+				CA9B4C8827444F250025012E /* Nowaste.xcdatamodeld */,
+				CA9B4C8D274453B00025012E /* FavoriteAd.swift */,
 				CA4AE311272B2FB700C444D8 /* FirebaseService.swift */,
 				CA4AE316272B380100C444D8 /* Ad.swift */,
 				CA4AE318272B38A200C444D8 /* Profile.swift */,
@@ -231,7 +240,6 @@
 			isa = PBXGroup;
 			children = (
 				CA86F51427399B4F00280393 /* NowasteUITests.swift */,
-				CA86F51627399B4F00280393 /* NowasteUITestsLaunchTests.swift */,
 			);
 			path = NowasteUITests;
 			sourceTree = "<group>";
@@ -239,7 +247,8 @@
 		CAA9A2F7273953E7009BD14D /* NowasteTests */ = {
 			isa = PBXGroup;
 			children = (
-				CAA9A2F8273953E7009BD14D /* NowasteTests.swift */,
+				CAA9A2F8273953E7009BD14D /* FirebaseServiceTests.swift */,
+				CA9B4C8F274541710025012E /* FavoriteAdTests.swift */,
 			);
 			path = NowasteTests;
 			sourceTree = "<group>";
@@ -394,7 +403,9 @@
 				CA4AE324272B473C00C444D8 /* RegisterController.swift in Sources */,
 				CA4AE320272B45CD00C444D8 /* IntroController.swift in Sources */,
 				CA4AE337272E777200C444D8 /* ListController.swift in Sources */,
+				CA9B4C8C274450FF0025012E /* ContainerManager.swift in Sources */,
 				CA4AE317272B380100C444D8 /* Ad.swift in Sources */,
+				CA9B4C8E274453B00025012E /* FavoriteAd.swift in Sources */,
 				CA5122552731624F0063D5A1 /* DynamicView.swift in Sources */,
 				CA4AE32B272BFDC500C444D8 /* MapView.swift in Sources */,
 				CA5122592731EA6B0063D5A1 /* LikesView.swift in Sources */,
@@ -404,6 +415,7 @@
 				CA4AE32F272BFDE700C444D8 /* AnnotationView.swift in Sources */,
 				CA512257273180070063D5A1 /* StarsView.swift in Sources */,
 				CA4AE349272F34A100C444D8 /* SearchView.swift in Sources */,
+				CA9B4C8A27444F250025012E /* Nowaste.xcdatamodeld in Sources */,
 				CA4AE329272B478400C444D8 /* LogInView.swift in Sources */,
 				CA4AE333272C341700C444D8 /* AdController.swift in Sources */,
 				CA4AE331272C336D00C444D8 /* AdView.swift in Sources */,
@@ -423,7 +435,6 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CA86F51727399B4F00280393 /* NowasteUITestsLaunchTests.swift in Sources */,
 				CA86F51527399B4F00280393 /* NowasteUITests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
@@ -432,7 +443,8 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
-				CAA9A2F9273953E7009BD14D /* NowasteTests.swift in Sources */,
+				CA9B4C90274541710025012E /* FavoriteAdTests.swift in Sources */,
+				CAA9A2F9273953E7009BD14D /* FirebaseServiceTests.swift in Sources */,
 			);
 			runOnlyForDeploymentPostprocessing = 0;
 		};
@@ -593,6 +605,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = YT8Z52P22T;
 				INFOPLIST_FILE = Nowaste/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -611,6 +624,7 @@
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
 				ASSETCATALOG_COMPILER_GLOBAL_ACCENT_COLOR_NAME = AccentColor;
 				CODE_SIGN_STYLE = Automatic;
+				DEVELOPMENT_TEAM = YT8Z52P22T;
 				INFOPLIST_FILE = Nowaste/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
 					"$(inherited)",
@@ -805,6 +819,19 @@
 			productName = GeoFireUtils;
 		};
 /* End XCSwiftPackageProductDependency section */
+
+/* Begin XCVersionGroup section */
+		CA9B4C8827444F250025012E /* Nowaste.xcdatamodeld */ = {
+			isa = XCVersionGroup;
+			children = (
+				CA9B4C8927444F250025012E /* Model.xcdatamodel */,
+			);
+			currentVersion = CA9B4C8927444F250025012E /* Model.xcdatamodel */;
+			path = Nowaste.xcdatamodeld;
+			sourceTree = "<group>";
+			versionGroupType = wrapper.xcdatamodel;
+		};
+/* End XCVersionGroup section */
 	};
 	rootObject = CA4AE2EB272B2EDD00C444D8 /* Project object */;
 }

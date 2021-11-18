@@ -7,9 +7,29 @@
 
 import UIKit
 import Firebase
+import CoreData
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
+    
+    // MARK: - COREDATA
+    
+    static var container = ContainerManager().persistentContainer
+    
+    static var persistentContainer: NSPersistentContainer {
+        return (UIApplication.shared.delegate as! AppDelegate).persistentContainer
+    }
+    
+    lazy var persistentContainer: NSPersistentContainer = {
+        //return container
+        return AppDelegate.container!
+    }()
+    
+    static var viewContext: NSManagedObjectContext {
+        return persistentContainer.viewContext
+    }
+
+    // END DATA
 
 
 

@@ -30,7 +30,8 @@ class NowasteUITests: XCTestCase {
         // Use recording to get started writing UI tests.
         // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
-/*
+    
+    /*
     func testLaunchPerformance() throws {
         if #available(macOS 10.15, iOS 13.0, tvOS 13.0, watchOS 7.0, *) {
             // This measures how long it takes to launch your application.
@@ -39,5 +40,22 @@ class NowasteUITests: XCTestCase {
             }
         }
     }
- */
+     */
+    
+    func testUINavigation() throws {
+        let app = XCUIApplication()
+       // app.launchEnvironment = ["UITEST_DISABLE_ANIMATIONS" : "YES"]
+        app.launch()
+        app.buttons["Log In"].tap()
+        app/*@START_MENU_TOKEN@*/.staticTexts["Login"]/*[[".buttons[\"Login\"].staticTexts[\"Login\"]",".staticTexts[\"Login\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
+        
+        let nowasteMapNavigationBar = app.navigationBars["Nowaste.Map"]
+        nowasteMapNavigationBar.buttons["magnifyingglass"].tap()
+        app.windows.children(matching: .other).element.children(matching: .other).element.children(matching: .other).element.children(matching: .other).element.children(matching: .other).element.children(matching: .other).element.children(matching: .other).element(boundBy: 1).children(matching: .textView).element.tap()
+        app.children(matching: .window).element(boundBy: 0).children(matching: .other).element.children(matching: .other).element.children(matching: .other).element.children(matching: .other).element.buttons["magnifyingglass"].tap()
+        nowasteMapNavigationBar.buttons["list.bullet"].tap()
+        
+    }
+    
+    
 }

@@ -39,7 +39,7 @@ class AnnotationView: MKAnnotationView {
         anim.startAnimating()
         
         count.frame = self.frame
-        count.backgroundColor = .white
+        //count.backgroundColor = .white
         count.textColor = .black
         count.font = UIFont(name: "helvetica-bold", size: 12)
         count.text = "12"

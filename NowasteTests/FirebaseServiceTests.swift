@@ -1,6 +1,6 @@
 //
-//  NowasteTests.swift
-//  NowasteTests
+//  FirebaseServiceTests.swift
+//  FirebaseServiceTests
 //
 //  Created by Gilles Sagot on 08/11/2021.
 //
@@ -10,7 +10,7 @@ import XCTest
 import CoreLocation
 import Firebase
 
-class NowasteTests: XCTestCase {
+class FirebaseServiceTests: XCTestCase {
 
     override func setUpWithError() throws {
         // Put setup code here. This method is called before the invocation of each test method in the class.
