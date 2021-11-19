@@ -40,7 +40,6 @@
 		CA5122552731624F0063D5A1 /* DynamicView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA5122542731624F0063D5A1 /* DynamicView.swift */; };
 		CA512257273180070063D5A1 /* StarsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA512256273180070063D5A1 /* StarsView.swift */; };
 		CA5122592731EA6B0063D5A1 /* LikesView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA5122582731EA6B0063D5A1 /* LikesView.swift */; };
-		CA51225B27328FAB0063D5A1 /* IntroView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA51225A27328FAB0063D5A1 /* IntroView.swift */; };
 		CA86F51527399B4F00280393 /* NowasteUITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA86F51427399B4F00280393 /* NowasteUITests.swift */; };
 		CA9B4C8A27444F250025012E /* Nowaste.xcdatamodeld in Sources */ = {isa = PBXBuildFile; fileRef = CA9B4C8827444F250025012E /* Nowaste.xcdatamodeld */; };
 		CA9B4C8C274450FF0025012E /* ContainerManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA9B4C8B274450FF0025012E /* ContainerManager.swift */; };
@@ -49,6 +48,7 @@
 		CAA4E149274312AE007A33F4 /* ProfileController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA4E148274312AE007A33F4 /* ProfileController.swift */; };
 		CAA4E14B2743DE28007A33F4 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA4E14A2743DE28007A33F4 /* ProfileView.swift */; };
 		CAA9A2F9273953E7009BD14D /* FirebaseServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA9A2F8273953E7009BD14D /* FirebaseServiceTests.swift */; };
+		CACFF38A2746D4E900C70D65 /* NavigationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CACFF3892746D4E900C70D65 /* NavigationButton.swift */; };
 		CAD3FD4E273082E900D01CA9 /* HorizontalScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD3FD4D273082E900D01CA9 /* HorizontalScrollView.swift */; };
 		CAD3FD502730972000D01CA9 /* DetailController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD3FD4F2730972000D01CA9 /* DetailController.swift */; };
 		CAD3FD52273128F300D01CA9 /* DetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD3FD51273128F300D01CA9 /* DetailView.swift */; };
@@ -101,7 +101,6 @@
 		CA5122542731624F0063D5A1 /* DynamicView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DynamicView.swift; sourceTree = "<group>"; };
 		CA512256273180070063D5A1 /* StarsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = StarsView.swift; sourceTree = "<group>"; };
 		CA5122582731EA6B0063D5A1 /* LikesView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LikesView.swift; sourceTree = "<group>"; };
-		CA51225A27328FAB0063D5A1 /* IntroView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = IntroView.swift; path = Nowaste/View/IntroView.swift; sourceTree = SOURCE_ROOT; };
 		CA86F51227399B4F00280393 /* NowasteUITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NowasteUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA86F51427399B4F00280393 /* NowasteUITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NowasteUITests.swift; sourceTree = "<group>"; };
 		CA9B4C8927444F250025012E /* Model.xcdatamodel */ = {isa = PBXFileReference; lastKnownFileType = wrapper.xcdatamodel; path = Model.xcdatamodel; sourceTree = "<group>"; };
@@ -112,6 +111,7 @@
 		CAA4E14A2743DE28007A33F4 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		CAA9A2F6273953E7009BD14D /* NowasteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NowasteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAA9A2F8273953E7009BD14D /* FirebaseServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseServiceTests.swift; sourceTree = "<group>"; };
+		CACFF3892746D4E900C70D65 /* NavigationButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationButton.swift; sourceTree = "<group>"; };
 		CAD3FD4D273082E900D01CA9 /* HorizontalScrollView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontalScrollView.swift; sourceTree = "<group>"; };
 		CAD3FD4F2730972000D01CA9 /* DetailController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DetailController.swift; sourceTree = "<group>"; };
 		CAD3FD51273128F300D01CA9 /* DetailView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = DetailView.swift; sourceTree = "<group>"; };
@@ -218,7 +218,7 @@
 		CA4AE325272B475900C444D8 /* View */ = {
 			isa = PBXGroup;
 			children = (
-				CA51225A27328FAB0063D5A1 /* IntroView.swift */,
+				CACFF3892746D4E900C70D65 /* NavigationButton.swift */,
 				CA4AE327272B478400C444D8 /* LogInView.swift */,
 				CA4AE326272B478400C444D8 /* RegisterView.swift */,
 				CAA4E14A2743DE28007A33F4 /* ProfileView.swift */,
@@ -421,10 +421,10 @@
 				CA4AE331272C336D00C444D8 /* AdView.swift in Sources */,
 				CAA4E149274312AE007A33F4 /* ProfileController.swift in Sources */,
 				CA4AE322272B473300C444D8 /* LogInController.swift in Sources */,
-				CA51225B27328FAB0063D5A1 /* IntroView.swift in Sources */,
 				CA4AE2F7272B2EDD00C444D8 /* AppDelegate.swift in Sources */,
 				CA4AE312272B2FB700C444D8 /* FirebaseService.swift in Sources */,
 				CA4AE31E272B455600C444D8 /* NavigationController.swift in Sources */,
+				CACFF38A2746D4E900C70D65 /* NavigationButton.swift in Sources */,
 				CA4AE339272E845400C444D8 /* ListCell.swift in Sources */,
 				CA4AE32D272BFDDF00C444D8 /* Annotation.swift in Sources */,
 				CA4AE2F9272B2EDD00C444D8 /* SceneDelegate.swift in Sources */,

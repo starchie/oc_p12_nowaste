@@ -120,6 +120,7 @@ class SearchView: UIView {
         line.isHidden = false
         slider.isHidden = false
         searchDistanceLabel.isHidden = false
+        self.isHidden = false
         
         animation.damping = 20
         animation.initialVelocity = 1

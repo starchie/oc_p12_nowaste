@@ -11,60 +11,43 @@ import SwiftUI
 
 class MapController: UIViewController {
     
+    // TOP NAV BUTTONS
+    var addButton:NavigationButton!
+    var listButton:NavigationButton!
+    var searchButton:NavigationButton!
+    var profileButton:NavigationButton!
+    
+    // VIEWS
     var mapView:MapView!
-    
     var searchView:SearchView!
-
-    var selectedProfiles = [Profile]()
-    
-    var addButton: UIButton!
-    var listButton:UIButton!
-    var searchButton:UIButton!
-    var profileButton:UIButton!
-    
     var dynamicView:DynamicView!
-    
     var listView: UIScrollView!
     var pageControl:UIPageControl!
     
+    // DATA
+    var profilesSelected = [Profile]()
+    var AdsFromProfilesSelected = [Ad]()
+    
+    // MARK: - PREPARE NAVIGATION CONTROLLER
+    
     override func viewWillAppear(_ animated: Bool) {
         
+        // NAVIGATION BAR
         navigationController?.navigationBar.isHidden = false
         self.navigationItem.hidesBackButton = true
   
-        // BUTTON TO ADD AN ADVERT
-        addButton = UIButton(type: .system)
-        addButton.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-        addButton.setBackgroundImage(UIImage(systemName: "plus.circle"), for: .normal)
-        //addButton.backgroundColor = .white
-        addButton.layer.cornerRadius = addButton.frame.width / 2
+        // // NAVIGATION BUTTONS
+        addButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "plus.circle")
         addButton.addTarget(self, action:#selector(addFunction), for: .touchUpInside)
-        addButton.tintColor = .init(white: 1.0, alpha: 1.0)
         
-        listButton = UIButton(type: .system)
-        listButton.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-        listButton.setBackgroundImage(UIImage(systemName: "list.bullet.circle"), for: .normal)
-        //listButton.backgroundColor = .white
-        listButton.layer.cornerRadius = listButton.frame.width / 2
+        listButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "list.bullet.circle")
         listButton.addTarget(self, action:#selector(listFunction), for: .touchUpInside)
-        listButton.tintColor = .init(white: 1.0, alpha: 1.0)
-        
-        searchButton = UIButton(type: .system)
-        searchButton.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-        searchButton.setBackgroundImage(UIImage(systemName: "magnifyingglass.circle"), for: .normal)
-        //searchButton.backgroundColor = .white
-        searchButton.layer.cornerRadius = searchButton.frame.width / 2
-        searchButton.tintColor = .init(white: 1.0, alpha: 1.0)
+
+        searchButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "magnifyingglass.circle")
         searchButton.addTarget(self, action:#selector(displaySearchToggle), for: .touchUpInside)
         
-        profileButton = UIButton(type: .system)
-        profileButton.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-        profileButton.setBackgroundImage(UIImage(systemName: "person.circle"), for: .normal)
-        //searchButton.backgroundColor = .white
-        profileButton.layer.cornerRadius = profileButton.frame.width / 2
-        profileButton.tintColor = .init(white: 1.0, alpha: 1.0)
+        profileButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "person.circle")
         profileButton.addTarget(self, action:#selector(profileFunction), for: .touchUpInside)
-
 
         self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: listButton),UIBarButtonItem(customView: addButton),UIBarButtonItem(customView: searchButton), UIBarButtonItem(customView: profileButton) ]
  
@@ -75,7 +58,7 @@ class MapController: UIViewController {
         FirebaseService.shared.removeListener()
     }
 
-    // MARK: - PREPARE CONTROLLER
+    // MARK: - PREPARE CONTROLLER AND VIEWS
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -89,7 +72,7 @@ class MapController: UIViewController {
         searchView.isHidden = true
         
         searchView.goButton.addTarget(self, action:#selector(searchFunction), for: .touchUpInside)
-        searchView.slider.addTarget(self, action: #selector(changeRadius), for: .touchUpInside)
+        searchView.slider.addTarget(self, action: #selector(getProfilesInRadius), for: .touchUpInside)
 
         // MAP INIT
         mapView = MapView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height))
@@ -117,18 +100,7 @@ class MapController: UIViewController {
         }
         
         // GET ALL USER ON THE MAP
-        FirebaseService.shared.getProfiles(){success,error in
-            if success {
-                for document in FirebaseService.shared.profiles {
-                    // CREATE ANNOTATIONS
-                    let customAnnotation = Annotation(with: document)
-                    self.mapView.addAnnotation(customAnnotation)
-                }
-                
-            }else{
-                print("aie")
-            }
-        }
+        getProfilesInRadius()
         
         // DYNAMIC VIEW
         let width: CGFloat = view.frame.width
@@ -153,7 +125,7 @@ class MapController: UIViewController {
         view.addSubview(listView)
         
         
-        // INDICATOR
+        // PAGE CONTROL
         pageControl = UIPageControl()
         pageControl.frame = CGRect(x: view.frame.midX - 100, y: view.frame.maxY - 50, width: 200, height: 20)
         view.addSubview(pageControl)
@@ -163,33 +135,64 @@ class MapController: UIViewController {
     
     //MARK: - ACTIONS
     
+    // CREATE NEW AD
     @objc func addFunction(_ sender:UIButton) {
         let vc = AdController()
         self.navigationController?.pushViewController(vc, animated: false)
     }
     
+    // GO TO LIST
     @objc func listFunction(_ sender:UIButton) {
         let vc = ListController()
         self.navigationController?.pushViewController(vc, animated: false)
     }
     
+    // VIEW USER PROFILE
     @objc func profileFunction(_ sender:UIButton) {
         let vc = ProfileController()
         self.navigationController?.pushViewController(vc, animated: false)
     }
     
-    @objc func changeRadius(_ sender:UIButton) {
+    // VIEW DETAIL
+    @objc func didTapScrollView(_ tap: UITapGestureRecognizer) {
+        let index = tap.view!.tag
+        let vc = DetailController()
+        vc.currentAd = FirebaseService.shared.ads[index]
+        vc.isFavorite = false
+        navigationController?.pushViewController(vc, animated: false)
+        
+    }
+    
+    //HIDE UNHIDE SEARCH VIEW
+    @objc func displaySearchToggle(_ sender:UIButton) {
+        if searchView.isHidden {
+            searchView.animPlay()
+        }else{
+            searchView.animReturnToStart()
+        }
+    }
+    
+    @objc func getProfilesInRadius() {
+        self.mapView.removeAnnotations(self.mapView.annotations)
+        
         let radiusInM:Double = Double(searchView.slider.value * 1000 * 10) // 10 km
         let center = CLLocationCoordinate2D(latitude: 48.8127729, longitude: 2.5203043)
+        
         searchView.searchDistanceLabel.text = "\(round(radiusInM) / 1000) km"
         FirebaseService.shared.getGeoHash(center: center, radiusInM: radiusInM){ success,error in
             if success {
-                self.mapView.removeAnnotations(self.mapView.annotations)
-                for  document in FirebaseService.shared.profiles {
-                    let customAnnotation = Annotation(with: document)
+                var profiles = [String]()
+                
+                self.profilesSelected = FirebaseService.shared.profiles // ARRAY WITH PROFILES
+        
+                // GET ALL UID AS STRING
+                for profile in FirebaseService.shared.profiles {
+                    profiles.append(profile.id)
+                    let customAnnotation = Annotation(with: profile)
                     self.mapView.addAnnotation(customAnnotation)
                 }
                 
+                self.getAdsFromProfilesInRadius(profiles) // FIND ALL ADS FOR PROFILES FOUND
             }else{
                 print ("aie")
             }
@@ -198,75 +201,36 @@ class MapController: UIViewController {
  
     }
     
-    @objc func searchFunction(_ sender:UIButton) {
-        selectedProfiles.removeAll()
-        search(searchView.searchText.text ?? "")
-    }
-    
-    @objc func displaySearchToggle(_ sender:UIButton) {
-        if searchView.isHidden {
-            searchView.isHidden = false
-            searchView.animPlay()
-        }else{
-            searchView.animReturnToStart()
-        }
-    }
-    
-    func search(_ item:String){
-        var resultID = [String]()
-        
-        FirebaseService.shared.getAds() {success,error in
+    func getAdsFromProfilesInRadius (_ profiles:[String]) {
+
+        FirebaseService.shared.querryAllAds(filter: profiles) { success,error in
             if success {
-                for document in FirebaseService.shared.ads {
-                    let objc = document.title
-                    let string = item
-                    if objc.range(of: string, options: .caseInsensitive) != nil {
-                        resultID.append(document.addedByUser)
-                    }
-                }
-                self.update(resultID:resultID)
+                self.AdsFromProfilesSelected = FirebaseService.shared.ads
             }else{
-                print("aie")
+                print ("aie")
             }
-    
+            
         }
+        
     }
     
-    func update(resultID: [String]){
+    @objc func searchFunction(_ sender:UIButton) {
+        // CLEAN
+        profilesSelected.removeAll()
         mapView.removeAnnotations(mapView.annotations)
-        for  document in FirebaseService.shared.profiles {
-            for id in resultID {
-                if document.id == id {
-                    let customAnnotation = Annotation(with: document)
-                    self.mapView.addAnnotation(customAnnotation)
-                }
-                
-            }
+        // GET
+        let uid = FirebaseService.shared.searchAdsByKeyWord(searchView.searchText.text ?? "")
+        FirebaseService.shared.getProfilesfromUIDList(uid) { profiles, distances in
+            profilesSelected = profiles
         }
-    }
-    
-    func getDate(dt: Double) -> String {
-        let date = Date(timeIntervalSince1970: TimeInterval(dt))
-        let dateFormatter = DateFormatter()
-        dateFormatter.dateFormat = "dd MM YYYY - HH:mm"
-        let result = dateFormatter.string(from: date)
-        return result
-    }
-    
-    @objc func didTapScrollView(_ tap: UITapGestureRecognizer) {
+        // UPDATE
+        for  profile in profilesSelected {
+            let customAnnotation = Annotation(with: profile)
+            self.mapView.addAnnotation(customAnnotation)
+        }
         
-        let index = tap.view!.tag
-    
-        let vc = DetailController()
-        vc.currentAd = FirebaseService.shared.ads[index]
-        vc.isFavorite = false
-        navigationController?.pushViewController(vc, animated: false)
-         
-        
-       
     }
-    
-    
+
 }
 
 
@@ -363,16 +327,10 @@ extension MapController : UIScrollViewDelegate{
             let ad = FirebaseService.shared.ads[i]
             
             scrollView.itemTitle.text = ad.title
-            /*
-            let attribText = NSMutableAttributedString(string: ad.title)
-            attribText.setAttributes([NSAttributedString.Key.backgroundColor: UIColor.cyan],
-                                     range: NSMakeRange(0, scrollView.itemTitle.text!.count))
-            
-            scrollView.itemTitle.attributedText = attribText
-             */
-            scrollView.itemDate.text = getDate(dt:ad.dateField)
+            scrollView.itemDate.text = FirebaseService.shared.getDate(dt:ad.dateField)
             scrollView.tag = i
             scrollView.isUserInteractionEnabled = true
+            
             listView.addSubview(scrollView)
             
             scrollView.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapScrollView)))

@@ -19,7 +19,6 @@ class FirebaseService {
     var storage =  Storage.storage()
     
     var currentUser : User? { return Auth.auth().currentUser}
-  
     var profile : Profile!
     
     var ads = [Ad]()
@@ -85,7 +84,6 @@ class FirebaseService {
             print("Unable to fetch snapshot data. \(String(describing: error))")
             return
         }
-        
         
         if error != nil {
             print("error")
@@ -309,6 +307,27 @@ class FirebaseService {
         }
     }
     
+    // NEED TESTS
+    func querryAllAds(filter:[String], completionHandler: @escaping ((Bool, String? ) -> Void)){
+
+            let selection:Query = db.collection("ads").whereField("addedByUser", in: filter)
+            selection.getDocuments { (querySnapshot, error) in
+                guard let querySnapshot = querySnapshot, error == nil else {
+                    completionHandler(false, error?.localizedDescription)
+                    return
+                }
+                
+                self.ads.removeAll()
+                for document in querySnapshot.documents {
+                    let newAd = Ad(snapshot: document.data())
+                    self.ads.append(newAd!)
+                }
+                completionHandler(true, nil)
+                
+            }
+        
+    }
+    
     func removeListener(){
         listener.remove()
     }
@@ -356,6 +375,58 @@ class FirebaseService {
         }
     }
     
+    //MARK: - UTILS
+    
+    // RETURN DELTATIME FROM DOUBLE TO READABLE STRING
+    func getDate(dt: Double) -> String {
+        let date = Date(timeIntervalSince1970: TimeInterval(dt))
+        let dateFormatter = DateFormatter()
+        dateFormatter.dateFormat = "dd MM YYYY - HH:mm"
+        let result = dateFormatter.string(from: date)
+        return result
+    }
+    
+    // GET ADS WHERE TITLE HAVE WORD SUBSTRING AND RETURN USERS UID
+    func searchAdsByKeyWord(_ word:String)->[String]{
+        var adsUIDResult = [String]()
+        
+        for i in 0...ads.count - 1 {
+            let objc = ads[i].title
+            let string = word
+            if objc.range(of: string, options: .caseInsensitive) != nil {
+                adsUIDResult.append(ads[i].addedByUser)
+               
+            }
+        }
+        return adsUIDResult
+    }
+    
+    // SELECT PROFILES FROM USERS UID LIST -> RETURN PROFILES AND DISTANCES
+    func getProfilesfromUIDList(_ uid: [String], result: ([Profile], [Double] ) -> Void ){
+        var profilesInRadius = [Profile]()
+        var distanceForProfilesInRadius = [Double]()
+        
+        for  i in 0...FirebaseService.shared.profiles.count - 1 {
+            for uid in uid {
+                if FirebaseService.shared.profiles[i].id == uid {
+                    profilesInRadius.append(FirebaseService.shared.profiles[i])
+                    distanceForProfilesInRadius.append(FirebaseService.shared.distances[i])
+                }
+            }
+        }
+        result(profilesInRadius, distanceForProfilesInRadius)
+    }
+    
+    // SELECT ADS FROM A USER UID
+    func searchAdsFromProfile (uid:String)->[Ad] {
+        var selectedAds = [Ad]()
+            for ad in FirebaseService.shared.ads {
+                if uid == ad.addedByUser {
+                    selectedAds.append(ad)
+                }
+        }
+        return selectedAds
+    }
 
 
 }

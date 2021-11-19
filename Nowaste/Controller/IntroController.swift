@@ -24,7 +24,8 @@ class IntroController: UIViewController {
 
     
     override func viewWillAppear(_ animated: Bool) {
-        navigationController?.navigationBar.isHidden = true
+        let nc = navigationController as? NavigationController
+        nc?.currentState = .intro
         anim.startAnimating()
         
         for vegetable in vegetables {
@@ -80,7 +81,6 @@ class IntroController: UIViewController {
         // Do any additional setup after loading the view.
 
         view.backgroundColor = UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
-        print (FirebaseService.shared.storage)
         //introView = IntroView(frame: view.frame)
         //view.addSubview(introView)
         anim.frame = CGRect(x: 0, y: view.frame.width/2 - 30, width: view.frame.width, height: view.frame.width )
@@ -173,12 +173,10 @@ class IntroController: UIViewController {
     // MARK: - UTILS
     
     func animatedImages(for name: String) -> [UIImage] {
-        print("blabla")
         var i = 0
         var images = [UIImage]()
         
         while let image = UIImage(named: "\(name)_\(i)") {
-            print (i)
             images.append(image)
             i += 1
         }

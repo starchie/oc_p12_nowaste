@@ -10,78 +10,49 @@ import CoreLocation
 
 class ListController: UIViewController {
     
-    var addButton: UIButton!
-    var mapButton: UIButton!
-    var searchButton: UIButton!
-    var profileButton: UIButton!
+    // MARK: VARIABLES
     
+    // TOP NAV BUTTONS
+    var addButton: NavigationButton!
+    var mapButton: NavigationButton!
+    var searchButton: NavigationButton!
+    var profileButton: NavigationButton!
+    
+    // SEARCH VIEW
     var searchView:SearchView!
     
-    var selectedProfiles = [Profile]()
+    // DATA
+    var ProfilesSelected = [Profile]()
+    var AdsFromProfilesSelected = [Ad]()
+    var distancesForProfilesSelected = [Double]()
     
+    // TABLEVIEW
     var tableView: UITableView!
-    var selectedRow: IndexPath!
+    var selectedRow: Int!
     var sizeForSelectedRow: CGFloat = 44
     var sizeForDefaultRow: CGFloat = 44
     
-    var topBarHeight:CGFloat {
-        let scene = UIApplication.shared.connectedScenes.first as! UIWindowScene
-        let window = scene.windows.first
-        let frameWindow = window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
-        let frameNavigationBar = self.navigationController?.navigationBar.frame.height ?? 0
-        return frameWindow + frameNavigationBar
-    }
-    
-    // MARK: - NAVIGATION CONTROLLER
+    // MARK: - PREPARE NAVIGATION CONTROLLER
     
     override func viewWillAppear(_ animated: Bool) {
         
         // NAVIGATION BAR
         navigationController?.navigationBar.isHidden = false
         self.navigationItem.hidesBackButton = true
-        /*
-        let appearance = UINavigationBarAppearance()
-        appearance.configureWithOpaqueBackground()
-        appearance.backgroundColor = UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0)
-        navigationController?.navigationBar.standardAppearance = appearance;
-        navigationController?.navigationBar.scrollEdgeAppearance = navigationController?.navigationBar.standardAppearance
-        navigationController?.navigationBar.isTranslucent = false
-        navigationController?.navigationBar.tintColor = .white
-        */
-        // BUTTON TO ADD AN ADVERT
-        addButton = UIButton(type: .system)
-        addButton.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-        addButton.setBackgroundImage(UIImage(systemName: "plus.circle"), for: .normal)
-        //addButton.backgroundColor = .white
-        addButton.layer.cornerRadius = addButton.frame.width / 2
+        
+        // NAVIGATION BUTTONS
+        addButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "plus.circle")
         addButton.addTarget(self, action:#selector(addFunction), for: .touchUpInside)
-        addButton.tintColor = .init(white: 1.0, alpha: 1.0)
-        
-        mapButton = UIButton(type: .system)
-        mapButton.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-        mapButton.setBackgroundImage(UIImage(systemName: "map.circle"), for: .normal)
-        //mapButton.backgroundColor = .white
-        mapButton.layer.cornerRadius = mapButton.frame.width / 2
+    
+        mapButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image:"map.circle")
         mapButton.addTarget(self, action:#selector(mapFunction), for: .touchUpInside)
-        mapButton.tintColor = .init(white: 1.0, alpha: 1.0)
-        
-        searchButton = UIButton(type: .system)
-        searchButton.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-        searchButton.setBackgroundImage(UIImage(systemName: "magnifyingglass.circle"), for: .normal)
-        //searchButton.backgroundColor = .white
-        searchButton.layer.cornerRadius = searchButton.frame.width / 2
-        searchButton.tintColor = .init(white: 1.0, alpha: 1.0)
+     
+        searchButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30),image: "magnifyingglass.circle")
         searchButton.addTarget(self, action:#selector(displaySearchToggle), for: .touchUpInside)
         
-        profileButton = UIButton(type: .system)
-        profileButton.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-        profileButton.setBackgroundImage(UIImage(systemName: "person.circle"), for: .normal)
-        //searchButton.backgroundColor = .white
-        profileButton.layer.cornerRadius = profileButton.frame.width / 2
-        profileButton.tintColor = .init(white: 1.0, alpha: 1.0)
+        profileButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30),image:"person.circle")
         profileButton.addTarget(self, action:#selector(profileFunction), for: .touchUpInside)
 
-        
         self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: mapButton),UIBarButtonItem(customView: addButton),UIBarButtonItem(customView: searchButton),UIBarButtonItem(customView: profileButton) ]
 
     }
@@ -91,20 +62,19 @@ class ListController: UIViewController {
         FirebaseService.shared.removeListener()
     }
   
-//MARK: - PREPARE
+    //MARK: - PREPARE CONTROLLER AND VIEWS
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //view.backgroundColor = UIColor(red: 8/255, green: 16/255, blue: 76/255, alpha: 1.0)
         view.backgroundColor = UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
+        
         // SEARCHVIEW
         searchView = SearchView(frame: view.frame)
         view.addSubview(searchView)
         searchView.isHidden = true
-        
         searchView.goButton.addTarget(self, action:#selector(searchFunction), for: .touchUpInside)
-        searchView.slider.addTarget(self, action: #selector(changeRadius), for: .touchUpInside)
+        searchView.slider.addTarget(self, action: #selector(getProfilesInRadius), for: .touchUpInside)
         
         // TABLEVIEW
         tableView = UITableView()
@@ -120,132 +90,115 @@ class ListController: UIViewController {
         
         self.view.addSubview(tableView)
         
-        // LOAD DATA WITH FIREBASE FIRST
+        // GET DATA AND UPDATE VIEWS
         
-        let radiusInM:Double = Double(searchView.slider.value * 1000 * 10) // 10 km
-        let center = CLLocationCoordinate2D(latitude: 48.8127729, longitude: 2.5203043)
-        FirebaseService.shared.getGeoHash(center: center, radiusInM: radiusInM){ success,error in
-            if success {
-               self.selectedProfiles = FirebaseService.shared.profiles
-               self.tableView.reloadData()
-            }else{
-                print ("aie")
-            }
-            
-        }
-
+        getProfilesInRadius()
+        
     }
     
-    //MARK: - ACTION
+    //MARK: - ACTIONS
     
-    // NEW AD
+    // CREATE NEW AD
     @objc func addFunction(_ sender:UIButton) {
         let vc = AdController()
         self.navigationController?.pushViewController(vc, animated: false)
     }
     
-    // MAP
+    // GO TO MAP
     @objc func mapFunction(_ sender:UIButton) {
         let vc = MapController()
         self.navigationController?.pushViewController(vc, animated: false)
     }
     
+    // VIEW USER PROFILE
     @objc func profileFunction(_ sender:UIButton) {
         let vc = ProfileController()
         self.navigationController?.pushViewController(vc, animated: false)
     }
     
-    // DISPLAY SELECTED AD
+    // VIEW DETAIL
     @objc func test(_ sender:UIButton) {
         let vc = DetailController()
         vc.currentAd = FirebaseService.shared.ads[sender.tag - 100]
         vc.isFavorite = false
         navigationController?.pushViewController(vc, animated: false)
-        
     }
     
+    //HIDE UNHIDE SEARCH VIEW
     @objc func displaySearchToggle(_ sender:UIButton) {
         if searchView.isHidden {
-            searchView.isHidden = false
             searchView.animPlay()
-        
-            UIView.animate(withDuration: 0.5, delay: 0,usingSpringWithDamping: 0.3, initialSpringVelocity: 0.4, options: [.curveLinear], animations: {
-                self.tableView.frame = CGRect(x: 0, y: 200, width: self.view.frame.width, height: self.view.frame.height - 200)
-            }, completion: nil)
-            
+            anim(frame: CGRect(x: 0, y: 200, width: view.frame.width, height: view.frame.height - 200))
         }else{
             searchView.animReturnToStart()
-            UIView.animate(withDuration: 0.5, delay: 0,usingSpringWithDamping: 0.3, initialSpringVelocity: 0.4, options: [.curveLinear], animations: {
-                self.tableView.frame = CGRect(x: 0, y: 0, width: self.view.frame.width, height: self.view.frame.height)
-            }, completion: nil)
-          
+            anim(frame:  CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height))
         }
     }
     
     @objc func searchFunction(_ sender:UIButton) {
+        // CLEAN
         selectedRow = nil
-        selectedProfiles.removeAll()
-        search(searchView.searchText.text ?? "")
+        ProfilesSelected.removeAll()
+        // GET
+        let uid = FirebaseService.shared.searchAdsByKeyWord(searchView.searchText.text ?? "")
+        FirebaseService.shared.getProfilesfromUIDList(uid) { profiles, distances in
+            ProfilesSelected = profiles
+            distancesForProfilesSelected = distances
+        }
+        // UPDATE
+        tableView.reloadData()
     }
     
-    @objc func changeRadius(_ sender:UIButton) {
+    
+    @objc func getProfilesInRadius() {
+        
         let radiusInM:Double = Double(searchView.slider.value * 1000 * 10) // 10 km
         let center = CLLocationCoordinate2D(latitude: 48.8127729, longitude: 2.5203043)
+        
         searchView.searchDistanceLabel.text = "\(round(radiusInM / 1000)) km"
+        
         FirebaseService.shared.getGeoHash(center: center, radiusInM: radiusInM){ success,error in
             if success {
-               self.selectedProfiles = FirebaseService.shared.profiles
-               self.tableView.reloadData()
+                var profiles = [String]()
+                
+                self.ProfilesSelected = FirebaseService.shared.profiles // ARRAY WITH PROFILES
+                self.distancesForProfilesSelected = FirebaseService.shared.distances // ARRAY WITH DISTANCES
+                // GET ALL UID AS STRING
+                for profile in FirebaseService.shared.profiles {
+                    profiles.append(profile.id)
+                }
+                self.selectedRow = nil // NEED TO RESET TABLE VIEW - NO PROFILE SELECTED
+                self.getAdsFromProfilesInRadius(profiles) // FIND ALL ADS FOR PROFILES FOUND
+                
             }else{
                 print ("aie")
             }
             
         }
- 
+        
     }
     
-    // MARK: - FILTERS AND SEARCH
-    
-    func search(_ item:String){
-        var resultID = [String]()
+    func getAdsFromProfilesInRadius (_ profiles:[String]) {
         
-        FirebaseService.shared.getAds() {success,error in
+        FirebaseService.shared.querryAllAds(filter: profiles) { success,error in
             if success {
-                for document in FirebaseService.shared.ads {
-                    let objc = document.title
-                    let string = item
-                    if objc.range(of: string, options: .caseInsensitive) != nil {
-                        resultID.append(document.addedByUser)
-                    }
-                
-                }
-                
-                self.update(resultID:resultID)
-                  
+                self.AdsFromProfilesSelected = FirebaseService.shared.ads
+                self.tableView.reloadData()
             }else{
-                print("aie")
+                print ("aie")
             }
-    
+            
         }
-        
         
     }
     
-    func update(resultID: [String]){
-        for  document in FirebaseService.shared.profiles {
-            for id in resultID {
-                if document.id == id {
-                    selectedProfiles.append(document)
-                    print ("selectedProfiles: \(selectedProfiles.count)")
-                }
-                
-            }
-        }
-        tableView.reloadData()
+    func anim (frame: CGRect) {
+        UIView.animate(withDuration: 0.5, delay: 0,usingSpringWithDamping: 0.3, initialSpringVelocity: 0.4, options: [.curveLinear], animations: {
+            self.tableView.frame = frame
+        }, completion: nil)
+        
     }
-    
-    
-
+      
 }
 
 
@@ -253,26 +206,12 @@ class ListController: UIViewController {
 
 extension ListController:UITableViewDataSource {
     
-    func updateTableViewIfReady(){
-        
-        let id = selectedProfiles[selectedRow.row].id
-        
-        FirebaseService.shared.querryAds(filter: "\(id)") { success,error in
-                if success {
-                    self.tableView.reloadData()
-                }else{
-                    print("aie")
-                }
-        }
-        
-    }
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return selectedProfiles.count
+        return ProfilesSelected.count
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
-        if indexPath == selectedRow {
+        if indexPath.row == selectedRow {
             return sizeForSelectedRow
            } else {
             return sizeForDefaultRow
@@ -283,17 +222,17 @@ extension ListController:UITableViewDataSource {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! ListCell
         cell.removeView()
-        cell.cellTitle.text = selectedProfiles[indexPath.row].userName
-        let distance = FirebaseService.shared.distances[indexPath.row]
+        cell.cellTitle.text = ProfilesSelected[indexPath.row].userName
+        let distance = distancesForProfilesSelected[indexPath.row]
         cell.distanceView.text = "à " + String(round(distance)) + " m"
        
-        if indexPath == selectedRow{
+        if indexPath.row == selectedRow{
             
             var list = [UIButton]()
-            for i in 0..<FirebaseService.shared.ads.count {
+            for i in 0..<AdsFromProfilesSelected.count {
                 let viewToAdd = UIButton()
                 viewToAdd.contentHorizontalAlignment = .left
-                viewToAdd.setTitle("\(FirebaseService.shared.ads[i].title)  > ", for: .normal)
+                viewToAdd.setTitle("\(AdsFromProfilesSelected[i].title)  > ", for: .normal)
                 viewToAdd.setTitleColor(.white, for: .normal)
                 viewToAdd.tag = 100 + i
                 viewToAdd.addTarget(self, action: #selector(test), for: .touchUpInside)
@@ -321,9 +260,16 @@ extension ListController:UITableViewDataSource {
         return cell
     }
     
+    // USER SELECT ROW
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        selectedRow = indexPath
-        updateTableViewIfReady()
+        selectedRow = indexPath.row // KEEP INDEX FOR UPDATE TABLEVIEW
+        
+        // 1 - GET PROFILE ID
+        let uid = ProfilesSelected[selectedRow].id
+        // 2 - SEARCH ADS FROM THIS PROFILE
+        AdsFromProfilesSelected = FirebaseService.shared.searchAdsFromProfile(uid: uid)
+        // 3 UPDATE
+        tableView.reloadData()
     }
     
 }
