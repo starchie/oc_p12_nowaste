@@ -8,8 +8,21 @@
         <attribute name="imageURL" optional="YES" attributeType="String"/>
         <attribute name="likes" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="title" optional="YES" attributeType="String"/>
+        <relationship name="profile" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="FavoriteProfile" inverseName="ad" inverseEntity="FavoriteProfile"/>
+    </entity>
+    <entity name="FavoriteProfile" representedClassName=".FavoriteProfile" syncable="YES" codeGenerationType="category">
+        <attribute name="activeAds" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
+        <attribute name="dateField" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="geohash" optional="YES" attributeType="String"/>
+        <attribute name="id" optional="YES" attributeType="String"/>
+        <attribute name="imageURL" optional="YES" attributeType="String"/>
+        <attribute name="latitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="longitude" optional="YES" attributeType="Double" defaultValueString="0.0" usesScalarValueType="YES"/>
+        <attribute name="userName" optional="YES" attributeType="String"/>
+        <relationship name="ad" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="FavoriteAd" inverseName="profile" inverseEntity="FavoriteAd"/>
     </entity>
     <elements>
-        <element name="FavoriteAd" positionX="-63" positionY="-18" width="128" height="134"/>
+        <element name="FavoriteAd" positionX="-81.05859375" positionY="28.41015625" width="128" height="163"/>
+        <element name="FavoriteProfile" positionX="124.11328125" positionY="28.59375" width="128" height="178"/>
     </elements>
 </model>

@@ -3,7 +3,25 @@
 //  Nowaste
 //
 //  Created by Gilles Sagot on 31/10/2021.
-//
+
+/// Copyright (c) 2021 Starchie
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+///
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions of the Software.
+///
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+/// THE SOFTWARE.
 
 import UIKit
 import CoreLocation
@@ -22,9 +40,10 @@ class ListController: UIViewController {
     var searchView:SearchView!
     
     // DATA
-    var ProfilesSelected = [Profile]()
-    var AdsFromProfilesSelected = [Ad]()
-    var distancesForProfilesSelected = [Double]()
+    var sortedProfiles = [Profile]()
+    var AdsFromSortedProfiles = [Ad]()
+    var distancesForSortedProfiles = [Double]()
+    var selectedProfile:Profile!
     
     // TABLEVIEW
     var tableView: UITableView!
@@ -119,7 +138,8 @@ class ListController: UIViewController {
     // VIEW DETAIL
     @objc func test(_ sender:UIButton) {
         let vc = DetailController()
-        vc.currentAd = FirebaseService.shared.ads[sender.tag - 100]
+        vc.currentAd = AdsFromSortedProfiles[sender.tag - 100]
+        vc.selectedProfile = selectedProfile
         vc.isFavorite = false
         navigationController?.pushViewController(vc, animated: false)
     }
@@ -138,36 +158,66 @@ class ListController: UIViewController {
     @objc func searchFunction(_ sender:UIButton) {
         // CLEAN
         selectedRow = nil
-        ProfilesSelected.removeAll()
+        sortedProfiles.removeAll()
         // GET
-        let uid = FirebaseService.shared.searchAdsByKeyWord(searchView.searchText.text ?? "")
-        FirebaseService.shared.getProfilesfromUIDList(uid) { profiles, distances in
-            ProfilesSelected = profiles
-            distancesForProfilesSelected = distances
+        // IF SEARCH HAS NOTHING -> RESET
+        if searchView.searchText.text == "" {
+            sortedProfiles = FirebaseService.shared.profiles
+            distancesForSortedProfiles = FirebaseService.shared.distances
+            
+            // AVOID PROFILES WITH ANY AD
+            FirebaseService.shared.removeProfileIfNoAd(self.sortedProfiles, distances: self.distancesForSortedProfiles){ resultProfiles,resultDistances in
+                self.sortedProfiles = resultProfiles
+                self.distancesForSortedProfiles = resultDistances
+            }
+
+            // UPDATE TABLE
+            tableView.reloadData()
         }
-        // UPDATE
-        tableView.reloadData()
+        else {
+            // FIND
+            let uid = FirebaseService.shared.searchAdsByKeyWord(searchView.searchText.text ?? "")
+            FirebaseService.shared.getProfilesfromUIDList(uid) { profiles, distances in
+                sortedProfiles = profiles
+                distancesForSortedProfiles = distances
+            }
+            // UPDATE TABLE
+            tableView.reloadData()
+        }
+    
     }
     
     
     @objc func getProfilesInRadius() {
         
-        let radiusInM:Double = Double(searchView.slider.value * 1000 * 10) // 10 km
-        let center = CLLocationCoordinate2D(latitude: 48.8127729, longitude: 2.5203043)
+        let latitude = FirebaseService.shared.profile.latitude
+        let longitude = FirebaseService.shared.profile.longitude
         
-        searchView.searchDistanceLabel.text = "\(round(radiusInM / 1000)) km"
+        let radiusInM:Double = Double(searchView.slider.value * 1000 * 10) // 10 km
+        let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
+        
+        searchView.searchDistanceLabel.text = "\(round(radiusInM) / 1000) km"
         
         FirebaseService.shared.getGeoHash(center: center, radiusInM: radiusInM){ success,error in
             if success {
                 var profiles = [String]()
                 
-                self.ProfilesSelected = FirebaseService.shared.profiles // ARRAY WITH PROFILES
-                self.distancesForProfilesSelected = FirebaseService.shared.distances // ARRAY WITH DISTANCES
+                self.sortedProfiles = FirebaseService.shared.profiles // ARRAY WITH PROFILES
+                self.distancesForSortedProfiles = FirebaseService.shared.distances // ARRAY WITH DISTANCES
+                
+                // AVOID PROFILES WITH ANY AD
+                FirebaseService.shared.removeProfileIfNoAd(self.sortedProfiles, distances: self.distancesForSortedProfiles){ resultProfiles,resultDistances in
+                    self.sortedProfiles = resultProfiles
+                    self.distancesForSortedProfiles = resultDistances
+                }
+                
+                
                 // GET ALL UID AS STRING
-                for profile in FirebaseService.shared.profiles {
+                for profile in self.sortedProfiles {
                     profiles.append(profile.id)
                 }
                 self.selectedRow = nil // NEED TO RESET TABLE VIEW - NO PROFILE SELECTED
+                guard profiles.count > 0 else {return}
                 self.getAdsFromProfilesInRadius(profiles) // FIND ALL ADS FOR PROFILES FOUND
                 
             }else{
@@ -182,7 +232,7 @@ class ListController: UIViewController {
         
         FirebaseService.shared.querryAllAds(filter: profiles) { success,error in
             if success {
-                self.AdsFromProfilesSelected = FirebaseService.shared.ads
+                self.AdsFromSortedProfiles = FirebaseService.shared.ads
                 self.tableView.reloadData()
             }else{
                 print ("aie")
@@ -207,7 +257,7 @@ class ListController: UIViewController {
 extension ListController:UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return ProfilesSelected.count
+        return sortedProfiles.count
     }
     
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
@@ -222,17 +272,17 @@ extension ListController:UITableViewDataSource {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! ListCell
         cell.removeView()
-        cell.cellTitle.text = ProfilesSelected[indexPath.row].userName
-        let distance = distancesForProfilesSelected[indexPath.row]
+        cell.cellTitle.text = sortedProfiles[indexPath.row].userName
+        let distance = distancesForSortedProfiles[indexPath.row]
         cell.distanceView.text = "à " + String(round(distance)) + " m"
        
         if indexPath.row == selectedRow{
             
             var list = [UIButton]()
-            for i in 0..<AdsFromProfilesSelected.count {
+            for i in 0..<AdsFromSortedProfiles.count {
                 let viewToAdd = UIButton()
                 viewToAdd.contentHorizontalAlignment = .left
-                viewToAdd.setTitle("\(AdsFromProfilesSelected[i].title)  > ", for: .normal)
+                viewToAdd.setTitle("\(AdsFromSortedProfiles[i].title)  > ", for: .normal)
                 viewToAdd.setTitleColor(.white, for: .normal)
                 viewToAdd.tag = 100 + i
                 viewToAdd.addTarget(self, action: #selector(test), for: .touchUpInside)
@@ -265,9 +315,10 @@ extension ListController:UITableViewDataSource {
         selectedRow = indexPath.row // KEEP INDEX FOR UPDATE TABLEVIEW
         
         // 1 - GET PROFILE ID
-        let uid = ProfilesSelected[selectedRow].id
+        let uid = sortedProfiles[selectedRow].id
+        selectedProfile = sortedProfiles[selectedRow]
         // 2 - SEARCH ADS FROM THIS PROFILE
-        AdsFromProfilesSelected = FirebaseService.shared.searchAdsFromProfile(uid: uid)
+        AdsFromSortedProfiles = FirebaseService.shared.searchAdsFromProfile(uid: uid)
         // 3 UPDATE
         tableView.reloadData()
     }

@@ -3,7 +3,25 @@
 //  Nowaste
 //
 //  Created by Gilles Sagot on 15/11/2021.
-//
+
+/// Copyright (c) 2021 Starchie
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+///
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions of the Software.
+///
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+/// THE SOFTWARE.
 
 import UIKit
 import Firebase
@@ -28,6 +46,8 @@ class ProfileController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        //FavoriteAd.deleteAllCoreDataItems()
+        
         favorites = FavoriteAd.all
         
         view.backgroundColor =  UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
@@ -36,7 +56,7 @@ class ProfileController: UIViewController {
         view.addSubview(profileView)
         
          
-        profileView.userName.text = FirebaseService.shared.profile.userName
+        //profileView.userName.text = FirebaseService.shared.profile.userName
         
         let items: [String] = ["✍︎","✮"]
         control = UISegmentedControl(items: items)
@@ -169,7 +189,6 @@ extension ProfileController:UITableViewDataSource {
     func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
         if editingStyle == .delete {
             let id = FirebaseService.shared.ads[indexPath.row].id
-            print (id)
             FirebaseService.shared.deleteAd(id:id) {
                 success, error in
                     if success {
@@ -190,14 +209,19 @@ extension ProfileController:UITableViewDataSource {
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         let vc = DetailController()
         if control.selectedSegmentIndex == 0 {
+            let profile = FirebaseService.shared.profile
+            vc.selectedProfile = profile
             vc.currentAd = FirebaseService.shared.ads[indexPath.row]
             vc.isUserCreation = true
             vc.isFavorite = false
         }
         else {
+            let profile = FavoriteProfile.returnUser(from: FavoriteAd.all[indexPath.row].id)
+            vc.selectedProfile = profile.first
             vc.currentAd = FavoriteAd.all[indexPath.row]
             vc.isUserCreation = false
             vc.isFavorite = true
+            
         }
        
         navigationController?.pushViewController(vc, animated: false)

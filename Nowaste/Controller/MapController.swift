@@ -3,7 +3,25 @@
 //  Nowaste
 //
 //  Created by Gilles Sagot on 28/10/2021.
-//
+
+/// Copyright (c) 2021 Starchie
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+///
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions of the Software.
+///
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+/// THE SOFTWARE.
 
 import UIKit
 import MapKit
@@ -25,8 +43,10 @@ class MapController: UIViewController {
     var pageControl:UIPageControl!
     
     // DATA
-    var profilesSelected = [Profile]()
-    var AdsFromProfilesSelected = [Ad]()
+    var sortedProfiles = [Profile]()
+    var AdsFromSortedProfiles = [Ad]()
+    var selectedProfile:Profile!
+    
     
     // MARK: - PREPARE NAVIGATION CONTROLLER
     
@@ -90,6 +110,9 @@ class MapController: UIViewController {
         // LOAD DATA FIRST
         // PLACE CAMERA - USER GEO LOCATION -
         
+        guard FirebaseService.shared.currentUser?.uid != nil, FirebaseService.shared.profile != nil
+        else { self.presentUIAlertController(title: "Erreur", message: "Vous n'êtes pas connecté"); return}
+        
         FirebaseService.shared.querryProfile(filter: FirebaseService.shared.currentUser!.uid) {success, error in
             if success == true {
                 self.mapView.location = CLLocationCoordinate2D(latitude: FirebaseService.shared.profile.latitude, longitude: FirebaseService.shared.profile.longitude)
@@ -133,6 +156,14 @@ class MapController: UIViewController {
 
     }
     
+    //MARK: -  ALERT CONTROLLER
+    
+    private func presentUIAlertController(title:String, message:String) {
+        let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+        present(ac, animated: true, completion: nil)
+    }
+    
     //MARK: - ACTIONS
     
     // CREATE NEW AD
@@ -159,6 +190,7 @@ class MapController: UIViewController {
         let vc = DetailController()
         vc.currentAd = FirebaseService.shared.ads[index]
         vc.isFavorite = false
+        vc.selectedProfile = selectedProfile
         navigationController?.pushViewController(vc, animated: false)
         
     }
@@ -175,23 +207,28 @@ class MapController: UIViewController {
     @objc func getProfilesInRadius() {
         self.mapView.removeAnnotations(self.mapView.annotations)
         
+        let latitude = FirebaseService.shared.profile.latitude
+        let longitude = FirebaseService.shared.profile.longitude
+        
         let radiusInM:Double = Double(searchView.slider.value * 1000 * 10) // 10 km
-        let center = CLLocationCoordinate2D(latitude: 48.8127729, longitude: 2.5203043)
+        let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         
         searchView.searchDistanceLabel.text = "\(round(radiusInM) / 1000) km"
         FirebaseService.shared.getGeoHash(center: center, radiusInM: radiusInM){ success,error in
             if success {
                 var profiles = [String]()
                 
-                self.profilesSelected = FirebaseService.shared.profiles // ARRAY WITH PROFILES
+                self.sortedProfiles = FirebaseService.shared.profiles // ARRAY WITH PROFILES
+            
         
                 // GET ALL UID AS STRING
-                for profile in FirebaseService.shared.profiles {
+                for profile in self.sortedProfiles {
                     profiles.append(profile.id)
                     let customAnnotation = Annotation(with: profile)
                     self.mapView.addAnnotation(customAnnotation)
                 }
-                
+                print ("profiles : \(profiles.count)")
+                guard profiles.count > 0 else {return}
                 self.getAdsFromProfilesInRadius(profiles) // FIND ALL ADS FOR PROFILES FOUND
             }else{
                 print ("aie")
@@ -205,7 +242,7 @@ class MapController: UIViewController {
 
         FirebaseService.shared.querryAllAds(filter: profiles) { success,error in
             if success {
-                self.AdsFromProfilesSelected = FirebaseService.shared.ads
+                self.AdsFromSortedProfiles = FirebaseService.shared.ads
             }else{
                 print ("aie")
             }
@@ -216,20 +253,31 @@ class MapController: UIViewController {
     
     @objc func searchFunction(_ sender:UIButton) {
         // CLEAN
-        profilesSelected.removeAll()
+        sortedProfiles.removeAll()
         mapView.removeAnnotations(mapView.annotations)
         // GET
-        let uid = FirebaseService.shared.searchAdsByKeyWord(searchView.searchText.text ?? "")
-        FirebaseService.shared.getProfilesfromUIDList(uid) { profiles, distances in
-            profilesSelected = profiles
-        }
-        // UPDATE
-        for  profile in profilesSelected {
-            let customAnnotation = Annotation(with: profile)
-            self.mapView.addAnnotation(customAnnotation)
-        }
+        // IF SEARCH HAS NOTHING -> RESET
+        if searchView.searchText.text == "" {
+            sortedProfiles = FirebaseService.shared.profiles
+            for  profile in sortedProfiles {
+                let customAnnotation = Annotation(with: profile)
+                self.mapView.addAnnotation(customAnnotation)
+            }
+        }else {
+            let uid = FirebaseService.shared.searchAdsByKeyWord(searchView.searchText.text ?? "")
+            FirebaseService.shared.getProfilesfromUIDList(uid) { profiles, distances in
+                sortedProfiles = profiles
+            }
+            // UPDATE
+            for  profile in sortedProfiles {
+                let customAnnotation = Annotation(with: profile)
+                self.mapView.addAnnotation(customAnnotation)
+            }
+            
+        }// End else
+    
         
-    }
+    }// End func
 
 }
 
@@ -277,7 +325,9 @@ extension MapController: MKMapViewDelegate {
         }
     
         let annotation = view.annotation as! Annotation
-
+        guard annotation.profile?.activeAds ?? 0 > 0 else {return}
+        selectedProfile = annotation.profile
+       
         FirebaseService.shared.querryAds(filter: annotation.profile!.id) {success,error in
             if success {
                 // CREATE LIST SUBVIEWS

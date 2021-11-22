@@ -3,7 +3,28 @@
 //  Nowaste
 //
 //  Created by Gilles Sagot on 16/11/2021.
-//
+
+/// Copyright (c) 2021 Starchie
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+///
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions of the Software.
+///
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+/// THE SOFTWARE.
+
+
+
 
 import Foundation
 import CoreData
@@ -25,7 +46,7 @@ public class FavoriteAd: NSManagedObject {
     
     //MARK: - ADD AD TO FAVORITE
     
-    static func saveAdToFavorite( userUID:String, id:String, title:String, description:String, imageURL:String, date:Double,likes:Int)  {
+    static func saveAdToFavorite( userUID:String, id:String, title:String, description:String, imageURL:String, date:Double,likes:Int, profile: Profile)  {
   
         let ad = FavoriteAd(context: AppDelegate.viewContext)
        
@@ -38,6 +59,19 @@ public class FavoriteAd: NSManagedObject {
         ad.addedByUser = userUID
         
         // Save context
+        guard ((try? AppDelegate.viewContext.save()) != nil) else {return}
+        
+        let profileTosave = FavoriteProfile(context: AppDelegate.viewContext)
+        profileTosave.activeAds = Int16(profile.activeAds)
+        profileTosave.dateField = profile.dateField
+        profileTosave.geohash = profile.geohash
+        profileTosave.id = profile.id
+        profileTosave.imageURL = profile.imageURL
+        profileTosave.latitude = profile.latitude
+        profileTosave.longitude = profile.longitude
+        profileTosave.userName = profile.userName
+        profileTosave.ad = ad
+        
         guard ((try? AppDelegate.viewContext.save()) != nil) else {return}
         
     }
@@ -69,8 +103,13 @@ public class FavoriteAd: NSManagedObject {
         
         //To delete things in core data...
         
-        let fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "FavoriteAd")
-        let deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+        var fetchRequest: NSFetchRequest<NSFetchRequestResult> = NSFetchRequest(entityName: "FavoriteAd")
+        var deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+      
+        guard ((try? AppDelegate.viewContext.execute(deleteRequest)) != nil)else{return}
+        
+        fetchRequest = NSFetchRequest(entityName: "FavoriteProfile")
+        deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
       
         guard ((try? AppDelegate.viewContext.execute(deleteRequest)) != nil)else{return}
 

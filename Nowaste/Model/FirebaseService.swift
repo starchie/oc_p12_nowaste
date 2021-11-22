@@ -3,7 +3,28 @@
 //  Barter
 //
 //  Created by Gilles Sagot on 10/10/2021.
-//
+
+/// Copyright (c) 2021 Starchie
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+///
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions of the Software.
+///
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+/// THE SOFTWARE.
+
+
+
 
 import Foundation
 import Firebase
@@ -21,12 +42,11 @@ class FirebaseService {
     var currentUser : User? { return Auth.auth().currentUser}
     var profile : Profile!
     
-    var ads = [Ad]()
     var profiles = [Profile]()
+    var ads = [Ad]()
     
     var radiusInM:Double!
     var center: CLLocationCoordinate2D!
-    
     var distances = [Double]()
     
     var listener: Firebase.ListenerRegistration!
@@ -390,7 +410,7 @@ class FirebaseService {
     func searchAdsByKeyWord(_ word:String)->[String]{
         var adsUIDResult = [String]()
         
-        for i in 0...ads.count - 1 {
+        for i in 0..<ads.count {
             let objc = ads[i].title
             let string = word
             if objc.range(of: string, options: .caseInsensitive) != nil {
@@ -406,7 +426,7 @@ class FirebaseService {
         var profilesInRadius = [Profile]()
         var distanceForProfilesInRadius = [Double]()
         
-        for  i in 0...FirebaseService.shared.profiles.count - 1 {
+        for  i in 0..<FirebaseService.shared.profiles.count {
             for uid in uid {
                 if FirebaseService.shared.profiles[i].id == uid {
                     profilesInRadius.append(FirebaseService.shared.profiles[i])
@@ -414,6 +434,7 @@ class FirebaseService {
                 }
             }
         }
+        
         result(profilesInRadius, distanceForProfilesInRadius)
     }
     
@@ -426,6 +447,19 @@ class FirebaseService {
                 }
         }
         return selectedAds
+    }
+    
+    // DONT NEED PROFILES THAT SHARE ANYTHING
+    func removeProfileIfNoAd(_ profiles:[Profile], distances:[Double], result: ([Profile], [Double] ) -> Void ) {
+        var resultProfiles = profiles
+        var resultDistances = distances
+        for i in 0..<profiles.count {
+            if profiles[i].activeAds == 0 {
+                resultProfiles.remove(at: i)
+                resultDistances.remove(at: i)
+            }
+        }
+        result(resultProfiles,resultDistances) 
     }
 
 

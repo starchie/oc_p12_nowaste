@@ -3,7 +3,25 @@
 //  Nowaste
 //
 //  Created by Gilles Sagot on 01/11/2021.
-//
+
+/// Copyright (c) 2021 Starchie
+/// Permission is hereby granted, free of charge, to any person obtaining a copy
+/// of this software and associated documentation files (the "Software"), to deal
+/// in the Software without restriction, including without limitation the rights
+/// to use, copy, modify, merge, publish, distribute, sublicense, and/or sell
+/// copies of the Software, and to permit persons to whom the Software is
+/// furnished to do so, subject to the following conditions:
+///
+/// The above copyright notice and this permission notice shall be included in
+/// all copies or substantial portions of the Software.
+///
+/// THE SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR
+/// IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY,
+/// FITNESS FOR A PARTICULAR PURPOSE AND NONINFRINGEMENT. IN NO EVENT SHALL THE
+/// AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
+/// LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
+/// OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
+/// THE SOFTWARE.
 
 import UIKit
 
@@ -16,6 +34,8 @@ class DetailController: UIViewController {
     var trashButton:UIButton!
     var isFavorite = false
     var isUserCreation = false
+    var dynamicView: DynamicView!
+    var selectedProfile: Profile!
 
     
     
@@ -33,18 +53,33 @@ class DetailController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        detailView = DetailView(frame: CGRect(x: 20.0, y: 467.0, width: 335.0, height: 160.0) )
+        let nc = navigationController as! NavigationController
+        nc.currentState = .detail
+        
+        view.backgroundColor = UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
+        
+        detailView = DetailView(frame: CGRect(x: 0, y: nc.topBarHeight, width: view.frame.width, height: view.frame.height - nc.topBarHeight) )
 
         self.view.addSubview(detailView)
         
-        self.detailView.itemTitle.text = currentAd.title
-        /*
-        let attribText = NSMutableAttributedString(string: detailView.itemTitle.text!)
-        attribText.setAttributes([NSAttributedString.Key.backgroundColor: UIColor.cyan],
-                                 range: NSMakeRange(0, detailView.itemTitle.text!.count))
+        // DYNAMIC VIEW
+        let width: CGFloat = view.frame.width
+        let height: CGFloat = view.frame.height
         
-        detailView.itemTitle.attributedText = attribText
-         */
+        dynamicView = DynamicView(frame: CGRect(x: 0, y: 0, width: width, height: height) )
+        dynamicView.alpha = 1.0
+        view.addSubview(dynamicView)
+        view.sendSubviewToBack(dynamicView)
+        dynamicView.animPlay()
+        
+        
+        self.detailView.itemTitle.text = currentAd.title
+        self.detailView.itemDescription.text = currentAd.description
+        self.detailView.countView.text = String(currentAd.likes)
+        self.detailView.card.nameProfile.text = selectedProfile.userName
+        
+
+        
         FirebaseService.shared.loadImage(currentAd.imageURL) { success,error,image in
             if success {
                 self.detailView.itemImage.image = UIImage(data: image!)
@@ -54,20 +89,8 @@ class DetailController: UIViewController {
             }
             
         }
-        
-        UIView.animate(withDuration: 1, delay: 0, usingSpringWithDamping: 0.4, initialSpringVelocity: 0.3, options: [], animations: {
-            
-            self.detailView.frame = self.view.frame
-        }, completion: { (finished: Bool) in
-            self.detailView.updateViews()
-            
-            self.detailView.itemDescription.text = self.currentAd.description
-            self.detailView.countView.text = String(self.currentAd.likes)
-            
-        
-            
-        })
-        
+         
+
         // BUTTONS
         favoriteButton = UIButton(type: .system)
         favoriteButton.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
@@ -115,7 +138,7 @@ class DetailController: UIViewController {
     
     func addToFavorite() {
         
-        FavoriteAd.saveAdToFavorite (userUID: currentAd.addedByUser, id: currentAd.id, title: currentAd.title, description: currentAd.description, imageURL: currentAd.imageURL, date: currentAd.dateField, likes: currentAd.likes)
+        FavoriteAd.saveAdToFavorite (userUID: currentAd.addedByUser, id: currentAd.id, title: currentAd.title, description: currentAd.description, imageURL: currentAd.imageURL, date: currentAd.dateField, likes: currentAd.likes, profile: selectedProfile)
 
         presentUIAlertController(title: "Info", message: "Recipe saved")
         
@@ -151,119 +174,4 @@ class DetailController: UIViewController {
   
     }
     
- 
-    
-   
-    
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-/*
-class DetailController: UIViewController {
-    
-    var dynamicView:DynamicView!
-    var detailview: DetailView!
-    var index:Int!
-    
-    var topBarHeight:CGFloat {
-        let scene = UIApplication.shared.connectedScenes.first as! UIWindowScene
-        let window = scene.windows.first
-        let frameWindow = window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
-        let frameNavigationBar = self.navigationController?.navigationBar.frame.height ?? 0
-        return frameWindow + frameNavigationBar
-    }
-
-    override func viewWillAppear(_ animated: Bool) {
-
-        
-    }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        FirebaseService.shared.removeListener()
-    }
-    
-    override func viewDidLoad() {
-        super.viewDidLoad()
-        
-        // VIEW
-        let width: CGFloat = view.frame.width
-        let height: CGFloat = view.frame.height - topBarHeight - 200
-        
-        dynamicView = DynamicView(frame: CGRect(x: 0, y: 200, width: width, height: height) )
-        dynamicView.animPlay()
-        dynamicView.alpha = 0.8
-       
-        view.addSubview(dynamicView)
-        
-        // DETAILVIEW
-        detailview = DetailView(frame: view.frame)
-        self.view.addSubview(detailview)
-       
-        print(FirebaseService.shared.ads.count)
-        
-        let selectedItem = FirebaseService.shared.ads[index]
-        detailview.isHidden = false
-        detailview.itemTitle.text = selectedItem.title
-        detailview.itemDescription.text = selectedItem.description
-        detailview.countView.text = "+ " + String(selectedItem.likes)
-        FirebaseService.shared.loadImage(selectedItem.imageURL) { success,error,image in
-            if success {
-                self.detailview.itemImage.image = UIImage(data: image!)
-                
-            }else {
-                self.presentUIAlertController(title: "erreur", message: error!)
-            }
-            
-        }
-        detailview.contactButton.addTarget(self, action: #selector(sendMessage), for: .touchUpInside)
-        
-        
-      
-    }
-    
-    //MARK: -  ALERT CONTROLLER
-    
-    private func presentUIAlertController(title:String, message:String) {
-        let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
-        ac.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
-        present(ac, animated: true, completion: nil)
-    }
-    
-    @objc func sendMessage() {
-        let value: Int = FirebaseService.shared.ads[index].likes + 1
-        
-        FirebaseService.shared.updateAd(field: "likes",
-                                        id: FirebaseService.shared.ads[index].id,
-                                        by: value) { success, error in
-            if success {
-                self.presentUIAlertController(title: "Info", message: "You sent a message ")
-                let selectedItem = FirebaseService.shared.ads[self.index]
-                self.detailview.countView.text = "+ " + String(selectedItem.likes)
-                
-            }else{
-                self.presentUIAlertController(title: "error", message: error!)
-            }
-            
-            
-        }
-        
-    }
-    
-}
-*/
