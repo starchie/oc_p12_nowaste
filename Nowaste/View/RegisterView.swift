@@ -56,7 +56,7 @@ class RegisterView: UIView {
         self.init(frame: rect)
         self.frame = rect
         
-        self.backgroundColor =  UIColor(red: 80/255, green: 140/255, blue: 80/255, alpha: 1.0)
+        self.backgroundColor =  UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
         
         
         imageProfile = UIImageView(image: UIImage(systemName: "person.fill"))
@@ -120,7 +120,7 @@ class RegisterView: UIView {
         city.textAlignment = .center
         
         register = UIButton()
-        register.setTitle("Register", for: .normal)
+        register.setTitle("Inscription", for: .normal)
         register.frame = city.frame.offsetBy(dx: 0, dy: 55)
         register.setTitleColor(.white, for: .normal)
 

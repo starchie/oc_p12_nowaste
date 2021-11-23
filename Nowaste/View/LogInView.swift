@@ -45,7 +45,7 @@ class LogInView: UIView {
         let rect = CGRect(x: 0, y: 0, width: inView.frame.width, height: inView.frame.height)
         self.init(frame: rect)
         
-        let color =  UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0)
+        let color =  UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
         
         self.frame = rect
         self.backgroundColor = color
@@ -72,7 +72,7 @@ class LogInView: UIView {
         password.textAlignment = .center
         
         login = UIButton()
-        login.setTitle("Login", for: .normal)
+        login.setTitle("Connexion", for: .normal)
         login.frame = password.frame.offsetBy(dx: 0, dy: 55)
 
         self.addSubview(mail)

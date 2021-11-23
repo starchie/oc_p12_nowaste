@@ -52,7 +52,11 @@ class IntroController: UIViewController {
         // Do any additional setup after loading the view.
 
         view.backgroundColor = UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
-      
+        let bgimage = UIImageView(image: UIImage(named: "vegetables"))
+        bgimage.frame = view.frame
+        bgimage.contentMode = .scaleAspectFill
+        bgimage.alpha = 1.0
+        view.addSubview(bgimage)
         boom.frame = CGRect(x: 0, y: view.frame.width/2 - 30, width: view.frame.width, height: view.frame.width )
         view.addSubview(boom)
 
@@ -94,18 +98,14 @@ class IntroController: UIViewController {
         view.addSubview(titleLabel)
         
         register.frame = CGRect(x: 30, y: view.frame.maxY - 50, width: view.frame.width - 60, height: 50)
-        register.layer.cornerRadius = register.frame.height / 2
-        register.setTitle("Register", for: .normal)
+        register.setTitle("Inscription", for: .normal)
         register.setTitleColor(.white, for: .normal)
-        register.backgroundColor =  UIColor(red: 80/255, green: 140/255, blue: 80/255, alpha: 1.0)
         register.titleLabel?.font = UIFont(name: "ArialRoundedMTBold", size: 20)
         view.addSubview(register)
         
         logIn.frame = register.frame.offsetBy(dx: 0, dy: -55)
-        logIn.layer.cornerRadius = logIn.frame.height / 2
-        logIn.setTitle("Log In", for: .normal)
+        logIn.setTitle("Connexion", for: .normal)
         logIn.setTitleColor(.white, for: .normal)
-        logIn.backgroundColor =  UIColor(red: 85/255,green: 85/255,blue: 192/255,alpha: 1.0)
         logIn.titleLabel?.font = UIFont(name: "ArialRoundedMTBold", size: 20)
         view.addSubview(logIn)
         
@@ -116,12 +116,12 @@ class IntroController: UIViewController {
     
     @objc func goLogIn() {
         let vc = LogInController()
-        self.navigationController?.pushViewController(vc, animated: false)
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     @objc func goRegister() {
         let vc = RegisterController()
-        self.navigationController?.pushViewController(vc, animated: false)
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     // MARK: - UTILS

@@ -51,7 +51,6 @@ class NavigationController: UINavigationController {
         print(" ", terminator: Array(repeating: "\n", count: 10).joined())
         print("Scroll up for Firebase log")
         print("Nowaste v0.1")
-        print("size if top var : \(topBarHeight)")
         
         let appearance = UINavigationBarAppearance()
         appearance.configureWithTransparentBackground()

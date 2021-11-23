@@ -68,7 +68,7 @@ class LogInController: UIViewController {
             if success {
                 // CONTINUE TO MAP
                 let vc = MapController()
-                self.navigationController?.pushViewController(vc, animated: false)
+                self.navigationController?.pushViewController(vc, animated: true)
             } else {
                 // ERROR
                 self.presentUIAlertController(title: "Erreur", message: "Impossible de charger vos informations")

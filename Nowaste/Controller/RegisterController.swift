@@ -37,7 +37,7 @@ class RegisterController: UIViewController {
         let nc = navigationController as! NavigationController
         nc.currentState = .register
         
-        view.backgroundColor =  UIColor(red: 80/255, green: 140/255, blue: 80/255, alpha: 1.0)
+        view.backgroundColor =  UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
  
         registerView = RegisterView(inView: self.view)
 
@@ -63,7 +63,7 @@ class RegisterController: UIViewController {
     
     func goMap() {
         let vc = MapController()
-        self.navigationController?.pushViewController(vc, animated: false)
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
 
