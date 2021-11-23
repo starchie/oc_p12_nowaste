@@ -70,6 +70,9 @@ class MapController: UIViewController {
         profileButton.addTarget(self, action:#selector(profileFunction), for: .touchUpInside)
 
         self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: listButton),UIBarButtonItem(customView: addButton),UIBarButtonItem(customView: searchButton), UIBarButtonItem(customView: profileButton) ]
+        
+        // GET ALL USER ON THE MAP
+        getProfilesInRadius()
  
     }
     
@@ -107,8 +110,8 @@ class MapController: UIViewController {
         // DELEGATE
         mapView.delegate = self
         
-        // LOAD DATA FIRST
-        // PLACE CAMERA - USER GEO LOCATION -
+        
+        // PLACE CAMERA - QUERRY USER LOCATION -
         
         guard FirebaseService.shared.currentUser?.uid != nil, FirebaseService.shared.profile != nil
         else { self.presentUIAlertController(title: "Erreur", message: "Vous n'êtes pas connecté"); return}
@@ -122,8 +125,6 @@ class MapController: UIViewController {
             
         }
         
-        // GET ALL USER ON THE MAP
-        getProfilesInRadius()
         
         // DYNAMIC VIEW
         let width: CGFloat = view.frame.width

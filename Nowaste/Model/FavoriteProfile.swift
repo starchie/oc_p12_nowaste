@@ -15,8 +15,6 @@ public class FavoriteProfile: NSManagedObject {
         // Request Ingredient
     
         let filter = ad
-        print("🍏")
-        print(ad)
         let predicate = NSPredicate(format: "ad.id = %@", filter)
         let requestProfile: NSFetchRequest<FavoriteProfile> = FavoriteProfile.fetchRequest()
     

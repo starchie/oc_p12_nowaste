@@ -8,7 +8,12 @@
         <attribute name="imageURL" optional="YES" attributeType="String"/>
         <attribute name="likes" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
         <attribute name="title" optional="YES" attributeType="String"/>
+        <relationship name="message" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="FavoriteMessage" inverseName="ad" inverseEntity="FavoriteMessage"/>
         <relationship name="profile" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="FavoriteProfile" inverseName="ad" inverseEntity="FavoriteProfile"/>
+    </entity>
+    <entity name="FavoriteMessage" representedClassName=".FavoriteMessage" syncable="YES" codeGenerationType="category">
+        <attribute name="sent" optional="YES" attributeType="Boolean" usesScalarValueType="YES"/>
+        <relationship name="ad" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="FavoriteAd" inverseName="message" inverseEntity="FavoriteAd"/>
     </entity>
     <entity name="FavoriteProfile" representedClassName=".FavoriteProfile" syncable="YES" codeGenerationType="category">
         <attribute name="activeAds" optional="YES" attributeType="Integer 16" defaultValueString="0" usesScalarValueType="YES"/>
@@ -22,7 +27,8 @@
         <relationship name="ad" optional="YES" maxCount="1" deletionRule="Cascade" destinationEntity="FavoriteAd" inverseName="profile" inverseEntity="FavoriteAd"/>
     </entity>
     <elements>
-        <element name="FavoriteAd" positionX="-81.05859375" positionY="28.41015625" width="128" height="163"/>
-        <element name="FavoriteProfile" positionX="124.11328125" positionY="28.59375" width="128" height="178"/>
+        <element name="FavoriteAd" positionX="-210.6796875" positionY="14.07421875" width="128" height="178"/>
+        <element name="FavoriteProfile" positionX="126.48046875" positionY="-55.8515625" width="128" height="178"/>
+        <element name="FavoriteMessage" positionX="122.75390625" positionY="226.92578125" width="128" height="73"/>
     </elements>
 </model>

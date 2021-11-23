@@ -28,6 +28,7 @@ import UIKit
 class ListCell: UITableViewCell {
     
     var circleView: UIView!
+    var imageProfile: UIImageView!
     var cellTitle: UILabel!
     var distanceView: UILabel!
     
@@ -52,6 +53,12 @@ class ListCell: UITableViewCell {
         circleView.backgroundColor = .white
         circleView.layer.cornerRadius = 20
         self.addSubview(circleView)
+        
+        imageProfile = UIImageView()
+        imageProfile.frame = CGRect(x: 4, y: 4, width: 40, height: 40)
+        imageProfile.backgroundColor = .white
+        imageProfile.layer.cornerRadius = 20
+        self.addSubview(imageProfile)
         
         cellTitle = UILabel()
         cellTitle.font = UIFont(name: "Helvetica-Bold", size: 20)
@@ -84,8 +91,6 @@ class ListCell: UITableViewCell {
         if circleView.frame.height >= 50 {
             self.circleView.frame = CGRect(x: 4, y: 4, width: 40, height: h - 5)
         }else {
-            //self.circleView.frame = CGRect(x: 4, y: 4, width: 40, height: h - 5)
-            
             UIView.animate(withDuration: 0.5, delay: 0.0, options: [.curveLinear], animations: { self.circleView.frame = CGRect(x: 4, y: 4, width: 40, height: h - 5) }, completion: nil)
             
         }

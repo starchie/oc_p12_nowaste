@@ -29,47 +29,62 @@ import Firebase
 class ProfileController: UIViewController {
     
     var profileView: ProfileView!
-    var tableView: UITableView!
-    var ads = [Ad]()
+
     var selection: UILabel!
     var control:UISegmentedControl!
-    var favorites:[Ad]!
+    var tableView: UITableView!
     
-    var topBarHeight:CGFloat {
-        let scene = UIApplication.shared.connectedScenes.first as! UIWindowScene
-        let window = scene.windows.first
-        let frameWindow = window?.windowScene?.statusBarManager?.statusBarFrame.height ?? 0
-        let frameNavigationBar = self.navigationController?.navigationBar.frame.height ?? 0
-        return frameWindow + frameNavigationBar
-    }
-
+    
+    var createdAds = [Ad]()
+    var favoriteAds:[Ad]!
+    
+    // MARK: - PREPARE CONTROLLER AND VIEWS
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         //FavoriteAd.deleteAllCoreDataItems()
         
-        favorites = FavoriteAd.all
+        // NAVIGATION CONTROLLER
+        let nc = navigationController as! NavigationController
+        nc.currentState = .profile
         
+        // PREPARE VIEWS
         view.backgroundColor =  UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
         
-        profileView = ProfileView(frame: CGRect(x: 10, y: topBarHeight, width: view.frame.width, height: 60))
+        // PROFILE VIEW HOW WE ARE
+        profileView = ProfileView(frame: CGRect(x: 10, y: nc.topBarHeight, width: view.frame.width, height: 60))
         view.addSubview(profileView)
         
-         
-        //profileView.userName.text = FirebaseService.shared.profile.userName
+        // GET PROFILE NAME
+        guard FirebaseService.shared.profile != nil else{ return }
+        profileView.userName.text = FirebaseService.shared.profile.userName
         
+        // GET PROFILE IMAGE
+        FirebaseService.shared.loadImage(FirebaseService.shared.profile.imageURL) { success,error,image in
+            if success {
+                self.profileView.imageProfile.image = UIImage(data: image!)
+                
+            }else {
+                self.presentUIAlertController(title: "erreur", message: error!)
+            }
+            
+        }// End Closure
+        
+        // SEGMENTED CONTROL
         let items: [String] = ["✍︎","✮"]
         control = UISegmentedControl(items: items)
+        control.tintColor = UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
+        control.backgroundColor = UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
         control.frame = CGRect(x: 10, y: profileView.frame.maxY + 30, width: view.frame.width - 20, height: 30)
-        control.addTarget(self, action: #selector(didChange(_:)), for: .valueChanged)
-        control.backgroundColor = .clear
+        control.layer.cornerRadius = 0
         control.selectedSegmentTintColor = .darkGray
-        control.setTitleTextAttributes([NSAttributedString.Key.foregroundColor: UIColor.white, NSAttributedString.Key.font: UIFont(name: "Helvetica", size: 30.0)!], for: .normal)
-      
-      
         view.addSubview(control)
+        // SEGMENTED CONTROL ACTION
+        control.addTarget(self, action: #selector(didChange(_:)), for: .valueChanged)
+  
         
-        
+        // LABEL : CHOICE DESCRIPTION - FAVORITE OR CREATED ADS
         selection = UILabel()
         selection.text = " Vos annonces sur NoWaste "
         selection.textColor = .white
@@ -91,39 +106,42 @@ class ProfileController: UIViewController {
         tableView.backgroundColor = UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
         
         self.view.addSubview(tableView)
-        
-        print (FirebaseService.shared.currentUser!.uid)
-        
 
-        
-
-        // Do any additional setup after loading the view.
     }
     
+    // RELOAD
+    override func viewWillAppear(_ animated: Bool) {
+        // GET DATA
+        getCreatedAds()
+        favoriteAds = FavoriteAd.all
+        tableView.reloadData()
+    }
     
+    // MARK: - ACTIONS
     
+    // SELECTION CHANGE BETWEEN FAVORITES AND CREATED ADS
     @objc func didChange(_ sender: UISegmentedControl){
         tableView.reloadData()
     }
     
-    override func viewWillAppear(_ animated: Bool) {
+    // ADS FROM USER
+    func getCreatedAds(){
+        
+        guard FirebaseService.shared.currentUser != nil else {
+            presentUIAlertController(title: "message", message: "your are not logged")
+            return}
         
         FirebaseService.shared.querryAds(filter: FirebaseService.shared.currentUser!.uid) {success, error in
             if success {
-                self.ads = FirebaseService.shared.ads
-                FirebaseService.shared.removeListener()
+                self.createdAds = FirebaseService.shared.ads
                 self.tableView.reloadData()
-                print (self.ads.count)
             }else{
                 self.presentUIAlertController(title: "error", message: error!)
             }
-            
         }
-        
-        favorites = FavoriteAd.all
-        
-        tableView.reloadData()
     }
+    
+
     
     //MARK: -  ALERT CONTROLLER
     
@@ -132,24 +150,6 @@ class ProfileController: UIViewController {
         ac.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
         present(ac, animated: true, completion: nil)
     }
-    
-    func updateActiveAdsForUser() {
-        
-        guard FirebaseService.shared.currentUser != nil else {
-            presentUIAlertController(title: "message", message: "your are not logged")
-            return}
-         let value = FieldValue.increment(Int64(-1))
-        
-        FirebaseService.shared.updateProfile(user: FirebaseService.shared.currentUser!.uid, field: "activeAds", by: value){success,error in
-             if success {
-                 self.presentUIAlertController(title: "Suppression", message: "post supprimé avec succés")
-             }else {
-                 self.presentUIAlertController(title: "Enregistrement", message: error!)
-             }
-         }
-     }
-    
-
 
 }
 
@@ -157,12 +157,11 @@ class ProfileController: UIViewController {
 
 extension ProfileController:UITableViewDataSource {
     
-    
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         if control.selectedSegmentIndex == 0 {
-            return ads.count
+            return createdAds.count
         }else{
-            return favorites.count
+            return favoriteAds.count
         }
     }
     
@@ -172,37 +171,25 @@ extension ProfileController:UITableViewDataSource {
     
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
-        cell.backgroundColor = UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
         cell.textLabel?.textColor = .white
         cell.backgroundColor = UIColor(red: 8/255, green: 16/255, blue: 76/255, alpha: 1.0)
+        
         if control.selectedSegmentIndex == 0 {
-            cell.textLabel?.text = ads[indexPath.row].title
+            cell.textLabel?.text = createdAds[indexPath.row].title
+            cell.imageView?.tintColor = .white
+            cell.imageView?.image = UIImage(systemName: "")
         }
         else {
-            cell.textLabel?.text = favorites[indexPath.row].title
+            cell.textLabel?.text = favoriteAds[indexPath.row].title
+            let message = FavoriteMessage.returnUser(from: FavoriteAd.all[indexPath.row].id)
+            if message == true {
+                cell.imageView?.tintColor = .white
+                cell.imageView?.image = UIImage(systemName: "mail")
+            }
             
         }
         
         return cell
-    }
-    
-    func tableView(_ tableView: UITableView, commit editingStyle: UITableViewCell.EditingStyle, forRowAt indexPath: IndexPath) {
-        if editingStyle == .delete {
-            let id = FirebaseService.shared.ads[indexPath.row].id
-            FirebaseService.shared.deleteAd(id:id) {
-                success, error in
-                    if success {
-                        print (self.ads.count)
-                        self.updateActiveAdsForUser()
-                        self.ads.remove(at: indexPath.row)
-                        tableView.deleteRows(at: [indexPath], with: .fade)
-                    } else{
-                        self.presentUIAlertController(title: "error", message: error!)
-                    }
-                }
-            }
-        
-        
     }
     
     

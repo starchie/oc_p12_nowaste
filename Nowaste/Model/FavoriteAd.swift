@@ -46,7 +46,7 @@ public class FavoriteAd: NSManagedObject {
     
     //MARK: - ADD AD TO FAVORITE
     
-    static func saveAdToFavorite( userUID:String, id:String, title:String, description:String, imageURL:String, date:Double,likes:Int, profile: Profile)  {
+    static func saveAdToFavorite( userUID:String, id:String, title:String, description:String, imageURL:String, date:Double,likes:Int, profile: Profile, contact: Bool)  {
   
         let ad = FavoriteAd(context: AppDelegate.viewContext)
        
@@ -74,6 +74,12 @@ public class FavoriteAd: NSManagedObject {
         
         guard ((try? AppDelegate.viewContext.save()) != nil) else {return}
         
+        let message = FavoriteMessage(context: AppDelegate.viewContext)
+        message.sent = contact
+        message.ad = ad
+        
+        guard ((try? AppDelegate.viewContext.save()) != nil) else {return}
+
     }
     
     static func deleteAd (id:String) {
@@ -109,6 +115,11 @@ public class FavoriteAd: NSManagedObject {
         guard ((try? AppDelegate.viewContext.execute(deleteRequest)) != nil)else{return}
         
         fetchRequest = NSFetchRequest(entityName: "FavoriteProfile")
+        deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
+      
+        guard ((try? AppDelegate.viewContext.execute(deleteRequest)) != nil)else{return}
+        
+        fetchRequest = NSFetchRequest(entityName: "FavoriteMessage")
         deleteRequest = NSBatchDeleteRequest(fetchRequest: fetchRequest)
       
         guard ((try? AppDelegate.viewContext.execute(deleteRequest)) != nil)else{return}

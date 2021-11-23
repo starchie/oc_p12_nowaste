@@ -7,6 +7,7 @@
 	objects = {
 
 /* Begin PBXBuildFile section */
+		CA476878274CDBB90029A23E /* FavoriteMessage.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA476877274CDBB90029A23E /* FavoriteMessage.swift */; };
 		CA4AE2F7272B2EDD00C444D8 /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA4AE2F6272B2EDD00C444D8 /* AppDelegate.swift */; };
 		CA4AE2F9272B2EDD00C444D8 /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA4AE2F8272B2EDD00C444D8 /* SceneDelegate.swift */; };
 		CA4AE2FB272B2EDD00C444D8 /* MapController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CA4AE2FA272B2EDD00C444D8 /* MapController.swift */; };
@@ -74,6 +75,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
+		CA476877274CDBB90029A23E /* FavoriteMessage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FavoriteMessage.swift; sourceTree = "<group>"; };
 		CA4AE2F3272B2EDD00C444D8 /* Nowaste.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = Nowaste.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		CA4AE2F6272B2EDD00C444D8 /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		CA4AE2F8272B2EDD00C444D8 /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -196,6 +198,7 @@
 				CA4AE32C272BFDDF00C444D8 /* Annotation.swift */,
 				CA9B4C8827444F250025012E /* Nowaste.xcdatamodeld */,
 				CA85DABC274B88B600D7D4BD /* FavoriteProfile.swift */,
+				CA476877274CDBB90029A23E /* FavoriteMessage.swift */,
 				CA9B4C8D274453B00025012E /* FavoriteAd.swift */,
 				CA4AE311272B2FB700C444D8 /* FirebaseService.swift */,
 				CA4AE316272B380100C444D8 /* Ad.swift */,
@@ -431,6 +434,7 @@
 				CA4AE2F7272B2EDD00C444D8 /* AppDelegate.swift in Sources */,
 				CA4AE312272B2FB700C444D8 /* FirebaseService.swift in Sources */,
 				CA4AE31E272B455600C444D8 /* NavigationController.swift in Sources */,
+				CA476878274CDBB90029A23E /* FavoriteMessage.swift in Sources */,
 				CACFF38A2746D4E900C70D65 /* NavigationButton.swift in Sources */,
 				CA4AE339272E845400C444D8 /* ListCell.swift in Sources */,
 				CA4AE32D272BFDDF00C444D8 /* Annotation.swift in Sources */,

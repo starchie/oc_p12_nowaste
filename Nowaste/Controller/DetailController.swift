@@ -24,62 +24,58 @@
 /// THE SOFTWARE.
 
 import UIKit
+import Firebase
 
 class DetailController: UIViewController {
     
  
     var currentAd: Ad!
     var detailView:DetailView!
-    var favoriteButton:UIButton!
-    var trashButton:UIButton!
+    var favoriteButton:NavigationButton!
+    var trashButton:NavigationButton!
     var isFavorite = false
     var isUserCreation = false
     var dynamicView: DynamicView!
     var selectedProfile: Profile!
 
-    
-    
-    override func viewWillAppear(_ animated: Bool) {
-        
-        // NAVIGATION BAR
-        navigationController?.navigationBar.isHidden = false
-    
-        self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: favoriteButton),UIBarButtonItem(customView: trashButton)]
 
-        
-
-    }
     
     override func viewDidLoad() {
         super.viewDidLoad()
         
+ 
+        
+        // NAVIGATION CONTROLLER
         let nc = navigationController as! NavigationController
         nc.currentState = .detail
         
+        addNavigationButton()
+        
+        self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: favoriteButton),UIBarButtonItem(customView: trashButton)]
+        
+        // VIEWS
         view.backgroundColor = UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
         
         detailView = DetailView(frame: CGRect(x: 0, y: nc.topBarHeight, width: view.frame.width, height: view.frame.height - nc.topBarHeight) )
-
         self.view.addSubview(detailView)
         
         // DYNAMIC VIEW
         let width: CGFloat = view.frame.width
         let height: CGFloat = view.frame.height
-        
         dynamicView = DynamicView(frame: CGRect(x: 0, y: 0, width: width, height: height) )
         dynamicView.alpha = 1.0
         view.addSubview(dynamicView)
         view.sendSubviewToBack(dynamicView)
         dynamicView.animPlay()
         
-        
-        self.detailView.itemTitle.text = currentAd.title
-        self.detailView.itemDescription.text = currentAd.description
-        self.detailView.countView.text = String(currentAd.likes)
-        self.detailView.card.nameProfile.text = selectedProfile.userName
-        
+        // DETAIL VIEW
+        detailView.itemTitle.text = currentAd.title
+        detailView.itemDescription.text = currentAd.description
+        detailView.countView.text = String(currentAd.likes)
+        detailView.card.nameProfile.text = selectedProfile.userName
+        detailView.contactButton.addTarget(self, action:#selector(sendMail), for: .touchUpInside)
 
-        
+        // GET IMAGE FROM AD
         FirebaseService.shared.loadImage(currentAd.imageURL) { success,error,image in
             if success {
                 self.detailView.itemImage.image = UIImage(data: image!)
@@ -88,39 +84,8 @@ class DetailController: UIViewController {
                 self.presentUIAlertController(title: "erreur", message: error!)
             }
             
-        }
-         
+        }// End Closure
 
-        // BUTTONS
-        favoriteButton = UIButton(type: .system)
-        favoriteButton.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-        favoriteButton.setBackgroundImage(UIImage(systemName: "star"), for: .normal)
-        favoriteButton.layer.cornerRadius = favoriteButton.frame.width / 2
-        favoriteButton.tintColor = .init(white: 1.0, alpha: 1.0)
-        favoriteButton.addTarget(self, action:#selector(toggleFavorite), for: .touchUpInside)
-        
-        trashButton = UIButton(type: .system)
-        trashButton.frame = CGRect(x: 0, y: 0, width: 30, height: 30)
-        trashButton.setBackgroundImage(UIImage(systemName: "trash"), for: .normal)
-        trashButton.layer.cornerRadius = favoriteButton.frame.width / 2
-        trashButton.tintColor = .init(white: 1.0, alpha: 1.0)
-        //trashButton.addTarget(self, action:#selector(toggleFavorite), for: .touchUpInside)
-        
-        if isFavorite {
-            favoriteButton.setImage(UIImage(systemName: "star.fill"), for: .normal)
-        }else {
-            favoriteButton.setImage(UIImage(systemName: "star"), for: .normal)
-        }
-        
-        if isUserCreation {
-            trashButton.isHidden = false
-        }
-        else {
-            trashButton.isHidden = true
-        }
-        
-        
-        
     }
     
    
@@ -134,38 +99,92 @@ class DetailController: UIViewController {
     }
     
     
-    //MARK: -  ACTION
+    //MARK: -  ACTIONS
+    
+    func addNavigationButton () {
+        // BUTTONS
+        favoriteButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "star")
+        favoriteButton.addTarget(self, action:#selector(toggleFavorite), for: .touchUpInside)
+        
+        trashButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "trash")
+        trashButton.addTarget(self, action:#selector(deleteFromSource), for: .touchUpInside)
+        
+        if isFavorite {
+            favoriteButton.setBackgroundImage(UIImage(systemName: "star.fill"), for: .normal)
+        }else {
+            favoriteButton.setBackgroundImage(UIImage(systemName: "star"), for: .normal)
+        }
+        
+        if isUserCreation {
+            trashButton.isHidden = false
+            favoriteButton.isHidden = true
+        }
+        else {
+            trashButton.isHidden = true
+            favoriteButton.isHidden = false
+        }
+        
+    }
+    
+    @objc func sendMail() {
+        FavoriteAd.saveAdToFavorite (userUID: currentAd.addedByUser, id: currentAd.id, title: currentAd.title, description: currentAd.description, imageURL: currentAd.imageURL, date: currentAd.dateField, likes: currentAd.likes, profile: selectedProfile, contact: true)
+        
+        presentUIAlertController(title: "Info", message: " Vous avez envoyé un mail à \(selectedProfile.userName), vous pouvez retrouver cette annonce dans vos favoris. Merci d'utiliser Nowaste :)")
+        
+    }
     
     func addToFavorite() {
         
-        FavoriteAd.saveAdToFavorite (userUID: currentAd.addedByUser, id: currentAd.id, title: currentAd.title, description: currentAd.description, imageURL: currentAd.imageURL, date: currentAd.dateField, likes: currentAd.likes, profile: selectedProfile)
+        FavoriteAd.saveAdToFavorite (userUID: currentAd.addedByUser, id: currentAd.id, title: currentAd.title, description: currentAd.description, imageURL: currentAd.imageURL, date: currentAd.dateField, likes: currentAd.likes, profile: selectedProfile, contact: false)
 
         presentUIAlertController(title: "Info", message: "Recipe saved")
-        
-        print("🍏 adding ...")
-        print(FavoriteAd.all.count)
         
     }
         
     func deleteFromFavorite() {
-    
         FavoriteAd.deleteAd(id: currentAd.id)
         presentUIAlertController(title: "Info", message: "Recipe deleted")
-     
-        print("🍎 deleting ...")
-        print(FavoriteAd.all.count)
     }
+    
+    @objc func deleteFromSource(){
+        let id = currentAd.id
+        FirebaseService.shared.deleteAd(id:id) {
+            success, error in
+                if success {
+                    self.updateActiveAdsForUser()
+                } else{
+                    self.presentUIAlertController(title: "error", message: error!)
+                }
+            }
+    }
+    
+    // IF WE DELETE AN AD, CHANGE AD COUNTER IN PROFILE
+    func updateActiveAdsForUser() {
+        
+        guard FirebaseService.shared.currentUser != nil else {
+            presentUIAlertController(title: "message", message: "your are not logged")
+            return}
+         let value = FieldValue.increment(Int64(-1))
+        
+        FirebaseService.shared.updateProfile(user: FirebaseService.shared.currentUser!.uid, field: "activeAds", by: value){success,error in
+             if success {
+                 self.presentUIAlertController(title: "Suppression", message: "post supprimé avec succés")
+             }else {
+                 self.presentUIAlertController(title: "Enregistrement", message: error!)
+             }
+         }
+     }
     
     @objc func toggleFavorite() {
         // Attempt to customize navigation controller...
         
         if isFavorite {
-            favoriteButton.setImage(UIImage(systemName: "star"), for: .normal)
+            favoriteButton.setBackgroundImage(UIImage(systemName: "star"), for: .normal)
             isFavorite = false
             deleteFromFavorite()
         }
         else {
-            favoriteButton.setImage(UIImage(systemName: "star.fill"), for: .normal)
+            favoriteButton.setBackgroundImage(UIImage(systemName: "star.fill"), for: .normal)
             isFavorite = true
             addToFavorite()
         }

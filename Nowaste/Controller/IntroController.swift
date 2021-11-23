@@ -112,7 +112,6 @@ class IntroController: UIViewController {
         register.addTarget(self, action:#selector(goRegister), for: .touchUpInside)
         logIn.addTarget(self, action:#selector(goLogIn), for: .touchUpInside)
         
-           
     }
     
     @objc func goLogIn() {

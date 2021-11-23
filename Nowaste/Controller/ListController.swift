@@ -73,6 +73,9 @@ class ListController: UIViewController {
         profileButton.addTarget(self, action:#selector(profileFunction), for: .touchUpInside)
 
         self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: mapButton),UIBarButtonItem(customView: addButton),UIBarButtonItem(customView: searchButton),UIBarButtonItem(customView: profileButton) ]
+        
+        // GET DATA AND UPDATE VIEWS
+        getProfilesInRadius()
 
     }
     
@@ -108,10 +111,6 @@ class ListController: UIViewController {
         tableView.register(ListCell.self, forCellReuseIdentifier: "Cell")
         
         self.view.addSubview(tableView)
-        
-        // GET DATA AND UPDATE VIEWS
-        
-        getProfilesInRadius()
         
     }
     
@@ -275,6 +274,12 @@ extension ListController:UITableViewDataSource {
         cell.cellTitle.text = sortedProfiles[indexPath.row].userName
         let distance = distancesForSortedProfiles[indexPath.row]
         cell.distanceView.text = "à " + String(round(distance)) + " m"
+        FirebaseService.shared.loadImage(sortedProfiles[indexPath.row].imageURL) { success, error, data in
+            if success {
+                cell.imageProfile.image = UIImage(data: data ?? Data())
+            }
+            
+        }
        
         if indexPath.row == selectedRow{
             

@@ -27,13 +27,12 @@ import UIKit
 
 class AdView: UIView {
     
-    var adTitle:UILabel!
-    var adDescription:UILabel!
+    var adTitle:UITextView!
+    var adDescription:UITextView!
     var adImage:UIImageView!
     var adDate:UILabel!
     var adButton:UIButton!
-    
-    var stack:UIStackView!
+
 
     required init?(coder: NSCoder) {
         super.init(coder: coder)
@@ -42,52 +41,51 @@ class AdView: UIView {
     override init(frame: CGRect) {
         super.init(frame: frame)
         
+        self.backgroundColor = .clear
+        
         adImage = UIImageView()
         self.addSubview(adImage)
-        adImage.frame = CGRect(x: 10, y: 0 , width: frame.width - 20, height: frame.width / 1.33)
+        adImage.frame = CGRect(x: 0, y: 0 , width: frame.width, height: frame.width / 1.33)
         adImage.image = UIImage(systemName: "photo")
-        adImage.tintColor = .gray
-        adImage.backgroundColor = .lightGray
-        adImage.contentMode = .scaleAspectFill
-        adImage.layer.cornerRadius = 10
+        adImage.tintColor = .white
+        adImage.backgroundColor = UIColor.init(white: 1.0, alpha: 0.05)
+        adImage.contentMode = .scaleAspectFit
         adImage.clipsToBounds = true
         
-        adTitle = UILabel()
-        adTitle.font = UIFont(name: "Helvetica-Bold", size: 18)
-        adTitle.text = "Titre qui peut être un peu long"
-        adTitle.sizeToFit()
-        
+        adTitle = UITextView()
+        self.addSubview(adTitle)
+        adTitle.frame = CGRect(x: 0, y: adImage.frame.maxY + 10, width: frame.width, height: frame.height / 8)
+        adTitle.font = UIFont(name: "Helvetica-Bold", size: 24)
+        adTitle.textColor = .white
+        adTitle.backgroundColor = UIColor.init(white: 1.0, alpha: 0.05)
+    
+        adTitle.text = "le titre de votre annonce"
+    
         adButton = UIButton()
-        adButton.frame = CGRect(x: 0, y: 0, width: 400, height: 50)
-        adButton.backgroundColor = UIColor(red: 85/255, green: 85/255, blue: 192/255, alpha: 1.0)
+        self.addSubview(adButton)
+        adButton.frame = CGRect(x: 60,
+                                y: frame.maxY - frame.height / 4,
+                                width: frame.width - 120,
+                                height: frame.height / 8)
+        adButton.backgroundColor = UIColor.clear
         adButton.setTitle("Send ad", for: .normal)
         adButton.setTitleColor(.white, for: .normal)
         
-        adDescription = UILabel()
-        adDescription.numberOfLines = 6
+        adDescription = UITextView()
+        self.addSubview(adDescription)
+
+        adDescription.font = UIFont(name: "Helvetica-Bold", size: 16)
+        adDescription.textColor = .white
+        adDescription.backgroundColor = UIColor.init(white: 1.0, alpha: 0.05)
         adDescription.text = """
-            C’est lui aussi qui était à la base du dernier processeur, le sphéro. Un processeur ayant une architecture en forme de sphère et capable de traiter les informations  à une vitesse jamais atteinte.
+            Écrivez une description de votre annonce ici...
             """
-        adDescription.sizeToFit()
+        adDescription.frame = CGRect(x: 0,
+                                     y: (adTitle.frame.maxY + 10),
+                                     width: frame.width ,
+                                     height: adButton.frame.minY - (adTitle.frame.maxY + 20) )
+      
         
-        stack = UIStackView()
-        stack.translatesAutoresizingMaskIntoConstraints = true
-        stack.isLayoutMarginsRelativeArrangement = true
-        stack.axis = .vertical
-        stack.layoutMargins = UIEdgeInsets(top: 0, left: 10, bottom: 10, right: 20)
-        stack.alignment = .fill
-        stack.contentMode = .top
-        
-        stack.distribution = .fillProportionally
-        self.addSubview(stack)
-        stack.addArrangedSubview(adTitle)
-        stack.addArrangedSubview(adDescription)
-        stack.addArrangedSubview(adButton)
-        //stack.backgroundColor = .cyan
-        stack.frame = CGRect(x: 0,
-                             y: adImage.frame.maxY,
-                             width: frame.width,
-                             height: frame.height - adImage.frame.maxY - 80)
     }
 
 }

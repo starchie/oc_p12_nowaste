@@ -35,7 +35,7 @@ class NavigationController: UINavigationController {
     }
     
     enum states {
-        case intro, login, register, map, list, profile, detail
+        case intro, login, register, map, list, ad, profile, detail
     }
     
     var topBarHeight:CGFloat {
@@ -100,6 +100,9 @@ class NavigationController: UINavigationController {
             print("detail")
             self.navigationBar.isHidden = false
 
+        case .ad:
+            print("ad")
+            self.navigationBar.isHidden = false
         }
         
     }
