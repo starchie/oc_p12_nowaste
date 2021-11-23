@@ -113,7 +113,7 @@ class ProfileController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         // GET DATA
         getCreatedAds()
-        favoriteAds = FavoriteAd.all
+        favoriteAds = CoreDataManager.shared.all
         tableView.reloadData()
     }
     
@@ -181,7 +181,7 @@ extension ProfileController:UITableViewDataSource {
         }
         else {
             cell.textLabel?.text = favoriteAds[indexPath.row].title
-            let message = FavoriteMessage.returnUser(from: FavoriteAd.all[indexPath.row].id)
+            let message = CoreDataManager.shared.returnMessage(from: CoreDataManager.shared.all[indexPath.row].id)
             if message == true {
                 cell.imageView?.tintColor = .white
                 cell.imageView?.image = UIImage(systemName: "mail")
@@ -203,9 +203,9 @@ extension ProfileController:UITableViewDataSource {
             vc.isFavorite = false
         }
         else {
-            let profile = FavoriteProfile.returnUser(from: FavoriteAd.all[indexPath.row].id)
+            let profile = CoreDataManager.shared.returnProfile(from: CoreDataManager.shared.all[indexPath.row].id)
             vc.selectedProfile = profile.first
-            vc.currentAd = FavoriteAd.all[indexPath.row]
+            vc.currentAd = CoreDataManager.shared.all[indexPath.row]
             vc.isUserCreation = false
             vc.isFavorite = true
             

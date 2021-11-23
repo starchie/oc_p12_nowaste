@@ -32,27 +32,6 @@ import CoreData
 
 @main
 class AppDelegate: UIResponder, UIApplicationDelegate {
-    
-    // MARK: - COREDATA
-    
-    static var container = ContainerManager().persistentContainer
-    
-    static var persistentContainer: NSPersistentContainer {
-        return (UIApplication.shared.delegate as! AppDelegate).persistentContainer
-    }
-    
-    lazy var persistentContainer: NSPersistentContainer = {
-        //return container
-        return AppDelegate.container!
-    }()
-    
-    static var viewContext: NSManagedObjectContext {
-        return persistentContainer.viewContext
-    }
-
-    // END DATA
-
-
 
     func application(_ application: UIApplication, didFinishLaunchingWithOptions launchOptions: [UIApplication.LaunchOptionsKey: Any]?) -> Bool {
         // Override point for customization after application launch.

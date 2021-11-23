@@ -52,11 +52,11 @@ class IntroController: UIViewController {
         // Do any additional setup after loading the view.
 
         view.backgroundColor = UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
-        let bgimage = UIImageView(image: UIImage(named: "vegetables"))
-        bgimage.frame = view.frame
-        bgimage.contentMode = .scaleAspectFill
-        bgimage.alpha = 1.0
-        view.addSubview(bgimage)
+        //let bgimage = UIImageView(image: UIImage(named: "vegetables"))
+        //bgimage.frame = view.frame
+        //bgimage.contentMode = .scaleAspectFill
+        //bgimage.alpha = 1.0
+        //view.addSubview(bgimage)
         boom.frame = CGRect(x: 0, y: view.frame.width/2 - 30, width: view.frame.width, height: view.frame.width )
         view.addSubview(boom)
 
@@ -97,16 +97,16 @@ class IntroController: UIViewController {
         titleLabel.center = view.center
         view.addSubview(titleLabel)
         
-        register.frame = CGRect(x: 30, y: view.frame.maxY - 50, width: view.frame.width - 60, height: 50)
+        register.frame = CGRect(x: 30, y: view.frame.maxY - 70, width: view.frame.width - 60, height: 50)
         register.setTitle("Inscription", for: .normal)
         register.setTitleColor(.white, for: .normal)
-        register.titleLabel?.font = UIFont(name: "ArialRoundedMTBold", size: 20)
+       // register.titleLabel?.font = UIFont(name: "ArialRoundedMTBold", size: 20)
         view.addSubview(register)
         
         logIn.frame = register.frame.offsetBy(dx: 0, dy: -55)
         logIn.setTitle("Connexion", for: .normal)
         logIn.setTitleColor(.white, for: .normal)
-        logIn.titleLabel?.font = UIFont(name: "ArialRoundedMTBold", size: 20)
+       // logIn.titleLabel?.font = UIFont(name: "ArialRoundedMTBold", size: 20)
         view.addSubview(logIn)
         
         register.addTarget(self, action:#selector(goRegister), for: .touchUpInside)

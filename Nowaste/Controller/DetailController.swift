@@ -127,7 +127,7 @@ class DetailController: UIViewController {
     }
     
     @objc func sendMail() {
-        FavoriteAd.saveAdToFavorite (userUID: currentAd.addedByUser, id: currentAd.id, title: currentAd.title, description: currentAd.description, imageURL: currentAd.imageURL, date: currentAd.dateField, likes: currentAd.likes, profile: selectedProfile, contact: true)
+        CoreDataManager.shared.saveAdToFavorite (userUID: currentAd.addedByUser, id: currentAd.id, title: currentAd.title, description: currentAd.description, imageURL: currentAd.imageURL, date: currentAd.dateField, likes: currentAd.likes, profile: selectedProfile, contact: true)
         
         presentUIAlertController(title: "Info", message: " Vous avez envoyé un mail à \(selectedProfile.userName), vous pouvez retrouver cette annonce dans vos favoris. Merci d'utiliser Nowaste :)")
         
@@ -135,14 +135,14 @@ class DetailController: UIViewController {
     
     func addToFavorite() {
         
-        FavoriteAd.saveAdToFavorite (userUID: currentAd.addedByUser, id: currentAd.id, title: currentAd.title, description: currentAd.description, imageURL: currentAd.imageURL, date: currentAd.dateField, likes: currentAd.likes, profile: selectedProfile, contact: false)
+        CoreDataManager.shared.saveAdToFavorite (userUID: currentAd.addedByUser, id: currentAd.id, title: currentAd.title, description: currentAd.description, imageURL: currentAd.imageURL, date: currentAd.dateField, likes: currentAd.likes, profile: selectedProfile, contact: false)
 
         presentUIAlertController(title: "Info", message: "Recipe saved")
         
     }
         
     func deleteFromFavorite() {
-        FavoriteAd.deleteAd(id: currentAd.id)
+        CoreDataManager.shared.deleteAd(id: currentAd.id)
         presentUIAlertController(title: "Info", message: "Recipe deleted")
     }
     
