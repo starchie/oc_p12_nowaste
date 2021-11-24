@@ -71,8 +71,17 @@ class MapController: UIViewController {
 
         self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: listButton),UIBarButtonItem(customView: addButton),UIBarButtonItem(customView: searchButton), UIBarButtonItem(customView: profileButton) ]
         
+
         // GET ALL USER ON THE MAP
         getProfilesInRadius()
+        // RESET
+        listView.isHidden = true
+        pageControl.isHidden = true
+        dynamicView.animReturnToStart()
+        
+        
+        isNewMessage ()
+        
  
     }
     
@@ -154,6 +163,12 @@ class MapController: UIViewController {
         pageControl.frame = CGRect(x: view.frame.midX - 100, y: view.frame.maxY - 50, width: 200, height: 20)
         view.addSubview(pageControl)
         self.pageControl.isHidden = true
+        
+        
+        
+        // INIT MESSAGE
+        FirebaseService.shared.initMessage(id: FirebaseService.shared.profile.id)
+        
 
     }
     
@@ -277,10 +292,22 @@ class MapController: UIViewController {
             
         }// End else
     
-        
     }// End func
+    
+    func isNewMessage () {
+        print("search for new message")
+        FirebaseService.shared.watchMessage(id: FirebaseService.shared.profile.id){ success, error, result in
+            if success {
+                self.presentUIAlertController(title: "Message", message: "You received a message from \(result?["senderName"] ?? "" )")
+            
+            }
+            
+        }
+   
+    }
 
 }
+
 
 
 

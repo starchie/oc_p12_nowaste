@@ -51,6 +51,8 @@ class FirebaseService {
     
     var listener: Firebase.ListenerRegistration!
     
+    var lastMessageTitle:String = ""
+    
     //MARK: - GEO HASH
     
     func locationToHash (location: CLLocationCoordinate2D) -> String{
@@ -394,6 +396,54 @@ class FirebaseService {
             
         }
     }
+    
+    //MARK: - MESSAGE
+    
+    func initMessage (id:String ){
+        let selection = db.collection("message").document("\(id)_message")
+        selection.getDocument { (querySnapshot, error) in
+            guard let querySnapshot = querySnapshot, error == nil else { return }
+            guard querySnapshot.data()?.isEmpty == false else { return }
+            let titleValue = querySnapshot.data()!["ad"] as! String
+            self.lastMessageTitle = titleValue
+            print ("message init says \(self.lastMessageTitle)")
+        }
+        
+    }
+    
+    func watchMessage (id:String, completionHandler: @escaping ((Bool, String?, [String:Any]? ) -> Void)){
+        let selection = db.collection("message").document("\(id)_message")
+        selection.getDocument { (querySnapshot, error) in
+            guard let querySnapshot = querySnapshot, error == nil else {
+                completionHandler(false, error?.localizedDescription, nil)
+                return
+            }
+            guard querySnapshot.data()?.isEmpty == false else {
+                completionHandler(false, error?.localizedDescription, nil)
+                return
+            }
+            if querySnapshot.data()!["ad"] as! String != self.lastMessageTitle {
+                completionHandler(true, nil, querySnapshot.data() )
+                self.lastMessageTitle = querySnapshot.data()!["ad"] as! String
+            }else {
+                completionHandler(false, nil, nil )
+            }
+            
+        }
+        
+    }
+    
+    func sendMessage (to uid:String, senderName: String, for ad:String, completionHandler: @escaping ((Bool, String? ) -> Void)){
+        db.collection("message").document("\(uid)_message").setData(["to": uid, "senderName": senderName, "ad":ad]) { error in
+            guard error == nil  else {
+                completionHandler(false,error?.localizedDescription)
+                return
+            }
+            completionHandler(true,nil)
+        }
+        
+    }
+    
     
     //MARK: - UTILS
     

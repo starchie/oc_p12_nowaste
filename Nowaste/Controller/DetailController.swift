@@ -87,6 +87,11 @@ class DetailController: UIViewController {
         }// End Closure
 
     }
+ 
+    override func viewWillDisappear(_ animated: Bool) {
+        guard FirebaseService.shared.listener != nil else {return}
+        FirebaseService.shared.removeListener()
+    }
     
    
     
@@ -127,6 +132,16 @@ class DetailController: UIViewController {
     }
     
     @objc func sendMail() {
+        FirebaseService.shared.sendMessage(to: selectedProfile.id, senderName: FirebaseService.shared.profile.userName, for: currentAd.title) {success, error in
+            if success {
+                print ("mail sent with success")
+            }
+            else {
+                print (error ?? "")
+            }
+            
+        }
+        
         CoreDataManager.shared.saveAdToFavorite (userUID: currentAd.addedByUser, id: currentAd.id, title: currentAd.title, description: currentAd.description, imageURL: currentAd.imageURL, date: currentAd.dateField, likes: currentAd.likes, profile: selectedProfile, contact: true)
         
         presentUIAlertController(title: "Info", message: " Vous avez envoyé un mail à \(selectedProfile.userName), vous pouvez retrouver cette annonce dans vos favoris. Merci d'utiliser Nowaste :)")
