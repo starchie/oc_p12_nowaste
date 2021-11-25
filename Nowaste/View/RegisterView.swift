@@ -29,17 +29,21 @@ class RegisterView: UIView {
     
     var imageProfile: UIImageView!
     
-    var userName: UITextField!
-    
-    var mail: UITextField!
-    var password: UITextField!
+    var userName: FormView!
+    var mail: FormView!
+    var password: FormView!
   
-    var number: UITextField!
-    var street: UITextField!
-    var code: UITextField!
-    var city: UITextField!
+    var number: FormView!
+    var street: FormView!
+    var code: FormView!
+    var city: FormView!
     
     var register: UIButton!
+    
+    var accountExist: UIButton!
+    
+    var vstack: UIStackView!
+ 
 
     
     required init?(coder: NSCoder) {
@@ -48,13 +52,7 @@ class RegisterView: UIView {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-
-    }
-    
-    convenience init(inView: UIView) {
-        let rect = CGRect(x: 0, y: 0, width: inView.frame.width, height: inView.frame.height)
-        self.init(frame: rect)
-        self.frame = rect
+        
         
         self.backgroundColor =  UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
         
@@ -68,73 +66,59 @@ class RegisterView: UIView {
         imageProfile.layer.borderWidth = 4
         imageProfile.layer.borderColor = .init(red: 1, green: 1, blue: 1, alpha: 1)
         imageProfile.center.x = self.center.x
+        self.addSubview(imageProfile)
         
-        userName = UITextField()
-        userName.backgroundColor = .white
-        userName.layer.cornerRadius = 25
-        userName.placeholder = "User Name"
-        userName.autocapitalizationType = .none
-        userName.frame = CGRect(x: 0, y: imageProfile.frame.maxY + 10, width: rect.width - 20, height: 50)
-        userName.textAlignment = .center
-        userName.center.x = self.center.x
-        
-        mail = UITextField()
-        mail.backgroundColor = .white
-        mail.layer.cornerRadius = 25
-        mail.placeholder = "Email"
-        mail.autocapitalizationType = .none
-        mail.frame = userName.frame.offsetBy(dx: 0, dy: 55)
-        mail.textAlignment = .center
- 
-        password = UITextField()
-        password.backgroundColor = .white
-        password.layer.cornerRadius = 25
-        password.placeholder = "Password"
-        password.isSecureTextEntry = true
-        password.autocapitalizationType = .none
-        password.frame = mail.frame.offsetBy(dx: 0, dy: 55)
-        password.textAlignment = .center
-        
-        street = UITextField()
-        street.backgroundColor = .white
-        street.layer.cornerRadius = 25
-        street.placeholder = "Street"
-        street.autocapitalizationType = .none
-        street.frame = password.frame.offsetBy(dx: 0, dy: 55)
-        street.textAlignment = .center
-        
-        code = UITextField()
-        code.backgroundColor = .white
-        code.layer.cornerRadius = 25
-        code.placeholder = "Code"
-        code.autocapitalizationType = .none
-        code.frame = street.frame.offsetBy(dx: 0, dy: 55)
-        code.textAlignment = .center
-        
-        city = UITextField()
-        city.backgroundColor = .white
-        city.layer.cornerRadius = 25
-        city.placeholder = "City"
-        city.autocapitalizationType = .none
-        city.frame = code.frame.offsetBy(dx: 0, dy: 55)
-        city.textAlignment = .center
+        userName = FormView(frame: CGRect(x: 0, y: imageProfile.frame.maxY, width: 200, height: 30),text: "Surnom")
+        mail = FormView(frame: CGRect(x: 0, y: imageProfile.frame.maxY, width: 200, height: 30),text: "Mail")
+        password = FormView(frame: CGRect(x: 0, y: imageProfile.frame.maxY, width: 200, height: 30),text: "Mot De Passe")
+        street = FormView(frame: CGRect(x: 0, y: imageProfile.frame.maxY, width: 200, height: 30),text: "Adresse")
+        code = FormView(frame: CGRect(x: 0, y: imageProfile.frame.maxY, width: 200, height: 30),text: "Code")
+        city = FormView(frame: CGRect(x: 0, y: imageProfile.frame.maxY, width: 200, height: 30),text: "Ville")
+    
         
         register = UIButton()
         register.setTitle("Inscription", for: .normal)
-        register.frame = city.frame.offsetBy(dx: 0, dy: 55)
+        register.frame = CGRect(x: 20,
+                                y: self.bounds.maxY - 120,
+                                width: self.bounds.width - 40,
+                                height: 30)
         register.setTitleColor(.white, for: .normal)
-
-        self.addSubview(imageProfile)
-        self.addSubview(userName)
-        self.addSubview(mail)
-        self.addSubview(password)
-        self.addSubview(street)
-        self.addSubview(code)
-        self.addSubview(city)
-        self.addSubview(register)
-  
         
+        accountExist = UIButton()
+        accountExist.setTitle("Déjà inscrit ? Connectez-vous", for: .normal)
+        accountExist.titleLabel?.adjustsFontSizeToFitWidth = true
+        accountExist.setTitleColor(.white, for: .normal)
+        accountExist.frame = CGRect(x: 20,
+                                    y: self.bounds.maxY - 60,
+                                    width: self.bounds.width - 40,
+                                    height: 30)
+        
+        let range = NSRange(location:15,length:14) // specific location. This means "range" handle 1 character at location 2
+
+        let attributedString = NSMutableAttributedString(string: "Déjà inscrit ? Connectez-vous", attributes: [NSAttributedString.Key.font:UIFont(name: "Helvetica", size: 12)!])
+      
+        attributedString.addAttribute(NSAttributedString.Key.font, value: UIFont(name:"Helvetica-Bold", size: 12)!, range: range)
+        accountExist.titleLabel?.attributedText = attributedString
+    
+        self.addSubview(register)
+        self.addSubview(accountExist)
+        
+    
+        
+        vstack = UIStackView()
+        vstack.axis = .vertical
+        vstack.alignment = .fill
+        vstack.distribution = .fillEqually
+        vstack.frame = CGRect(x: 20, y: imageProfile.frame.maxY, width: self.bounds.width - 40, height: register.frame.minY - imageProfile.frame.maxY)
+        vstack.addArrangedSubview(userName)
+        vstack.addArrangedSubview(mail)
+        vstack.addArrangedSubview(password)
+        vstack.addArrangedSubview(street)
+        vstack.addArrangedSubview(code)
+        vstack.addArrangedSubview(city)
  
+        self.addSubview(vstack)
+         
     }
     
     

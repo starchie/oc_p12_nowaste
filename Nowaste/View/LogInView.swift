@@ -27,9 +27,10 @@ import UIKit
 
 class LogInView: UIView {
     
-    var mail: UITextField!
-    var password: UITextField!
+    var mail: FormView!
+    var password: FormView!
     var login: UIButton!
+    var noAccount: UIButton!
 
     
     required init?(coder: NSCoder) {
@@ -51,33 +52,41 @@ class LogInView: UIView {
         self.backgroundColor = color
         
         
-        mail = UITextField()
-        mail.backgroundColor = .white
-        mail.layer.cornerRadius = 25
-        mail.placeholder = "Email"
-        mail.text = "lucile@nowatse.com"
-        mail.autocapitalizationType = .none
-        mail.frame = CGRect(x: 0, y: 0, width: rect.width - 20, height: 50)
-        mail.center = CGPoint(x: self.center.x, y: self.center.y - 160)
-        mail.textAlignment = .center
+        mail = FormView(frame: CGRect(x: 20, y: self.bounds.midX - 50, width: self.bounds.width - 40, height: 50), text: "Email")
+        mail.textView.text = "lucile@nowatse.com"
+   
  
-        password = UITextField()
-        password.backgroundColor = .white
-        password.layer.cornerRadius = 25
-        password.placeholder = "Password"
-        password.text = "123456"
-        password.isSecureTextEntry = true
-        password.autocapitalizationType = .none
-        password.frame = mail.frame.offsetBy(dx: 0, dy: 55)
-        password.textAlignment = .center
+        password = FormView(frame: CGRect(x: 20, y: mail.frame.maxY, width: self.bounds.width - 40, height: 50), text: "Mot de Passe")
+        password.textView.text = "123456"
+        password.textView.isSecureTextEntry = true
+        password.textView.autocapitalizationType = .none
+
         
         login = UIButton()
         login.setTitle("Connexion", for: .normal)
         login.frame = password.frame.offsetBy(dx: 0, dy: 55)
+        
+        noAccount = UIButton()
+        noAccount.setTitle("Pas encore de compte nowaste ? Inscrivez-vous", for: .normal)
+        noAccount.titleLabel?.adjustsFontSizeToFitWidth = true
+        noAccount.setTitleColor(.white, for: .normal)
+        noAccount.frame = CGRect(x: 20,
+                                  y: rect.maxY - 60,
+                                  width: rect.width - 40,
+                                  height: 30)
+        
+        let range = NSRange(location:31,length:14) // specific location. This means "range" handle 1 character at location 2
+
+        let attributedString = NSMutableAttributedString(string: "Pas encore de compte nowaste ? Inscrivez-vous", attributes: [NSAttributedString.Key.font:UIFont(name: "Helvetica", size: 18)!])
+      
+        attributedString.addAttribute(NSAttributedString.Key.font, value: UIFont(name:"Helvetica-Bold", size: 18)!, range: range)
+        noAccount.titleLabel?.attributedText = attributedString
+        
 
         self.addSubview(mail)
         self.addSubview(password)
         self.addSubview(login)
+        self.addSubview(noAccount)
  
     }
     

@@ -38,13 +38,14 @@ class RegisterController: UIViewController {
         nc.currentState = .register
         
         view.backgroundColor =  UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
- 
-        registerView = RegisterView(inView: self.view)
+        
+        let frame = CGRect(x: 0, y: nc.topBarHeight, width: view.frame.width, height: view.frame.height - nc.topBarHeight)
+        registerView = RegisterView(frame: frame)
 
-        registerView.center = CGPoint(x: self.view.center.x, y: self.view.center.y + nc.topBarHeight)
         self.view.addSubview(registerView)
         
         registerView.register.addTarget(self, action:#selector(register), for: .touchUpInside)
+        registerView.accountExist.addTarget(self, action: #selector(goLogIn), for: .touchUpInside)
         registerView.imageProfile.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapOnImageView)))
         registerView.imageProfile.isUserInteractionEnabled = true
         
@@ -66,12 +67,17 @@ class RegisterController: UIViewController {
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
+    @objc func goLogIn() {
+        self.navigationController?.popViewController(animated: true)
+    }
+    
+    
 
     // 1 CREATE USER
     @objc func register () {
         
         // CONVERT ADRESS TO COORDINATE ...
-        let adress:String = "\(registerView.street.text!)" + "\(registerView.code.text!)" + "\(registerView.city.text!)"
+        let adress:String = "\(registerView.street.textView.text!)" + "\(registerView.code.textView.text!)" + "\(registerView.city.textView.text!)"
         
         var coordinate = CLLocationCoordinate2D()
         var geohash = String()
@@ -92,7 +98,7 @@ class RegisterController: UIViewController {
     
     func saveUser(coordinate:CLLocationCoordinate2D, geohash:String) {
         // ... CREATE USER UID WITH MAIL AND PASSWORD
-        FirebaseService.shared.register(mail: registerView.mail.text!, pwd: registerView.password.text!) { success, error in
+        FirebaseService.shared.register(mail: registerView.mail.textView.text!, pwd: registerView.password.textView.text!) { success, error in
             if success {
                 self.saveProfile(coordinate: coordinate, geohash: geohash)
             }else{
@@ -111,7 +117,7 @@ class RegisterController: UIViewController {
         }
         let documentName = FirebaseService.shared.currentUser!.uid + "_profile"
         let date = Date().timeIntervalSince1970
-        FirebaseService.shared.saveProfile(documentName: documentName, userName: registerView.userName.text!,id: FirebaseService.shared.currentUser!.uid, date: date, latitude: coordinate.latitude, longitude: coordinate.longitude, imageURL: "images/\(FirebaseService.shared.currentUser!.uid)/profil_img.png", activeAds: 0, geohash: geohash) { success,error in
+        FirebaseService.shared.saveProfile(documentName: documentName, userName: registerView.userName.textView.text!,id: FirebaseService.shared.currentUser!.uid, date: date, latitude: coordinate.latitude, longitude: coordinate.longitude, imageURL: "images/\(FirebaseService.shared.currentUser!.uid)/profil_img.png", activeAds: 0, geohash: geohash) { success,error in
             if success {
                 self.saveImageProfile()
             }else{

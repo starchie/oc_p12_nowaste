@@ -489,9 +489,9 @@ class FirebaseService {
     }
     
     // SELECT ADS FROM A USER UID
-    func searchAdsFromProfile (uid:String)->[Ad] {
+    func searchAdsFromProfile (uid:String, array:[Ad])->[Ad] {
         var selectedAds = [Ad]()
-            for ad in FirebaseService.shared.ads {
+            for ad in array {
                 if uid == ad.addedByUser {
                     selectedAds.append(ad)
                 }

@@ -38,28 +38,18 @@ class IntroController: UIViewController {
     var turnip = UIImageView()
     var carrot = UIImageView()
     var vegetables = [UIImageView]()
-    //var introView: IntroView!
-
-    
-    override func viewWillAppear(_ animated: Bool) {
-        let nc = navigationController as? NavigationController
-        nc?.currentState = .intro
-        playAnimations()
-    }
+ 
     
     override func viewDidLoad() {
         super.viewDidLoad()
         // Do any additional setup after loading the view.
+        let nc = navigationController as? NavigationController
+        nc?.currentState = .intro
 
         view.backgroundColor = UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
-        //let bgimage = UIImageView(image: UIImage(named: "vegetables"))
-        //bgimage.frame = view.frame
-        //bgimage.contentMode = .scaleAspectFill
-        //bgimage.alpha = 1.0
-        //view.addSubview(bgimage)
+        
         boom.frame = CGRect(x: 0, y: view.frame.width/2 - 30, width: view.frame.width, height: view.frame.width )
         view.addSubview(boom)
-
         boom.alpha = 1.0
         boom.animationImages = animatedImages(for: "boom")
         boom.animationDuration = 1.4
@@ -97,20 +87,15 @@ class IntroController: UIViewController {
         titleLabel.center = view.center
         view.addSubview(titleLabel)
         
-        register.frame = CGRect(x: 30, y: view.frame.maxY - 70, width: view.frame.width - 60, height: 50)
-        register.setTitle("Inscription", for: .normal)
-        register.setTitleColor(.white, for: .normal)
-       // register.titleLabel?.font = UIFont(name: "ArialRoundedMTBold", size: 20)
-        view.addSubview(register)
         
-        logIn.frame = register.frame.offsetBy(dx: 0, dy: -55)
+        logIn.frame = CGRect(x: 20, y: view.frame.maxY - 100, width: view.frame.width - 40, height: 30)
         logIn.setTitle("Connexion", for: .normal)
         logIn.setTitleColor(.white, for: .normal)
-       // logIn.titleLabel?.font = UIFont(name: "ArialRoundedMTBold", size: 20)
         view.addSubview(logIn)
         
-        register.addTarget(self, action:#selector(goRegister), for: .touchUpInside)
         logIn.addTarget(self, action:#selector(goLogIn), for: .touchUpInside)
+        
+        playAnimations()
         
     }
     
@@ -119,12 +104,10 @@ class IntroController: UIViewController {
         self.navigationController?.pushViewController(vc, animated: true)
     }
     
-    @objc func goRegister() {
-        let vc = RegisterController()
-        self.navigationController?.pushViewController(vc, animated: true)
-    }
     
-    // MARK: - UTILS
+
+    
+    // MARK: - ANIMATIONS
     
     func animatedImages(for name: String) -> [UIImage] {
         var i = 0

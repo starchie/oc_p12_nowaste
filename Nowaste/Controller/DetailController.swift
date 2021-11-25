@@ -49,7 +49,7 @@ class DetailController: UIViewController {
         let nc = navigationController as! NavigationController
         nc.currentState = .detail
         
-        addNavigationButton()
+        prepareNavigationButton()
         
         self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: favoriteButton),UIBarButtonItem(customView: trashButton)]
         
@@ -106,7 +106,7 @@ class DetailController: UIViewController {
     
     //MARK: -  ACTIONS
     
-    func addNavigationButton () {
+    func prepareNavigationButton () {
         // BUTTONS
         favoriteButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "star")
         favoriteButton.addTarget(self, action:#selector(toggleFavorite), for: .touchUpInside)

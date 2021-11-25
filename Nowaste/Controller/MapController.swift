@@ -53,8 +53,8 @@ class MapController: UIViewController {
     override func viewWillAppear(_ animated: Bool) {
         
         // NAVIGATION BAR
-        navigationController?.navigationBar.isHidden = false
-        self.navigationItem.hidesBackButton = true
+        let nc = navigationController as! NavigationController
+        nc.currentState = .map
   
         // // NAVIGATION BUTTONS
         addButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "plus.circle")

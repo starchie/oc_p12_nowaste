@@ -28,23 +28,18 @@ import UIKit
 class LogInController: UIViewController {
     
     var logInView:LogInView!
-    
-    override func viewWillAppear(_ animated: Bool) {
-        let nc = navigationController as! NavigationController
-        nc.currentState = .login
-    }
-    
+
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        let nc = navigationController as! NavigationController
+        nc.currentState = .login
+        
         logInView = LogInView(inView: self.view)
-        
-        logInView.center = CGPoint(x: self.view.center.x,
-                                   y: self.view.center.y)
-        
         self.view.addSubview(logInView)
         
         logInView.login.addTarget(self, action:#selector(login), for: .touchUpInside)
+        logInView.noAccount.addTarget(self, action:#selector(goRegister), for: .touchUpInside)
         
     }
     
@@ -81,7 +76,7 @@ class LogInController: UIViewController {
     // LOGIN USER
     @objc func login () {
         
-        FirebaseService.shared.login(mail: logInView.mail.text!, pwd: logInView.password.text!) { success, error in
+        FirebaseService.shared.login(mail: logInView.mail.textView.text!, pwd: logInView.password.textView.text!) { success, error in
             if success {
                 self.goMap()
             }else{
@@ -91,6 +86,11 @@ class LogInController: UIViewController {
         }
         
          
+    }
+    
+    @objc func goRegister() {
+        let vc = RegisterController()
+        self.navigationController?.pushViewController(vc, animated: true)
     }
     
     

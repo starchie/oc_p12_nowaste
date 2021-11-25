@@ -51,6 +51,7 @@
 		CAA4E149274312AE007A33F4 /* ProfileController.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA4E148274312AE007A33F4 /* ProfileController.swift */; };
 		CAA4E14B2743DE28007A33F4 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA4E14A2743DE28007A33F4 /* ProfileView.swift */; };
 		CAA9A2F9273953E7009BD14D /* FirebaseServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA9A2F8273953E7009BD14D /* FirebaseServiceTests.swift */; };
+		CAC0BAD6274FD0DB00CB6BFA /* FormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC0BAD5274FD0DB00CB6BFA /* FormView.swift */; };
 		CACFF38A2746D4E900C70D65 /* NavigationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CACFF3892746D4E900C70D65 /* NavigationButton.swift */; };
 		CACFF3AC274AAEBD00C70D65 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CACFF3AB274AAEBD00C70D65 /* CardView.swift */; };
 		CAD3FD4E273082E900D01CA9 /* HorizontalScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD3FD4D273082E900D01CA9 /* HorizontalScrollView.swift */; };
@@ -118,6 +119,7 @@
 		CAA4E14A2743DE28007A33F4 /* ProfileView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProfileView.swift; sourceTree = "<group>"; };
 		CAA9A2F6273953E7009BD14D /* NowasteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NowasteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAA9A2F8273953E7009BD14D /* FirebaseServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseServiceTests.swift; sourceTree = "<group>"; };
+		CAC0BAD5274FD0DB00CB6BFA /* FormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormView.swift; sourceTree = "<group>"; };
 		CACFF3892746D4E900C70D65 /* NavigationButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationButton.swift; sourceTree = "<group>"; };
 		CACFF3AB274AAEBD00C70D65 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		CAD3FD4D273082E900D01CA9 /* HorizontalScrollView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontalScrollView.swift; sourceTree = "<group>"; };
@@ -230,6 +232,7 @@
 			isa = PBXGroup;
 			children = (
 				CACFF3892746D4E900C70D65 /* NavigationButton.swift */,
+				CAC0BAD5274FD0DB00CB6BFA /* FormView.swift */,
 				CA4AE327272B478400C444D8 /* LogInView.swift */,
 				CA4AE326272B478400C444D8 /* RegisterView.swift */,
 				CAA4E14A2743DE28007A33F4 /* ProfileView.swift */,
@@ -429,6 +432,7 @@
 				CA4AE32F272BFDE700C444D8 /* AnnotationView.swift in Sources */,
 				CA512257273180070063D5A1 /* StarsView.swift in Sources */,
 				CA4AE349272F34A100C444D8 /* SearchView.swift in Sources */,
+				CAC0BAD6274FD0DB00CB6BFA /* FormView.swift in Sources */,
 				CA9B4C8A27444F250025012E /* Nowaste.xcdatamodeld in Sources */,
 				CA4AE329272B478400C444D8 /* LogInView.swift in Sources */,
 				CA4AE333272C341700C444D8 /* AdController.swift in Sources */,

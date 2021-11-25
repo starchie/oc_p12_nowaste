@@ -77,31 +77,37 @@ class NavigationController: UINavigationController {
             
         case .login:
             print("login")
-            self.navigationBar.isHidden = false
+            self.navigationBar.isHidden = true
             
         case .register:
             print("register")
-            self.navigationBar.isHidden = false
+            self.navigationBar.isHidden = true
             
         case .map:
             print("map")
             self.navigationBar.isHidden = false
+            self.topViewController?.navigationItem.hidesBackButton = true
        
         case .list:
             print("list")
             self.navigationBar.isHidden = false
+            self.topViewController?.navigationItem.hidesBackButton = true
             
         case .profile:
             print("profile")
             self.navigationBar.isHidden = false
+            self.topViewController?.navigationItem.hidesBackButton = false
+            
             
         case .detail:
             print("detail")
             self.navigationBar.isHidden = false
+            self.topViewController?.navigationItem.hidesBackButton = false
 
         case .ad:
             print("ad")
             self.navigationBar.isHidden = false
+            self.topViewController?.navigationItem.hidesBackButton = false
         }
         
     }

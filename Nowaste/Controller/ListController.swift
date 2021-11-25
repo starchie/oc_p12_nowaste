@@ -44,20 +44,21 @@ class ListController: UIViewController {
     var AdsFromSortedProfiles = [Ad]()
     var distancesForSortedProfiles = [Double]()
     var selectedProfile:Profile!
+    var adsForSelectedProfile = [Ad]()
     
     // TABLEVIEW
     var tableView: UITableView!
     var selectedRow: Int!
-    var sizeForSelectedRow: CGFloat = 44
-    var sizeForDefaultRow: CGFloat = 44
+    var sizeForSelectedRow: CGFloat = 60
+    var sizeForDefaultRow: CGFloat = 60
     
     // MARK: - PREPARE NAVIGATION CONTROLLER
     
     override func viewWillAppear(_ animated: Bool) {
         
         // NAVIGATION BAR
-        navigationController?.navigationBar.isHidden = false
-        self.navigationItem.hidesBackButton = true
+        let nc = navigationController as! NavigationController
+        nc.currentState = .list
         
         // NAVIGATION BUTTONS
         addButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "plus.circle")
@@ -100,6 +101,8 @@ class ListController: UIViewController {
         
         // TABLEVIEW
         tableView = UITableView()
+        tableView.separatorStyle = .singleLine
+        tableView.separatorColor = .init(white: 1.0, alpha: 0.1)
         tableView.backgroundColor =  UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
         tableView.frame = CGRect(x: 0,
                                  y: 0,
@@ -270,45 +273,55 @@ extension ListController:UITableViewDataSource {
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! ListCell
+        // CLEAN
         cell.removeView()
-        cell.cellTitle.text = sortedProfiles[indexPath.row].userName
+        
+        // UPDATE LAYOUT
+        let text = sortedProfiles[indexPath.row].userName
         let distance = distancesForSortedProfiles[indexPath.row]
-        cell.distanceView.text = "à " + String(round(distance)) + " m"
+        let distanceText = "à " + String(round(distance)) + " m"
+        /*
         FirebaseService.shared.loadImage(sortedProfiles[indexPath.row].imageURL) { success, error, data in
             if success {
                 cell.imageProfile.image = UIImage(data: data ?? Data())
             }
             
         }
+         */
+        
+        cell.layoutFirstLine(image: UIImage(named: "vegetables") ?? UIImage(), title: text, distance: distanceText)
        
+        // IF SELECTED ROW DISPLAY ADS FOR SELECTED USER
         if indexPath.row == selectedRow{
             
-            var list = [UIButton]()
-            for i in 0..<AdsFromSortedProfiles.count {
-                let viewToAdd = UIButton()
-                viewToAdd.contentHorizontalAlignment = .left
-                viewToAdd.setTitle("\(AdsFromSortedProfiles[i].title)  > ", for: .normal)
-                viewToAdd.setTitleColor(.white, for: .normal)
-                viewToAdd.tag = 100 + i
-                viewToAdd.addTarget(self, action: #selector(test), for: .touchUpInside)
-                viewToAdd.frame = CGRect(x: cell.cellTitle.frame.minX,
-                                        y: cell.cellTitle.frame.maxY * CGFloat(i) + cell.cellTitle.frame.maxY + 10,
-                                        width: cell.frame.width - 40,
-                                        height: cell.cellTitle.frame.height)
+            var buttons = [UIButton]()
+            for i in 0..<adsForSelectedProfile.count {
+                let buttonToAdd = UIButton()
+                buttonToAdd.contentHorizontalAlignment = .left
+                buttonToAdd.titleLabel?.font = UIFont(name: "Helvetica", size: 12)
+                buttonToAdd.setTitle("\(adsForSelectedProfile[i].title)  > ", for: .normal)
+                buttonToAdd.setTitleColor(.white, for: .normal)
+                buttonToAdd.tag = 100 + i
+                buttonToAdd.addTarget(self, action: #selector(test), for: .touchUpInside)
+                buttonToAdd.frame = CGRect(x: cell.cellTitle.frame.minX,
+                                         y: cell.cellTitle.frame.maxY + CGFloat(i * 30),
+                                         width: cell.frame.width - 40,
+                                         height: 30)
                     
-                viewToAdd.center.x += view.frame.width
+                buttonToAdd.center.x += view.frame.width
               
-                list.append(viewToAdd)
+                buttons.append(buttonToAdd)
             }
-            cell.list = list
-            cell.showSubView()
-            sizeForSelectedRow = cell.totalSize + 10
-            cell.anim(h: (sizeForSelectedRow - 5) )
+             
+            cell.buttons = buttons // UPDATE LIST
+            cell.showSubView() // DISPLAY BUTTONS JUST CREATED
+            sizeForSelectedRow = cell.totalSize + 20 // UPDATE THE HEIGHT CELL
+            cell.anim(refSize:sizeForSelectedRow) // ANIMATION
    
             
         }else{
             cell.removeView()
-            cell.anim(h: 44)
+            cell.anim(refSize:60)
              
         }
  
@@ -317,13 +330,14 @@ extension ListController:UITableViewDataSource {
     
     // USER SELECT ROW
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        selectedRow = indexPath.row // KEEP INDEX FOR UPDATE TABLEVIEW
+        // KEEP INDEX FOR UPDATE TABLEVIEW
+        selectedRow = indexPath.row
         
         // 1 - GET PROFILE ID
         let uid = sortedProfiles[selectedRow].id
         selectedProfile = sortedProfiles[selectedRow]
         // 2 - SEARCH ADS FROM THIS PROFILE
-        AdsFromSortedProfiles = FirebaseService.shared.searchAdsFromProfile(uid: uid)
+        adsForSelectedProfile = FirebaseService.shared.searchAdsFromProfile(uid: uid, array: AdsFromSortedProfiles)
         // 3 UPDATE
         tableView.reloadData()
     }

@@ -35,7 +35,7 @@ class ListCell: UITableViewCell {
     var totalSize:CGFloat = 0
     
     var activeAds:Int = 0
-    var list = [UIButton]()
+    var buttons = [UIButton]()
     
 
     
@@ -49,33 +49,47 @@ class ListCell: UITableViewCell {
         self.backgroundColor =  UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
         
         circleView = UIView()
-        circleView.frame = CGRect(x: 4, y: 4, width: 40, height: 40)
+        circleView.frame = CGRect(x: 20, y: 10, width: 40, height: 40)
         circleView.backgroundColor = .white
         circleView.layer.cornerRadius = 20
         self.addSubview(circleView)
         
         imageProfile = UIImageView()
-        imageProfile.frame = CGRect(x: 4, y: 4, width: 40, height: 40)
+        imageProfile.frame = CGRect(x: 20, y: 10, width: 40, height: 40)
         imageProfile.backgroundColor = .white
+        imageProfile.image = UIImage(named: "Carrots")
         imageProfile.layer.cornerRadius = 20
+        imageProfile.clipsToBounds = true
+        imageProfile.layer.borderWidth = 3
+        imageProfile.layer.borderColor = UIColor(white: 1, alpha: 1).cgColor
         self.addSubview(imageProfile)
         
         cellTitle = UILabel()
         cellTitle.font = UIFont(name: "Helvetica-Bold", size: 20)
-        cellTitle.text = "Title here"
+        cellTitle.text = "Title here "
         cellTitle.textColor = .white
         cellTitle.sizeToFit()
-        cellTitle.center = CGPoint(x: circleView.frame.width + cellTitle.frame.midX + 20,
-                                   y: circleView.frame.midY)
+        let currentWidthTitle = cellTitle.frame.width
+        
+        cellTitle.frame = CGRect(x: circleView.frame.maxX + 10,
+                                 y: circleView.frame.midY - 15,
+                                 width: currentWidthTitle,
+                                 height: 30)
+        
         self.addSubview(cellTitle)
         
         distanceView = UILabel()
+        
         distanceView.font = UIFont(name: "Helvetica", size: 16)
         distanceView.text = "à 44000 m"
         distanceView.textColor = .white
         distanceView.sizeToFit()
-        distanceView.center = CGPoint(x: cellTitle.frame.maxX + 10,
-                                      y: circleView.frame.midY + 2)
+        let distanceWidthTitle = distanceView.frame.width
+        distanceView.frame = CGRect(x: cellTitle.frame.maxX + 10,
+                                 y: cellTitle.frame.maxY - 30,
+                                 width: distanceWidthTitle,
+                                 height: 30)
+
         
         self.addSubview(distanceView)
         
@@ -84,21 +98,47 @@ class ListCell: UITableViewCell {
     
     }
     
-    func anim(h:CGFloat) {
+    // MARK: - LAYOUT PROFILE LINE
+    
+    func layoutFirstLine (image:UIImage ,title:String, distance:String){
+        imageProfile.image = image
+        
+        cellTitle.text = title
+        cellTitle.sizeToFit()
+        let currentWidthTitle = cellTitle.frame.width
+        cellTitle.frame = CGRect(x: imageProfile.frame.maxX + 10,
+                                 y: imageProfile.frame.midY - 15,
+                                 width: currentWidthTitle,
+                                 height: 30)
+        
+        distanceView.text = distance
+        distanceView.sizeToFit()
+        let distanceWidthTitle = distanceView.frame.width
+        distanceView.frame = CGRect(x: cellTitle.frame.maxX + 10,
+                                 y: cellTitle.frame.maxY - 30,
+                                 width: distanceWidthTitle,
+                                 height: 30)
+        
+        
+    }
+    
+    // MARK: - ANIMATION
+    
+    func anim(refSize:CGFloat) {
         
         var delay = 0.0
-
-        if circleView.frame.height >= 50 {
-            self.circleView.frame = CGRect(x: 4, y: 4, width: 40, height: h - 5)
+        // CHANGE LEFT SHAPE HEIGHT TO FIT THE VIEW CELL
+        if refSize == 60 {
+            self.circleView.frame = CGRect(x: 20, y: 10, width: 40, height: 40)
         }else {
-            UIView.animate(withDuration: 0.5, delay: 0.0, options: [.curveLinear], animations: { self.circleView.frame = CGRect(x: 4, y: 4, width: 40, height: h - 5) }, completion: nil)
+            UIView.animate(withDuration: 0.5, delay: 0.0, options: [.curveLinear], animations: { self.circleView.frame = CGRect(x: 20, y: 10, width: 40, height: refSize - 20) }, completion: nil)
             
         }
-        
-        for item in list {
+        // ANIM VIEW FROM RIGHT TO LEFT
+        for button in buttons {
             Timer.scheduledTimer(withTimeInterval: 0.3 * delay, repeats: false) { (timer) in
                 UIView.animate(withDuration: 0.5, delay: 0.0, options: [.curveLinear], animations: {
-                    item.center.x -= self.frame.width }, completion: nil)
+                    button.center.x -= self.frame.width }, completion: nil)
             }
             delay += 1.0
             
@@ -107,18 +147,13 @@ class ListCell: UITableViewCell {
     }
     
     
-    
-    
     func showSubView() {
-        for i in 0..<list.count {
-            self.addSubview(list[i])
-            totalSize = list[i].frame.maxY
+        for i in 0..<buttons.count {
+            self.addSubview(buttons[i])
+            totalSize = buttons[i].frame.maxY
         }
-        
-        
-        
-        
     }
+    
     
     func removeView() {
         for viewWithTag in self.subviews {
