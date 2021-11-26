@@ -49,6 +49,21 @@ class AdController: UIViewController{
         
         view.backgroundColor = UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
         
+        adView.adTitle.delegate = self
+        adView.adDescription.delegate = self
+        
+        // gesture recognizer
+        let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:)))
+        self.view.addGestureRecognizer(tap)
+        
+        // Avoid Keyboard hides TextView
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow),
+                                               name: UIResponder.keyboardWillShowNotification, object: nil)
+          
+            
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide),
+                                               name: UIResponder.keyboardWillHideNotification, object: nil)
+        
     }
     
     //MARK: -  ALERT CONTROLLER
@@ -61,12 +76,25 @@ class AdController: UIViewController{
     
     //MARK: - ACTIONS
     
+    @objc func handleTap(_ sender: UITapGestureRecognizer? = nil) {
+        // handling code
+        adView.adTitle.resignFirstResponder()
+        adView.adDescription.resignFirstResponder()
+        
+    }
+    
     @objc func saveAd(_ sender:UIButton) {
         
         guard FirebaseService.shared.currentUser != nil else {
             
             self.presentUIAlertController(title: "Enregistrement", message: "You are not connected")
             return
+        }
+        
+        guard adView.adTitle.text != "", adView.adDescription.text != "", adView.adImage.contentMode == .scaleAspectFill else {
+            presentUIAlertController(title: "Info", message: "Veuillez remplir tout les champs et ajoutez une image svp")
+            return
+            
         }
         
         let userUID = FirebaseService.shared.currentUser!.uid
@@ -126,6 +154,21 @@ class AdController: UIViewController{
         }
     }
     
+    // Move Keyboard automatically
+    @objc func keyboardWillShow(notification: NSNotification) {
+        guard let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else {
+            return
+        }
+        
+        // move the view up by the distance of keyboard height
+        self.view.frame.origin.y = 0 - keyboardSize.height
+    }
+    
+    @objc func keyboardWillHide(notification: NSNotification) {
+        // move back the root view origin to zero
+        self.view.frame.origin.y = 0
+    }
+    
     
 }
 
@@ -163,6 +206,7 @@ extension AdController: UIImagePickerControllerDelegate, UINavigationControllerD
             let imagePickerController = UIImagePickerController()
             imagePickerController.delegate = self
             imagePickerController.sourceType = sourceType
+            imagePickerController.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
             self.present(imagePickerController, animated: true, completion: nil)
         }
     }
@@ -175,11 +219,45 @@ extension AdController: UIImagePickerControllerDelegate, UINavigationControllerD
             guard let image = info[UIImagePickerController.InfoKey.originalImage] as? UIImage else { return }
             //Setting image to your image view
             self?.adView.adImage.image = image
+            self?.adView.adImage.contentMode = .scaleAspectFill
         }
     }
     
     func imagePickerControllerDidCancel(_ picker: UIImagePickerController) {
         picker.dismiss(animated: true, completion: nil)
     }
+    
+}
+
+
+// MARK: - UITEXTVIEW DELEGATE
+
+extension AdController: UITextViewDelegate {
+    
+    func textViewDidBeginEditing (_ textView: UITextView) {
+        if textView.textColor == .init(white: 1.0, alpha: 0.2) {
+            textView.text = nil
+            textView.textColor = .white
+        }
+    }
+    
+    func textViewDidEndEditing (_ textView: UITextView) {
+        if adView.adTitle.text == "" {
+            textView.text  = "le titre de votre annonce"
+            textView.textColor = .init(white: 1.0, alpha: 0.2)
+        }
+        else if adView.adDescription.text == "" {
+            textView.text  = "Écrivez une description de votre annonce ici..."
+            textView.textColor = .init(white: 1.0, alpha: 0.2)
+        }
+    }
+    
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+           if(text == "\n") {
+               textView.resignFirstResponder()
+               return false
+           }
+           return true
+       }
     
 }

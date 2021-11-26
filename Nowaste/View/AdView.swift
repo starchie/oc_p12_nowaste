@@ -27,6 +27,7 @@ import UIKit
 
 class AdView: UIView {
     
+    var infoLabel:UILabel!
     var adTitle:UITextView!
     var adDescription:UITextView!
     var adImage:UIImageView!
@@ -43,20 +44,32 @@ class AdView: UIView {
         
         self.backgroundColor = .clear
         
+        infoLabel = UILabel()
+        infoLabel.text = "Quelque chose à partager ? Remplissez les champs suivants"
+        infoLabel.adjustsFontSizeToFitWidth = true
+        infoLabel.numberOfLines = 0
+        infoLabel.textColor = .white
+        infoLabel.font = UIFont(name: "Helvetica-Bold", size: 18)
+        infoLabel.frame = CGRect(x: 10, y: 0 , width: frame.width - 20, height: 60)
+        self.addSubview(infoLabel)
+        
         adImage = UIImageView()
         self.addSubview(adImage)
-        adImage.frame = CGRect(x: 0, y: 0 , width: frame.width, height: frame.width / 1.33)
+        adImage.frame = CGRect(x: 0, y: infoLabel.frame.maxY + 10 , width: frame.width, height: frame.height / 3)
         adImage.image = UIImage(systemName: "photo")
-        adImage.tintColor = .white
+        adImage.tintColor = .init(white: 1, alpha: 0.2)
         adImage.backgroundColor = UIColor.init(white: 1.0, alpha: 0.05)
-        adImage.contentMode = .scaleAspectFit
+        adImage.contentMode = .center
         adImage.clipsToBounds = true
         
         adTitle = UITextView()
         self.addSubview(adTitle)
+        adTitle.autocorrectionType = .no
+        adTitle.autoresizingMask = .flexibleTopMargin
+        adTitle.spellCheckingType = .no
         adTitle.frame = CGRect(x: 0, y: adImage.frame.maxY + 10, width: frame.width, height: frame.height / 8)
         adTitle.font = UIFont(name: "Helvetica-Bold", size: 24)
-        adTitle.textColor = .white
+        adTitle.textColor = .init(white: 1, alpha: 0.2)
         adTitle.backgroundColor = UIColor.init(white: 1.0, alpha: 0.05)
     
         adTitle.text = "le titre de votre annonce"
@@ -68,18 +81,19 @@ class AdView: UIView {
                                 width: frame.width - 120,
                                 height: frame.height / 8)
         adButton.backgroundColor = UIColor.clear
-        adButton.setTitle("Send ad", for: .normal)
+        adButton.setTitle("Envoyer", for: .normal)
         adButton.setTitleColor(.white, for: .normal)
         
         adDescription = UITextView()
         self.addSubview(adDescription)
 
         adDescription.font = UIFont(name: "Helvetica-Bold", size: 16)
-        adDescription.textColor = .white
+        adDescription.autocorrectionType = .no
+        adDescription.spellCheckingType = .no
+        adDescription.autoresizingMask = .flexibleBottomMargin
+        adDescription.textColor = .init(white: 1, alpha: 0.2)
         adDescription.backgroundColor = UIColor.init(white: 1.0, alpha: 0.05)
-        adDescription.text = """
-            Écrivez une description de votre annonce ici...
-            """
+        adDescription.text = "Écrivez une description de votre annonce ici..."
         adDescription.frame = CGRect(x: 0,
                                      y: (adTitle.frame.maxY + 10),
                                      width: frame.width ,
