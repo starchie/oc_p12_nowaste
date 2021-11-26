@@ -30,10 +30,11 @@ class ProfileController: UIViewController {
     
     var profileView: ProfileView!
 
-    var selection: UILabel!
-    var control:UISegmentedControl!
+    var choiceDescription: UILabel!
+    
     var tableView: UITableView!
     
+    var segmentedControl:SegmentedControl!
     
     var createdAds = [Ad]()
     var favoriteAds:[Ad]!
@@ -43,9 +44,7 @@ class ProfileController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-        //FavoriteAd.deleteAllCoreDataItems()
-        
-        // NAVIGATION CONTROLLER
+        // PREPARE NAVIGATION CONTROLLER
         let nc = navigationController as! NavigationController
         nc.currentState = .profile
         
@@ -69,47 +68,51 @@ class ProfileController: UIViewController {
                 self.presentUIAlertController(title: "erreur", message: error!)
             }
             
-        }// End Closure
+        }
+
+        // PREPARE SEGMENTED CONTROL
+        segmentedControl = SegmentedControl(frame: CGRect(x: 10, y: profileView.frame.maxY + 30,
+                                                 width: view.frame.width - 20,height: 80))
         
-        // SEGMENTED CONTROL
-        let items: [String] = ["✍︎","✮"]
-        control = UISegmentedControl(items: items)
-        control.tintColor = UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
-        control.backgroundColor = UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
-        control.frame = CGRect(x: 10, y: profileView.frame.maxY + 30, width: view.frame.width - 20, height: 30)
-        control.layer.cornerRadius = 0
-        control.selectedSegmentTintColor = .darkGray
-        view.addSubview(control)
-        // SEGMENTED CONTROL ACTION
-        control.addTarget(self, action: #selector(didChange(_:)), for: .valueChanged)
-  
+        view.addSubview(segmentedControl)
+        segmentedControl.button0.addTarget(self, action: #selector(didSelectFavorite), for: .touchUpInside)
+        segmentedControl.button1.addTarget(self, action: #selector(didSelectCreated), for: .touchUpInside)
+        segmentedControl.selectedSegmentIndex = 0
         
         // LABEL : CHOICE DESCRIPTION - FAVORITE OR CREATED ADS
-        selection = UILabel()
-        selection.text = " Vos annonces sur NoWaste "
-        selection.textColor = .white
-        selection.frame = CGRect(x: 10, y: control.frame.maxY + 30, width: view.frame.width, height: 30)
-        selection.font = UIFont(name: "Chalkduster", size: 18)
-        view.addSubview(selection)
+        choiceDescription = UILabel()
+        choiceDescription.textColor = .white
+        choiceDescription.text = "Vos annonces sauvegardé sur NoWaste "
+        choiceDescription.font = UIFont(name: "Helvetica-Bold", size: 28)
+        choiceDescription.numberOfLines = 0
+        choiceDescription.adjustsFontSizeToFitWidth = true
+        choiceDescription.frame = CGRect(x: 20, y: segmentedControl.frame.maxY + 30,
+                                         width: view.frame.width - 40, height: 60)
         
-        // TABLEVIEW
+
+        view.addSubview(choiceDescription)
+        
+        // PREPARE TABLEVIEW
         tableView = UITableView()
        
         tableView.frame = CGRect(x: 0,
-                                 y: selection.frame.maxY + 30,
+                                 y: choiceDescription.frame.maxY + 30,
                                  width: view.frame.width,
-                                 height: view.frame.height - (selection.frame.maxY + 30) )
+                                 height: view.frame.height - (choiceDescription.frame.maxY + 30) )
         
         tableView.delegate = self
         tableView.dataSource = self
+        tableView.separatorStyle = .singleLine
+        tableView.separatorColor = UIColor(white: 1.0, alpha: 0.6)
+        tableView.separatorInset = UIEdgeInsets(top: 0, left: 80, bottom: 0, right: 80)
         tableView.register(UITableViewCell.self, forCellReuseIdentifier: "Cell")
         tableView.backgroundColor = UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
-        
+ 
         self.view.addSubview(tableView)
 
     }
     
-    // RELOAD
+    // LOAD WHEN CONTROLLER APPEAR
     override func viewWillAppear(_ animated: Bool) {
         // GET DATA
         getCreatedAds()
@@ -120,17 +123,26 @@ class ProfileController: UIViewController {
     // MARK: - ACTIONS
     
     // SELECTION CHANGE BETWEEN FAVORITES AND CREATED ADS
-    @objc func didChange(_ sender: UISegmentedControl){
+    @objc func didSelectFavorite(){
+        segmentedControl.selectedSegmentIndex = 0
+        choiceDescription.text = "Vos annonces sauvegardé sur NoWaste "
         tableView.reloadData()
     }
     
-    // ADS FROM USER
+    @objc func didSelectCreated(){
+        segmentedControl.selectedSegmentIndex = 1
+        choiceDescription.text = "Vos annonces crées sur NoWaste "
+        tableView.reloadData()
+    }
+    
+    // GET ADS CREATED BY USER
     func getCreatedAds(){
         
         guard FirebaseService.shared.currentUser != nil else {
             presentUIAlertController(title: "message", message: "your are not logged")
-            return}
-        
+            return
+        }
+        // GET ADS
         FirebaseService.shared.querryAds(filter: FirebaseService.shared.currentUser!.uid) {success, error in
             if success {
                 self.createdAds = FirebaseService.shared.ads
@@ -157,34 +169,47 @@ class ProfileController: UIViewController {
 
 extension ProfileController:UITableViewDataSource {
     
+    // HOW MANY CELL TO BUILD
     func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if control.selectedSegmentIndex == 0 {
+        if segmentedControl.selectedSegmentIndex == 1 {
             return createdAds.count
         }else{
             return favoriteAds.count
         }
     }
     
+    // CELL HEIGHT
     func tableView(_ tableView: UITableView, heightForRowAt indexPath: IndexPath) -> CGFloat {
         return 120
     }
     
+    // CELL STYLE
     func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath)
+        // FOR ALL CELLS
+        let cell = UITableViewCell(style: .subtitle, reuseIdentifier: "Cell")
         cell.textLabel?.textColor = .white
-        cell.backgroundColor = UIColor(red: 8/255, green: 16/255, blue: 76/255, alpha: 1.0)
+        cell.detailTextLabel?.textColor = .white
+        cell.textLabel?.font = UIFont(name: "Helvetica-Bold", size: 16)
+        cell.textLabel?.adjustsFontSizeToFitWidth = true
+        cell.backgroundColor = .clear
+        cell.imageView?.tintColor = .white
         
-        if control.selectedSegmentIndex == 0 {
+        // CELL WILL DISPLAY CREATED ADS
+        if segmentedControl.selectedSegmentIndex == 1 {
             cell.textLabel?.text = createdAds[indexPath.row].title
-            cell.imageView?.tintColor = .white
-            cell.imageView?.image = UIImage(systemName: "")
+            cell.detailTextLabel?.text = FirebaseService.shared.getDate(dt: createdAds[indexPath.row].dateField)
+            cell.imageView?.image = UIImage(systemName: "doc.richtext")
         }
+        // CELL WILL DISPLAY FAVORITE
         else {
             cell.textLabel?.text = favoriteAds[indexPath.row].title
+            cell.detailTextLabel?.text = FirebaseService.shared.getDate(dt: favoriteAds[indexPath.row].dateField)
             let message = CoreDataManager.shared.returnMessage(from: CoreDataManager.shared.all[indexPath.row].id)
             if message == true {
-                cell.imageView?.tintColor = .white
                 cell.imageView?.image = UIImage(systemName: "mail")
+            }
+            else{
+                cell.imageView?.image = UIImage(systemName: "star")
             }
             
         }
@@ -192,10 +217,12 @@ extension ProfileController:UITableViewDataSource {
         return cell
     }
     
-    
+    // USER SELECT A CELL : PREPARE NEXT CONTROLLER VIEW
     func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
         let vc = DetailController()
-        if control.selectedSegmentIndex == 0 {
+        
+        if segmentedControl.selectedSegmentIndex == 1 {
             let profile = FirebaseService.shared.profile
             vc.selectedProfile = profile
             vc.currentAd = FirebaseService.shared.ads[indexPath.row]

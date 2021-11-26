@@ -52,6 +52,7 @@
 		CAA4E14B2743DE28007A33F4 /* ProfileView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA4E14A2743DE28007A33F4 /* ProfileView.swift */; };
 		CAA9A2F9273953E7009BD14D /* FirebaseServiceTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAA9A2F8273953E7009BD14D /* FirebaseServiceTests.swift */; };
 		CAC0BAD6274FD0DB00CB6BFA /* FormView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC0BAD5274FD0DB00CB6BFA /* FormView.swift */; };
+		CAC0BAD827502C6100CB6BFA /* SegmentedControl.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAC0BAD727502C6100CB6BFA /* SegmentedControl.swift */; };
 		CACFF38A2746D4E900C70D65 /* NavigationButton.swift in Sources */ = {isa = PBXBuildFile; fileRef = CACFF3892746D4E900C70D65 /* NavigationButton.swift */; };
 		CACFF3AC274AAEBD00C70D65 /* CardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CACFF3AB274AAEBD00C70D65 /* CardView.swift */; };
 		CAD3FD4E273082E900D01CA9 /* HorizontalScrollView.swift in Sources */ = {isa = PBXBuildFile; fileRef = CAD3FD4D273082E900D01CA9 /* HorizontalScrollView.swift */; };
@@ -120,6 +121,7 @@
 		CAA9A2F6273953E7009BD14D /* NowasteTests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = NowasteTests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		CAA9A2F8273953E7009BD14D /* FirebaseServiceTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FirebaseServiceTests.swift; sourceTree = "<group>"; };
 		CAC0BAD5274FD0DB00CB6BFA /* FormView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = FormView.swift; sourceTree = "<group>"; };
+		CAC0BAD727502C6100CB6BFA /* SegmentedControl.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SegmentedControl.swift; sourceTree = "<group>"; };
 		CACFF3892746D4E900C70D65 /* NavigationButton.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = NavigationButton.swift; sourceTree = "<group>"; };
 		CACFF3AB274AAEBD00C70D65 /* CardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CardView.swift; sourceTree = "<group>"; };
 		CAD3FD4D273082E900D01CA9 /* HorizontalScrollView.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = HorizontalScrollView.swift; sourceTree = "<group>"; };
@@ -235,6 +237,7 @@
 				CAC0BAD5274FD0DB00CB6BFA /* FormView.swift */,
 				CA4AE327272B478400C444D8 /* LogInView.swift */,
 				CA4AE326272B478400C444D8 /* RegisterView.swift */,
+				CAC0BAD727502C6100CB6BFA /* SegmentedControl.swift */,
 				CAA4E14A2743DE28007A33F4 /* ProfileView.swift */,
 				CA4AE348272F34A000C444D8 /* SearchView.swift */,
 				CA4AE32A272BFDC500C444D8 /* MapView.swift */,
@@ -417,6 +420,7 @@
 				CAD3FD502730972000D01CA9 /* DetailController.swift in Sources */,
 				CA4AE324272B473C00C444D8 /* RegisterController.swift in Sources */,
 				CA4AE320272B45CD00C444D8 /* IntroController.swift in Sources */,
+				CAC0BAD827502C6100CB6BFA /* SegmentedControl.swift in Sources */,
 				CA47687A274D46FC0029A23E /* CoreDataManager.swift in Sources */,
 				CA4AE337272E777200C444D8 /* ListController.swift in Sources */,
 				CA9B4C8C274450FF0025012E /* ContainerManager.swift in Sources */,
