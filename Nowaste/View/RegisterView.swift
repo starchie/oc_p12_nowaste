@@ -25,7 +25,7 @@
 
 import UIKit
 
-class RegisterView: UIView {
+class RegisterView: UIScrollView {
     
     var imageProfile: UIImageView!
     

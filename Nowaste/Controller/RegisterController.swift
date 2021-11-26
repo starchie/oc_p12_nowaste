@@ -49,6 +49,24 @@ class RegisterController: UIViewController {
         registerView.imageProfile.addGestureRecognizer(UITapGestureRecognizer(target: self, action: #selector(didTapOnImageView)))
         registerView.imageProfile.isUserInteractionEnabled = true
         
+        // gesture recognizer
+        let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:)))
+        self.view.addGestureRecognizer(tap)
+        
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillShow),
+                                               name: UIResponder.keyboardWillShowNotification, object: nil)
+          
+            
+        NotificationCenter.default.addObserver(self, selector: #selector(keyboardWillHide),
+                                               name: UIResponder.keyboardWillHideNotification, object: nil)
+        
+        registerView.mail.textView.delegate = self
+        registerView.password.textView.delegate = self
+        registerView.userName.textView.resignFirstResponder()
+        registerView.street.textView.delegate = self
+        registerView.code.textView.delegate = self
+        registerView.city.textView.delegate = self
+        
          
     }
     
@@ -61,6 +79,15 @@ class RegisterController: UIViewController {
     }
     
     //MARK: -  ACTIONS
+    
+    @objc func handleTap(_ sender: UITapGestureRecognizer? = nil) {
+        registerView.mail.textView.resignFirstResponder()
+        registerView.password.textView.resignFirstResponder()
+        registerView.userName.textView.resignFirstResponder()
+        registerView.street.textView.resignFirstResponder()
+        registerView.code.textView.resignFirstResponder()
+        registerView.city.textView.resignFirstResponder()
+    }
     
     func goMap() {
         let vc = MapController()
@@ -141,6 +168,29 @@ class RegisterController: UIViewController {
 
     }
     
+    // Move Keyboard automatically
+    @objc func keyboardWillShow(notification: NSNotification) {
+        //Need to calculate keyboard exact size due to Apple suggestions
+        guard let keyboardSize = (notification.userInfo?[UIResponder.keyboardFrameEndUserInfoKey] as? NSValue)?.cgRectValue else {
+            return
+        }
+        
+        self.registerView.isScrollEnabled = true
+        
+        if registerView.street.textView.isEditing || registerView.code.textView.isEditing  || registerView.city.textView.isEditing {
+            self.registerView.setContentOffset(CGPoint(x: 0, y: keyboardSize.height), animated: true)
+        }
+  
+        
+
+    }
+    
+    @objc func keyboardWillHide(notification: NSNotification) {
+        // move back the root view origin to zero
+        self.registerView.setContentOffset(CGPoint(x: 0, y: 0), animated: true)
+    }
+    
+    
     //MARK: -  UTIL
     
     // 4 GEO CODE GIVEN ADRESS
@@ -161,7 +211,7 @@ class RegisterController: UIViewController {
 }
 
 
-//MARK:- IMAGE PICKER
+//MARK: - IMAGE PICKER
 
 extension RegisterController: UIImagePickerControllerDelegate, UINavigationControllerDelegate {
 
@@ -194,6 +244,7 @@ extension RegisterController: UIImagePickerControllerDelegate, UINavigationContr
             let imagePickerController = UIImagePickerController()
             imagePickerController.delegate = self
             imagePickerController.sourceType = sourceType
+            imagePickerController.modalPresentationStyle = UIModalPresentationStyle.overCurrentContext
             self.present(imagePickerController, animated: true, completion: nil)
         }
     }
@@ -213,5 +264,21 @@ extension RegisterController: UIImagePickerControllerDelegate, UINavigationContr
         picker.dismiss(animated: true, completion: nil)
     }
 
+}
+
+
+// MARK: - UITEXTVIEW DELEGATE
+
+extension RegisterController: UITextFieldDelegate {
+    
+    
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+           if(text == "\n") {
+               textView.resignFirstResponder()
+               return false
+           }
+           return true
+       }
+    
 }
 

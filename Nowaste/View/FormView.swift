@@ -29,6 +29,8 @@ class FormView: UIView {
         textView.backgroundColor = .white
         textView.placeholder = text
         textView.autocapitalizationType = .none
+        textView.autocorrectionType = .no
+        textView.spellCheckingType = .no
         textView.frame = CGRect(x: 5, y: 5, width: self.bounds.width - 10, height: self.bounds.height - 10)
         textView.layer.cornerRadius = textView.frame.height / 2
         textView.textAlignment = .center
