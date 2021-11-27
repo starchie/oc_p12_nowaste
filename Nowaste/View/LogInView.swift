@@ -53,8 +53,7 @@ class LogInView: UIView {
         
         
         mail = FormView(frame: CGRect(x: 20, y: self.bounds.midX - 50, width: self.bounds.width - 40, height: 50), text: "Email")
-        mail.textView.text = "lucile@nowatse.com"
-   
+        mail.textView.text = "lulu@nowaste.com"
  
         password = FormView(frame: CGRect(x: 20, y: mail.frame.maxY, width: self.bounds.width - 40, height: 50), text: "Mot de Passe")
         password.textView.text = "123456"

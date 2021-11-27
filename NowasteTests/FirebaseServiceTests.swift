@@ -45,6 +45,83 @@ class FirebaseServiceTests: XCTestCase {
         // Use XCTAssert and related functions to verify your tests produce the correct results.
     }
     
+    func testGivenDateWhenQuerryAsStringThenShouldReturnString () {
+        //Given
+        let date = 1637936047.251909
+        //When
+        let dateAsString = FirebaseService.shared.getDate(dt: date)
+        // then
+        XCTAssert(dateAsString == "26 11 2021 - 15:14")
+        
+    }
+    
+    
+    func testGivenAdArrayWhenSearchByNameTitleThenShouldSuccess () {
+        //Given
+        let snapshots: [String:Any] = ["addedByUser":"User","dateField":1637936047.251909 , "title": "Carottes", "imageURL":"https://openclassrooms.com" , "description":"plein de carottes" , "likes":1 , "id":"1234"]
+        let newAd = Ad(snapshot: snapshots)
+        let ads = [newAd!]
+        //When
+       
+        let result = FirebaseService.shared.searchAdsByKeyWord("caro", array: ads)
+        
+        
+        // then
+        XCTAssert(result.count == 1)
+    }
+    
+    func testGivenProfilesArrayWhenSearchWithMultipleIDProfilesArrayThenShouldSuccess () {
+        //Given
+        let userProfile = Profile(snapshot: ["id": "1234", "userName": "Richard", "dateField": 123.5, "activeAds": 1, "imageURL":"https://image.com","latitude": 12.4, "longitude": 12.4, "geohash":"ff4CC33" ])
+        let profiles = [userProfile!]
+        let distances = [220.0]
+        let uids = ["1234"]
+        //When
+        FirebaseService.shared.getProfilesfromUIDList(uids, arrayProfiles: profiles, arrayDistances: distances) { resultProfiles, resultDistances in
+        //then
+            XCTAssertTrue(resultProfiles.count == 1)
+            XCTAssertTrue(resultProfiles.count == 1)
+        }
+        
+    }
+    
+    
+    func testGivenAdsArrayWhenSearchByIDProfileThenShouldSuccess () {
+        //Given
+        let snapshots: [String:Any] = ["addedByUser":"User234","dateField":1637936047.251909 , "title": "Carottes", "imageURL":"https://openclassrooms.com" , "description":"plein de carottes" , "likes":1 , "id":"1234"]
+        let newAd = Ad(snapshot: snapshots)
+        let ads = [newAd!]
+        //When
+        let selectedAdResult = FirebaseService.shared.searchAdsFromProfile(uid: "User234", array: ads)
+        //then
+            XCTAssertTrue(selectedAdResult.count == 1)
+          
+        }
+    
+    func testGivenProfilesArrayWhenProfileWithNoAdsThenShouldBeIgnored() {
+        
+        //Given
+        let userProfile = Profile(snapshot: ["id": "1234", "userName": "Richard", "dateField": 123.5, "activeAds": 0, "imageURL":"https://image.com","latitude": 12.4, "longitude": 12.4, "geohash":"ff4CC33" ])
+        let profiles = [userProfile!]
+        let distances = [220.0]
+        
+        // When
+        FirebaseService.shared.removeProfileIfNoAd(profiles, distances: distances) {resultProfiles, resultDistances in
+            //then
+                XCTAssertTrue(resultProfiles.count == 0)
+                XCTAssertTrue(resultDistances.count == 0)
+            
+        }
+        
+        
+    }
+    
+    
+    // TESTS FIREBASE : NEED LOCAL FIREBASE EMULATOR
+    // RULES FOR STORAGE AND FIRESTORE SET FOR TESTS :
+    // allow read, write: if request.time < timestamp.date(2021, 12, 10); // Date of your choice
+    
+   
     // TEST AUTHENTICATION
     // REGISTER
     func test_A0_AuthWhenRegisterThenShouldSuccess() throws {
@@ -162,19 +239,7 @@ class FirebaseServiceTests: XCTestCase {
   
     }
     
-    func test_F2_FirestoreWhenGetAllProfilesThenShouldReturnSuccess() throws {
-        // when
-        let expectation = XCTestExpectation(description: "Wait for queue change.")
-        FirebaseService.shared.getProfiles( completionHandler:{ (success, error) in
-            
-        // Then
-            XCTAssertTrue(success)
-            expectation.fulfill()
-            
-        })
-        self.wait(for: [expectation], timeout: 1)
-  
-    }
+
      
     // ADS
     
@@ -194,24 +259,6 @@ class FirebaseServiceTests: XCTestCase {
         self.wait(for: [expectation], timeout: 1)
     }
     
-
-    func test_F4_FirestoreWhenQuerryAllAdsThenShouldSucess() throws {
-       // given
-    
-        
-        // when
-        let expectation = XCTestExpectation(description: "Wait for queue change.")
-        FirebaseService.shared.getAds( completionHandler:{ (success, error) in
-            
-        // Then
-            XCTAssertTrue(success)
-            expectation.fulfill()
-            
-        })
-        self.wait(for: [expectation], timeout: 1)
-  
-    }
-    
     // TODO HERE ...
     func test_F5_FirestoreWhenQuerryAnAdThenShouldSucess() throws {
        // given
@@ -229,23 +276,7 @@ class FirebaseServiceTests: XCTestCase {
         self.wait(for: [expectation], timeout: 1)
   
     }
-    
-    func test_F5_FirestoreWhenUpdateAnAdThenShouldSucess() throws {
-       // given
-        let adUID = "AdIdCreatedByApp"
-        
-        // when
-        let expectation = XCTestExpectation(description: "Wait for queue change.")
-        FirebaseService.shared.updateAd(field: "likes", id: adUID, by: 1, completionHandler: { (success, error) in
-            
-        // Then
-            XCTAssertTrue(success)
-            expectation.fulfill()
-            
-        })
-        self.wait(for: [expectation], timeout: 1)
-  
-    }
+
     
     func test_F6_GivenLocationWhenConvertToHashThenShouldReturnString() throws {
        // given
@@ -325,27 +356,8 @@ class FirebaseServiceTests: XCTestCase {
            
     }
     
-    // Log out
     
-    func test_Z0_uthWhenSignOutThenShouldSucess() throws {
-       // given
-    
-        
-        // when
-        let expectation = XCTestExpectation(description: "Wait for queue change.")
-        FirebaseService.shared.logout( completionHandler:{ (success, error) in
-            
-        // Then
-            XCTAssertTrue(success)
-            expectation.fulfill()
-            
-        })
-        self.wait(for: [expectation], timeout: 1)
-  
-    }
-    
-    
-    
+
     
     
     

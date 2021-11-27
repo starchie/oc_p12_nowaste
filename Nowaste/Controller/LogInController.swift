@@ -93,6 +93,7 @@ class LogInController: UIViewController {
                 self.goMap()
             }else{
                 self.presentUIAlertController(title: "Enregistrement", message: error!)
+                self.activityIndicator.stopAnimating()
             }
  
         }

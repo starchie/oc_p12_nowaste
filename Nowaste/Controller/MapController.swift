@@ -36,11 +36,11 @@ class MapController: UIViewController {
     var profileButton:NavigationButton!
     
     // VIEWS
-    var mapView:MapView!
-    var searchView:SearchView!
-    var dynamicView:DynamicView!
-    var listView: UIScrollView!
-    var pageControl:UIPageControl!
+    var mapView = MapView()
+    var searchView = SearchView()
+    var dynamicView = DynamicView()
+    var listView = UIScrollView()
+    var pageControl = UIPageControl()
     
     // DATA
     var sortedProfiles = [Profile]()
@@ -74,23 +74,24 @@ class MapController: UIViewController {
         self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: listButton),UIBarButtonItem(customView: addButton),UIBarButtonItem(customView: searchButton), UIBarButtonItem(customView: profileButton) ]
         
 
-        // GET ALL USER ON THE MAP
-        getProfilesInRadius()
-        // RESET
-        listView.isHidden = true
-        pageControl.isHidden = true
-        dynamicView.animReturnToStart()
+        // GET ALL USER ON THE MAP FROM CURRENT LOCATION
+        if FirebaseService.shared.profile != nil {
+            getProfilesInRadius()
+            listView.isHidden = true
+            pageControl.isHidden = true
+            dynamicView.animReturnToStart()
+        
+            
+            isNewMessage ()
+        }
         
         
-        isNewMessage ()
+
+    
         
  
     }
-    
-    override func viewWillDisappear(_ animated: Bool) {
-        guard FirebaseService.shared.listener != nil else {return}
-        FirebaseService.shared.removeListener()
-    }
+
 
     // MARK: - PREPARE CONTROLLER AND VIEWS
     
@@ -124,18 +125,10 @@ class MapController: UIViewController {
         
         // PLACE CAMERA - QUERRY USER LOCATION -
         
-        guard FirebaseService.shared.currentUser?.uid != nil, FirebaseService.shared.profile != nil
-        else { self.presentUIAlertController(title: "Erreur", message: "Vous n'êtes pas connecté"); return}
-        
-        FirebaseService.shared.querryProfile(filter: FirebaseService.shared.currentUser!.uid) {success, error in
-            if success == true {
+ 
                 self.mapView.location = CLLocationCoordinate2D(latitude: FirebaseService.shared.profile.latitude, longitude: FirebaseService.shared.profile.longitude)
-            }else {
-                print("error")
-            }
-            
-        }
-        
+                
+    
         
         // DYNAMIC VIEW
         let width: CGFloat = view.frame.width
@@ -235,6 +228,7 @@ class MapController: UIViewController {
         
         self.mapView.removeAnnotations(self.mapView.annotations)
         
+        
         let latitude = FirebaseService.shared.profile.latitude
         let longitude = FirebaseService.shared.profile.longitude
         
@@ -248,7 +242,6 @@ class MapController: UIViewController {
                 
                 self.sortedProfiles = FirebaseService.shared.profiles // ARRAY WITH PROFILES
             
-        
                 // GET ALL UID AS STRING
                 for profile in self.sortedProfiles {
                     profiles.append(profile.id)
@@ -295,8 +288,8 @@ class MapController: UIViewController {
                 self.mapView.addAnnotation(customAnnotation)
             }
         }else {
-            let uid = FirebaseService.shared.searchAdsByKeyWord(searchView.searchText.text ?? "")
-            FirebaseService.shared.getProfilesfromUIDList(uid) { profiles, distances in
+            let uids = FirebaseService.shared.searchAdsByKeyWord(searchView.searchText.text ?? "", array: AdsFromSortedProfiles)
+            FirebaseService.shared.getProfilesfromUIDList(uids, arrayProfiles: FirebaseService.shared.profiles, arrayDistances: FirebaseService.shared.distances) { profiles, distances in
                 sortedProfiles = profiles
             }
             // UPDATE

@@ -57,7 +57,6 @@ class ListCell: UITableViewCell {
         imageProfile = UIImageView()
         imageProfile.frame = CGRect(x: 20, y: 10, width: 40, height: 40)
         imageProfile.backgroundColor = .white
-        imageProfile.image = UIImage(named: "Carrots")
         imageProfile.layer.cornerRadius = 20
         imageProfile.clipsToBounds = true
         imageProfile.layer.borderWidth = 3
@@ -66,7 +65,7 @@ class ListCell: UITableViewCell {
         
         cellTitle = UILabel()
         cellTitle.font = UIFont(name: "Helvetica-Bold", size: 20)
-        cellTitle.text = "Title here "
+        cellTitle.text = ""
         cellTitle.textColor = .white
         cellTitle.sizeToFit()
         let currentWidthTitle = cellTitle.frame.width
@@ -81,7 +80,7 @@ class ListCell: UITableViewCell {
         distanceView = UILabel()
         
         distanceView.font = UIFont(name: "Helvetica", size: 16)
-        distanceView.text = "à 44000 m"
+        distanceView.text = ""
         distanceView.textColor = .white
         distanceView.sizeToFit()
         let distanceWidthTitle = distanceView.frame.width

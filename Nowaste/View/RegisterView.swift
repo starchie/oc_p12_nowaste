@@ -58,6 +58,7 @@ class RegisterView: UIScrollView {
         
         
         imageProfile = UIImageView(image: UIImage(systemName: "person.fill"))
+        imageProfile.contentMode = .scaleAspectFill
         imageProfile.frame = CGRect(x: 0, y: 10, width: 100, height: 100)
         imageProfile.layer.cornerRadius = 50
         imageProfile.backgroundColor = .init(white: 1, alpha: 0.2)

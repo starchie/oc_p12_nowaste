@@ -42,9 +42,7 @@ class DetailController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        
- 
-        
+  
         // NAVIGATION CONTROLLER
         let nc = navigationController as! NavigationController
         nc.currentState = .detail
@@ -88,13 +86,7 @@ class DetailController: UIViewController {
 
     }
  
-    override func viewWillDisappear(_ animated: Bool) {
-        guard FirebaseService.shared.listener != nil else {return}
-        FirebaseService.shared.removeListener()
-    }
-    
-   
-    
+
     //MARK: -  ALERT CONTROLLER
     
     private func presentUIAlertController(title:String, message:String) {
@@ -134,31 +126,38 @@ class DetailController: UIViewController {
     @objc func sendMail() {
         FirebaseService.shared.sendMessage(to: selectedProfile.id, senderName: FirebaseService.shared.profile.userName, for: currentAd.title) {success, error in
             if success {
-                print ("mail sent with success")
+                if CoreDataManager.shared.findAd(id: self.currentAd.id) {
+                    CoreDataManager.shared.deleteAd(id: self.currentAd.id)
+                }
+                
+                CoreDataManager.shared.saveAdToFavorite (userUID: self.currentAd.addedByUser, id: self.currentAd.id, title: self.currentAd.title, description: self.currentAd.description, imageURL: self.currentAd.imageURL, date: self.currentAd.dateField, likes: self.currentAd.likes, profile: self.selectedProfile, contact: true)
+                
+                self.presentUIAlertController(title: "Info", message: " Vous avez envoyé un mail à \(self.selectedProfile.userName), vous pouvez retrouver cette annonce dans vos favoris. Merci d'utiliser Nowaste :)")
             }
             else {
-                print (error ?? "")
+                self.presentUIAlertController(title: "Erreur", message: error!)
             }
             
         }
         
-        CoreDataManager.shared.saveAdToFavorite (userUID: currentAd.addedByUser, id: currentAd.id, title: currentAd.title, description: currentAd.description, imageURL: currentAd.imageURL, date: currentAd.dateField, likes: currentAd.likes, profile: selectedProfile, contact: true)
-        
-        presentUIAlertController(title: "Info", message: " Vous avez envoyé un mail à \(selectedProfile.userName), vous pouvez retrouver cette annonce dans vos favoris. Merci d'utiliser Nowaste :)")
+    
         
     }
     
     func addToFavorite() {
-        
+        if CoreDataManager.shared.findAd(id: self.currentAd.id) {
+            presentUIAlertController(title: "Info", message: "Annonce déjà dans vos favoris.")
+            return
+        }
         CoreDataManager.shared.saveAdToFavorite (userUID: currentAd.addedByUser, id: currentAd.id, title: currentAd.title, description: currentAd.description, imageURL: currentAd.imageURL, date: currentAd.dateField, likes: currentAd.likes, profile: selectedProfile, contact: false)
 
-        presentUIAlertController(title: "Info", message: "Recipe saved")
+        presentUIAlertController(title: "Info", message: "Annonce enregistrée")
         
     }
         
     func deleteFromFavorite() {
         CoreDataManager.shared.deleteAd(id: currentAd.id)
-        presentUIAlertController(title: "Info", message: "Recipe deleted")
+        presentUIAlertController(title: "Info", message: "Annonce supprimée")
     }
     
     @objc func deleteAd(){

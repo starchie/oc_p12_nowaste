@@ -112,12 +112,6 @@ class NavigationController: UINavigationController {
         
     }
     
-    override func viewWillLayoutSubviews() {
-        print (self.viewControllers.count)
-    }
-    
-
-    
 
 
 }

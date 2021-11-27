@@ -83,11 +83,6 @@ class ListController: UIViewController {
 
     }
     
-    override func viewWillDisappear(_ animated: Bool) {
-        guard FirebaseService.shared.listener != nil else {return}
-        FirebaseService.shared.removeListener()
-    }
-  
     //MARK: - PREPARE CONTROLLER AND VIEWS
     
     override func viewDidLoad() {
@@ -200,11 +195,13 @@ class ListController: UIViewController {
         }
         else {
             // FIND
-            let uid = FirebaseService.shared.searchAdsByKeyWord(searchView.searchText.text ?? "")
-            FirebaseService.shared.getProfilesfromUIDList(uid) { profiles, distances in
+            let uid = FirebaseService.shared.searchAdsByKeyWord(searchView.searchText.text ?? "", array: FirebaseService.shared.ads)
+            
+            FirebaseService.shared.getProfilesfromUIDList(uid, arrayProfiles: FirebaseService.shared.profiles, arrayDistances: FirebaseService.shared.distances) { profiles, distances in
                 sortedProfiles = profiles
                 distancesForSortedProfiles = distances
             }
+            
             // UPDATE TABLE
             tableView.reloadData()
         }
@@ -236,15 +233,21 @@ class ListController: UIViewController {
                     self.sortedProfiles = resultProfiles
                     self.distancesForSortedProfiles = resultDistances
                 }
-                
-                
+
                 // GET ALL UID AS STRING
                 for profile in self.sortedProfiles {
                     profiles.append(profile.id)
                 }
-                self.selectedRow = nil // NEED TO RESET TABLE VIEW - NO PROFILE SELECTED
-                guard profiles.count > 0 else {return}
-                self.getAdsFromProfilesInRadius(profiles) // FIND ALL ADS FOR PROFILES FOUND
+                if profiles.count == 0 {
+                    self.sortedProfiles = []
+                    self.AdsFromSortedProfiles = []
+                    self.tableView.reloadData()
+                    self.activityIndicator.stopAnimating()
+                }else {
+                    self.selectedRow = nil // NEED TO RESET TABLE VIEW - NO PROFILE SELECTED
+                    self.getAdsFromProfilesInRadius(profiles) // FIND ALL ADS FOR PROFILES FOUND
+                }
+                
                 
             }else{
                 print ("aie")
@@ -306,17 +309,20 @@ extension ListController:UITableViewDataSource {
         let text = sortedProfiles[indexPath.row].userName
         let distance = distancesForSortedProfiles[indexPath.row]
         let distanceText = "à " + String(round(distance)) + " m"
-        /*
+       
+        
         FirebaseService.shared.loadImage(sortedProfiles[indexPath.row].imageURL) { success, error, data in
             if success {
-                cell.imageProfile.image = UIImage(data: data ?? Data())
+                let cellImage = UIImage(data: data!) ?? UIImage()
+                cell.layoutFirstLine(image: cellImage, title: text, distance: distanceText)
+            }else {
+                let cellImage = UIImage(named: "annotationBlue") ?? UIImage()
+                cell.layoutFirstLine(image: cellImage, title: text, distance: distanceText)
+               
             }
             
         }
-         */
-        
-        cell.layoutFirstLine(image: UIImage(named: "vegetables") ?? UIImage(), title: text, distance: distanceText)
-       
+
         // IF SELECTED ROW DISPLAY ADS FOR SELECTED USER
         if indexPath.row == selectedRow{
             
@@ -364,7 +370,7 @@ extension ListController:UITableViewDataSource {
         let uid = sortedProfiles[selectedRow].id
         selectedProfile = sortedProfiles[selectedRow]
         // 2 - SEARCH ADS FROM THIS PROFILE
-        adsForSelectedProfile = FirebaseService.shared.searchAdsFromProfile(uid: uid, array: AdsFromSortedProfiles)
+        adsForSelectedProfile = FirebaseService.shared.searchAdsFromProfile(uid: uid, array: FirebaseService.shared.ads)
         // 3 UPDATE
         tableView.reloadData()
     }

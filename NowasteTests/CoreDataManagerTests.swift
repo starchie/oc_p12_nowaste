@@ -150,6 +150,22 @@ class CoreDataManagerTests: XCTestCase {
         XCTAssert(value == true)
        
     }
+    
+    func testCoreDataManagerGivenFavoritesWhenAlreadySavedThenShouldReturnTrue() {
+        //Given
+        CoreDataManager.shared.container = ContainerManager(.inMemory).persistentContainer
+        CoreDataManager.shared.deleteAllCoreDataItems()
+        
+        let userProfile = Profile(snapshot: ["id": "1234", "userName": "Richard", "dateField": 123.5, "activeAds": 1, "imageURL":"https://image.com","latitude": 12.4, "longitude": 12.4, "geohash":"ff4CC33" ])
+        // With One entity
+        CoreDataManager.shared.saveAdToFavorite(userUID: "1234", id: "12345678", title: "carottes", description: "donne des carottes", imageURL: "https://image.com", date: 1, likes: 0, profile: userProfile!, contact: true)
+        
+        //When
+        let value = CoreDataManager.shared.findAd(id: "12345678")
+        //Then
+        XCTAssert(value == true)
+       
+    }
 
 
 }

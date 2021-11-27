@@ -63,41 +63,45 @@ class SearchView: UIView {
         
         self.layer.addSublayer(shapeLayer)
         
-        goButton = UIButton()
-        self.addSubview(goButton)
-        goButton.setBackgroundImage(UIImage(systemName: "magnifyingglass.circle"), for: .normal)        
-        goButton.tintColor = .init(white: 1.0, alpha: 1.0)
-        goButton.frame = CGRect(x: frame.maxX - 90, y: 120, width: 20, height: 20)
+     
         
         searchText = UITextField()
         searchText.placeholder = "Légume ou fruit "
         self.addSubview(searchText)
-        searchText.frame = CGRect(x: 70, y: 110, width: frame.width - 170, height: 40)
+        searchText.frame = CGRect(x: 85, y: 130, width: frame.width - 170, height: 40)
         searchText.font = UIFont(name: "Helvetica-Bold", size: 21)
-        //searchText.backgroundColor = .blue
+        searchText.adjustsFontSizeToFitWidth = true
         searchText.textColor = UIColor.white
         searchText.textAlignment = .center
         
+        
         line = UIView()
-        line.frame = CGRect(x: 70, y: 150, width: frame.width - 170, height: 1)
+        line.frame = CGRect(x: 85, y: 170, width: frame.width - 170, height: 1)
         line.backgroundColor = .white
         self.addSubview(line)
+        
+        goButton = UIButton()
+        self.addSubview(goButton)
+        goButton.setBackgroundImage(UIImage(systemName: "magnifyingglass.circle"), for: .normal)
+        goButton.tintColor = .init(white: 1.0, alpha: 1.0)
+        goButton.frame = CGRect(x: line.frame.maxX + 5, y: line.frame.minY - 30, width: 20, height: 20)
         
         
         slider = UISlider()
         self.addSubview(slider)
         slider.tintColor = .white
         slider.value = 1
-        slider.frame = CGRect(x: 40, y: 80, width: frame.width - 100, height: 20)
+        slider.frame = CGRect(x: 40, y: 100, width: frame.width - 100, height: 20)
         
         searchDistanceLabel = UILabel()
         self.addSubview(searchDistanceLabel)
         searchDistanceLabel.textColor = .white
+        searchDistanceLabel.adjustsFontSizeToFitWidth = true
         searchDistanceLabel.font = UIFont(name: "Helvetica-Bold", size: 12)
         searchDistanceLabel.text = "10 km"
-        searchDistanceLabel.frame = CGRect(x: slider.frame.maxX + 10,
-                                           y: 80,
-                                           width: 100,
+        searchDistanceLabel.frame = CGRect(x: slider.frame.maxX + 5,
+                                           y: 100,
+                                           width: self.frame.width - ( slider.frame.maxX + 10 ),
                                            height: 30)
      
        

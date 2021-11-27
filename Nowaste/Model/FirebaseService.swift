@@ -49,8 +49,6 @@ class FirebaseService {
     var center: CLLocationCoordinate2D!
     var distances = [Double]()
     
-    var listener: Firebase.ListenerRegistration!
-    
     var lastMessageTitle:String = ""
     
     //MARK: - GEO HASH
@@ -211,6 +209,7 @@ class FirebaseService {
     }
     
     // LOGOUT
+    /*
     func logout(completionHandler: @escaping ((Bool, String? ) -> Void)){
         do {
             try Auth.auth().signOut()
@@ -220,7 +219,7 @@ class FirebaseService {
         }
         completionHandler(true,nil)
     }
-    
+    */
     // REGISTER
     func register(mail:String, pwd:String, completionHandler: @escaping ((Bool, String? ) -> Void)) {
         Auth.auth().createUser(withEmail: mail, password: pwd) { (result, error) in
@@ -229,7 +228,6 @@ class FirebaseService {
                 return
                 
             }
-                Auth.auth().signIn(withEmail: mail, password: pwd)
                 completionHandler(true,nil)
         }
         
@@ -264,28 +262,7 @@ class FirebaseService {
         
     }
     
-    // GET ALL USERS
-    
-    func getProfiles(completionHandler: @escaping ((Bool, String? ) -> Void)){
-        db.collection("users").getDocuments { (snapshot, error) in
-            guard let snapshot = snapshot, error == nil else {
-                completionHandler(false, error?.localizedDescription)
-                return
-            }
-            self.profiles.removeAll()
-            
-            for document in snapshot.documents {
-                let newItem = Profile(snapshot: document.data())
-                self.profiles.append(newItem!)
-                
-            }
-            completionHandler(true, nil)
-        }
-        
-    }
-    
     // GET ONE USER
-    
     func querryProfile(filter:String, completionHandler: @escaping ((Bool, String? ) -> Void)){
         let selection:Query = db.collection("users").whereField("id", isEqualTo: filter)
        
@@ -311,8 +288,7 @@ class FirebaseService {
     
     //MARK: - ADVERT
     
-    // CREATE
-    
+    // CREATE AN AD
     func setAd(userUID:String, id:String, title:String, description:String, imageURL:String, date:Double,likes:Int, completionHandler: @escaping ((Bool, String? ) -> Void)) {
         db.collection("ads").document("\(id)").setData(["title": title, "description": description, "imageURL": imageURL, "addedByUser": "\(userUID)", "dateField": date, "likes": likes, "id":id]) { error in
             guard error == nil else {
@@ -325,11 +301,10 @@ class FirebaseService {
         }
     }
     
-    // GET ADS FROM A USER
-    
+    // GET ADS FROM A CURRENT USER
     func querryAds(filter:String, completionHandler: @escaping ((Bool, String? ) -> Void)){
         let selection:Query = db.collection("ads").whereField("addedByUser", isEqualTo: filter)
-        listener = selection.addSnapshotListener { (querySnapshot, error) in
+        selection.getDocuments { (querySnapshot, error) in
             guard let querySnapshot = querySnapshot, error == nil else {
                 completionHandler(false, error?.localizedDescription)
                 return
@@ -343,7 +318,7 @@ class FirebaseService {
         }
     }
     
-    // NEED TESTS
+    // GET ADS FROM ARRAY OF USERS
     func querryAllAds(filter:[String], completionHandler: @escaping ((Bool, String? ) -> Void)){
 
             let selection:Query = db.collection("ads").whereField("addedByUser", in: filter)
@@ -364,42 +339,7 @@ class FirebaseService {
         
     }
     
-    func removeListener(){
-        listener.remove()
-    }
-
-    // GET ALL ADS
-    func getAds(completionHandler: @escaping ((Bool, String? ) -> Void)){
-        db.collection("ads")
-            .getDocuments { (querySnapshot, error) in
-                guard  error == nil else {
-                    completionHandler(false, error?.localizedDescription)
-                    return
-                }
-                
-                self.ads.removeAll()
-                
-                for document in querySnapshot!.documents {
-                    let newItem = Ad(snapshot: document.data())
-                    self.ads.append(newItem!)
-                }
-                self.ads.reverse()
-                completionHandler(true, nil)
-                
-            }
-    }
-    
-    func updateAd (field:String,id:String, by value:Any, completionHandler: @escaping ((Bool, String? ) -> Void)){
-        db.collection("ads").document("\(id)").updateData(["\(field)": value]) { error in
-            guard error == nil  else {
-                completionHandler(false,error?.localizedDescription)
-                return
-            }
-            completionHandler(true,nil)
-        }
-        
-    }
-    
+    // DELETE AD
     func deleteAd (id:String, completionHandler: @escaping ((Bool, String? ) -> Void)){
         db.collection("ads").document(id).delete() { error in
             guard error == nil  else {
@@ -413,6 +353,7 @@ class FirebaseService {
     
     //MARK: - MESSAGE
     
+    // JUST TO KNOW TITLE
     func initMessage (id:String ){
         let selection = db.collection("message").document("\(id)_message")
         selection.getDocument { (querySnapshot, error) in
@@ -471,14 +412,14 @@ class FirebaseService {
     }
     
     // GET ADS WHERE TITLE HAVE WORD SUBSTRING AND RETURN USERS UID
-    func searchAdsByKeyWord(_ word:String)->[String]{
+    func searchAdsByKeyWord(_ word:String, array:[Ad])->[String]{
         var adsUIDResult = [String]()
         
-        for i in 0..<ads.count {
-            let objc = ads[i].title
+        for i in 0..<array.count {
+            let objc = array[i].title
             let string = word
             if objc.range(of: string, options: .caseInsensitive) != nil {
-                adsUIDResult.append(ads[i].addedByUser)
+                adsUIDResult.append(array[i].addedByUser)
                
             }
         }
@@ -486,15 +427,15 @@ class FirebaseService {
     }
     
     // SELECT PROFILES FROM USERS UID LIST -> RETURN PROFILES AND DISTANCES
-    func getProfilesfromUIDList(_ uid: [String], result: ([Profile], [Double] ) -> Void ){
+    func getProfilesfromUIDList(_ uids: [String], arrayProfiles:[Profile],arrayDistances:[Double], result: ([Profile], [Double] ) -> Void ){
         var profilesInRadius = [Profile]()
         var distanceForProfilesInRadius = [Double]()
         
-        for  i in 0..<FirebaseService.shared.profiles.count {
-            for uid in uid {
-                if FirebaseService.shared.profiles[i].id == uid {
-                    profilesInRadius.append(FirebaseService.shared.profiles[i])
-                    distanceForProfilesInRadius.append(FirebaseService.shared.distances[i])
+        for  i in 0..<arrayProfiles.count {
+            for uid in uids {
+                if arrayProfiles[i].id == uid {
+                    profilesInRadius.append(arrayProfiles[i])
+                    distanceForProfilesInRadius.append(arrayDistances[i])
                 }
             }
         }
@@ -503,7 +444,7 @@ class FirebaseService {
     }
     
     // SELECT ADS FROM A USER UID
-    func searchAdsFromProfile (uid:String, array:[Ad])->[Ad] {
+    func searchAdsFromProfile (uid:String,array:[Ad])->[Ad] {
         var selectedAds = [Ad]()
             for ad in array {
                 if uid == ad.addedByUser {
@@ -515,12 +456,15 @@ class FirebaseService {
     
     // DONT NEED PROFILES THAT SHARE ANYTHING
     func removeProfileIfNoAd(_ profiles:[Profile], distances:[Double], result: ([Profile], [Double] ) -> Void ) {
-        var resultProfiles = profiles
-        var resultDistances = distances
+        var resultProfiles = [Profile]()
+        var resultDistances = [Double]()
+       
         for i in 0..<profiles.count {
-            if profiles[i].activeAds == 0 {
-                resultProfiles.remove(at: i)
-                resultDistances.remove(at: i)
+            if profiles[i].activeAds > 0 {
+                print("profiles : \(profiles.count)")
+                
+                resultProfiles.append(profiles[i])
+                resultDistances.append(distances[i])
             }
         }
         result(resultProfiles,resultDistances) 

@@ -158,8 +158,6 @@ class CoreDataManager {
         }else{
             return resultMessage.first!.sent
         }
-        
-   
     }
     
     

@@ -50,28 +50,23 @@ class NowasteUITests: XCTestCase {
         // Put teardown code here. This method is called after the invocation of each test method in the class.
     }
 
-    func testExample() throws {
-        // UI tests must launch the application that they test.
-        let app = XCUIApplication()
-        app.launch()
-
-        // Use recording to get started writing UI tests.
-        // Use XCTAssert and related functions to verify your tests produce the correct results.
-    }
     
     func testUINavigation() throws {
-        let app = XCUIApplication()
-        app.launchEnvironment = ["UITEST_DISABLE_ANIMATIONS" : "YES"]
-        app.launch()
-        app.buttons["Log In"].tap()
         
-        app/*@START_MENU_TOKEN@*/.staticTexts["Login"]/*[[".buttons[\"Login\"].staticTexts[\"Login\"]",".staticTexts[\"Login\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
+        let app = XCUIApplication()
+        let connexionStaticText = app/*@START_MENU_TOKEN@*/.staticTexts["Connexion"]/*[[".buttons[\"Connexion\"].staticTexts[\"Connexion\"]",".staticTexts[\"Connexion\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/
+        connexionStaticText.tap()
+        connexionStaticText.tap()
         
         let nowasteMapNavigationBar = app.navigationBars["Nowaste.Map"]
+        nowasteMapNavigationBar.buttons["person"].tap()
+        app.navigationBars["Nowaste.Profile"].buttons["Back"].tap()
         nowasteMapNavigationBar.buttons["magnifyingglass"].tap()
-        app.windows.children(matching: .other).element.children(matching: .other).element.children(matching: .other).element.children(matching: .other).element.children(matching: .other).element.children(matching: .other).element.children(matching: .other).element(boundBy: 1).children(matching: .textView).element.tap()
-        app.children(matching: .window).element(boundBy: 0).children(matching: .other).element.children(matching: .other).element.children(matching: .other).element.children(matching: .other).element.buttons["magnifyingglass"].tap()
+        nowasteMapNavigationBar.buttons["plus"].tap()
+        app.navigationBars["Nowaste.Ad"].buttons["Back"].tap()
         nowasteMapNavigationBar.buttons["list.bullet"].tap()
+        app.navigationBars["Nowaste.List"].buttons["map"].tap()
+      
         
     }
     
