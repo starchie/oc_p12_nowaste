@@ -31,29 +31,31 @@ class AnnotationView: MKAnnotationView {
     
     var anim = UIImageView()
     var count = UILabel()
+    var title = UILabel()
+    
     
     // Required for MKAnnotationView
     required init?(coder aDecoder: NSCoder) {
         super.init(coder: aDecoder)
-      
+        
     }
     
     
     override init(annotation: MKAnnotation?, reuseIdentifier: String?) {
         super.init(annotation: annotation, reuseIdentifier: reuseIdentifier)
-      
+        
         self.frame = CGRect(x: 0, y: 0, width: 40, height: 40)
-        self.layer.cornerRadius = 15
-      
+
+        self.backgroundColor = .clear
         
         anim.frame = self.frame
         self.addSubview(anim)
-
+        
         anim.alpha = 1.0
+        anim.image = UIImage(named: "annotationBlue")
         anim.animationImages = animatedImages(for: "annotation")
         anim.animationDuration = 1.4
         anim.animationRepeatCount = .zero
-        anim.image = anim.animationImages?[Int.random(in: 0...2)]
         anim.startAnimating()
         
         count.frame = self.frame
@@ -65,21 +67,35 @@ class AnnotationView: MKAnnotationView {
         count.textAlignment = .center
         self.addSubview(count)
         
-    }
-    
-    override func prepareForReuse() {
-        super.prepareForReuse()
+        title.text = "userName"
+        title.font = UIFont(name: "helvetica", size: 14)
+        title.textColor = .white
+        title.sizeToFit()
+        title.center = CGPoint(x: self.center.x, y: self.frame.maxY + 10)
+        self.addSubview(title)
         
     }
     
-    override func prepareForDisplay() {
-        super.prepareForDisplay()
+    func updateView (size: CGFloat, text:String, number:Int, test:Bool) {
+        
+        self.frame = CGRect(x: 0, y: 0, width: size, height: size)
+        
+        title.text = text
+        title.sizeToFit()
+        title.center = CGPoint(x: self.center.x, y: self.frame.maxY + 10)
+        
+        anim.frame = self.frame
+        
+        count.text = String(number)
+        count.frame = self.frame
+        count.center = self.center
+        
+        if test == true {
+            anim.stopAnimating()
+        }
         
     }
     
-    override func setSelected(_ selected: Bool, animated: Bool) {
-        
-    }
     
     // MARK: - UTILS
     

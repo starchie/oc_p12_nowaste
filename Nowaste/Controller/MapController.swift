@@ -316,24 +316,28 @@ class MapController: UIViewController {
 extension MapController: MKMapViewDelegate {
     
     // MARK: - PLACE ANNOTATIONS
-    
+ 
     func mapView(_ mapView: MKMapView,viewFor annotation: MKAnnotation) -> MKAnnotationView? {
+        
         let annotation = annotation as! Annotation
         let identifier = "Annotation"
         var annotationView = mapView.dequeueReusableAnnotationView(withIdentifier: identifier)
         annotationView = AnnotationView(annotation: annotation, reuseIdentifier: identifier)
         let marker = annotationView as! AnnotationView
-    
-        let size = 30 + (3 * annotation.profile!.activeAds)
-        annotationView?.frame = CGRect(x: 0, y: 0, width: size, height: size)
-        marker.anim.frame = annotationView!.frame
-        marker.count.text = String(annotation.profile!.activeAds)
-        marker.count.center = annotationView!.center
-        marker.layer.cornerRadius = CGFloat(size / 2)
-        marker.canShowCallout = false
         
+        let test = annotation.profile?.id == FirebaseService.shared.currentUser?.uid ? true : false
+        
+        let size:CGFloat = 30.0 + CGFloat(3 * annotation.profile!.activeAds)
+        marker.updateView(size: size,
+                          text: annotation.profile!.userName,
+                          number: annotation.profile!.activeAds,
+                          test:test)
+       
+        marker.canShowCallout = false
+
         return marker
         
+        //return annotationView
     }
     
     func mapView(_ mapView: MKMapView, regionDidChangeAnimated animated: Bool) {
