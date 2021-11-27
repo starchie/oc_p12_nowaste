@@ -339,6 +339,17 @@ class FirebaseService {
         
     }
     
+    func updateAd (ad:String, field:String, by value:Any, completionHandler: @escaping ((Bool, String? ) -> Void)){
+        db.collection("ads").document("\(ad)").updateData(["\(field)": value]) { error in
+            guard error == nil else {
+                completionHandler(false,error?.localizedDescription)
+                return
+            }
+            completionHandler(true,nil)
+        }
+        
+    }
+    
     // DELETE AD
     func deleteAd (id:String, completionHandler: @escaping ((Bool, String? ) -> Void)){
         db.collection("ads").document(id).delete() { error in

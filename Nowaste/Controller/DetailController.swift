@@ -130,6 +130,8 @@ class DetailController: UIViewController {
                     CoreDataManager.shared.deleteAd(id: self.currentAd.id)
                 }
                 
+                self.addLike ()
+                
                 CoreDataManager.shared.saveAdToFavorite (userUID: self.currentAd.addedByUser, id: self.currentAd.id, title: self.currentAd.title, description: self.currentAd.description, imageURL: self.currentAd.imageURL, date: self.currentAd.dateField, likes: self.currentAd.likes, profile: self.selectedProfile, contact: true)
                 
                 self.presentUIAlertController(title: "Info", message: " Vous avez envoyé un mail à \(self.selectedProfile.userName), vous pouvez retrouver cette annonce dans vos favoris. Merci d'utiliser Nowaste :)")
@@ -139,8 +141,20 @@ class DetailController: UIViewController {
             }
             
         }
-        
+
+    }
     
+    func addLike () {
+        let value = FieldValue.increment(Int64(1))
+        
+        FirebaseService.shared.updateAd(ad: currentAd.id, field: "likes", by: value){ success, error in
+            if success {
+                print ("likes updated")
+            }else {
+                print ("cant't edit ad")
+            }
+            
+        }
         
     }
     
