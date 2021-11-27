@@ -10,6 +10,4 @@ import CoreData
 
 public class FavoriteMessage: NSManagedObject {
 
-    
-
 }

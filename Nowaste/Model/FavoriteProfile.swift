@@ -10,8 +10,6 @@ import CoreData
 
 
 public class FavoriteProfile: NSManagedObject {
-    
-    
-    
+  
     
 }

@@ -29,6 +29,7 @@ import CoreLocation
 class RegisterController: UIViewController {
     
     var registerView:RegisterView!
+    var activityIndicator = UIActivityIndicatorView()
     
 
     override func viewDidLoad() {
@@ -67,6 +68,13 @@ class RegisterController: UIViewController {
         registerView.code.textView.delegate = self
         registerView.city.textView.delegate = self
         
+        // INDICATOR
+        activityIndicator.frame = CGRect(x: 0, y: view.frame.maxY - 100, width: 30, height: 30)
+        activityIndicator.center.x = view.center.x
+        activityIndicator.color = .white
+        activityIndicator.hidesWhenStopped = true
+        view.addSubview(activityIndicator)
+        
          
     }
     
@@ -102,6 +110,8 @@ class RegisterController: UIViewController {
 
     // 1 CREATE USER
     @objc func register () {
+        
+        activityIndicator.startAnimating()
         
         // CONVERT ADRESS TO COORDINATE ...
         let adress:String = "\(registerView.street.textView.text!)" + "\(registerView.code.textView.text!)" + "\(registerView.city.textView.text!)"
@@ -159,8 +169,10 @@ class RegisterController: UIViewController {
     func saveImageProfile(){
         FirebaseService.shared.saveImage(PNG: (registerView.imageProfile.image?.pngData())!, location: "images/\(FirebaseService.shared.currentUser!.uid)/profil_img.png"){ success,error in
             if success {
+                self.activityIndicator.stopAnimating()
                 self.goMap()
             }else{
+                self.activityIndicator.stopAnimating()
                 self.presentUIAlertController(title: "Enregistrement", message: error!)
             }
 

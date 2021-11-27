@@ -33,7 +33,6 @@ class SegmentedControl: UIView {
         button0.imageView?.animationImages = animatedImages(for: "star")
         button0.imageView?.animationDuration = 1.4
         button0.imageView?.animationRepeatCount = .zero
-        button0.imageView?.image = button0.imageView?.animationImages?[0]
         button0.backgroundColor = .clear
         
         button1.setImage(UIImage(named: "form_5"), for: .normal)
@@ -41,7 +40,6 @@ class SegmentedControl: UIView {
         button1.imageView?.animationImages = animatedImages(for: "form")
         button1.imageView?.animationDuration = 1.4
         button1.imageView?.animationRepeatCount = .zero
-        button1.imageView?.image = button1.imageView?.animationImages?[0]
         button1.backgroundColor = .clear
         
         hStack.frame = CGRect(x: 0, y: 0, width: frame.width, height: frame.height)
@@ -60,17 +58,16 @@ class SegmentedControl: UIView {
         switch selectedSegmentIndex {
             
         case 0:
-            
             button0.imageView?.startAnimating()
-            button0.imageView?.alpha = 1.0
+            button0.alpha = 1.0
             button1.imageView?.stopAnimating()
-            button1.imageView?.alpha = 0.3
+            button1.alpha = 0.3
             
         case 1:
             button0.imageView?.stopAnimating()
-            button0.imageView?.alpha = 0.3
+            button0.alpha = 0.3
             button1.imageView?.startAnimating()
-            button1.imageView?.alpha = 1.0
+            button1.alpha = 1.0
          
             
         default:

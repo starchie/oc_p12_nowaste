@@ -77,12 +77,11 @@ class ProfileController: UIViewController {
         view.addSubview(segmentedControl)
         segmentedControl.button0.addTarget(self, action: #selector(didSelectFavorite), for: .touchUpInside)
         segmentedControl.button1.addTarget(self, action: #selector(didSelectCreated), for: .touchUpInside)
-        segmentedControl.selectedSegmentIndex = 0
         
         // LABEL : CHOICE DESCRIPTION - FAVORITE OR CREATED ADS
         choiceDescription = UILabel()
         choiceDescription.textColor = .white
-        choiceDescription.text = "Vos annonces sauvegardé sur NoWaste "
+        choiceDescription.text = "Vos annonces sauvegardées sur NoWaste "
         choiceDescription.font = UIFont(name: "Helvetica-Bold", size: 28)
         choiceDescription.numberOfLines = 0
         choiceDescription.adjustsFontSizeToFitWidth = true
@@ -125,7 +124,7 @@ class ProfileController: UIViewController {
     // SELECTION CHANGE BETWEEN FAVORITES AND CREATED ADS
     @objc func didSelectFavorite(){
         segmentedControl.selectedSegmentIndex = 0
-        choiceDescription.text = "Vos annonces sauvegardé sur NoWaste "
+        choiceDescription.text = "Vos annonces sauvegardées sur NoWaste "
         tableView.reloadData()
     }
     

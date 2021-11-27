@@ -28,6 +28,7 @@ import UIKit
 class LogInController: UIViewController {
     
     var logInView:LogInView!
+    var activityIndicator = UIActivityIndicatorView()
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -40,6 +41,13 @@ class LogInController: UIViewController {
         
         logInView.login.addTarget(self, action:#selector(login), for: .touchUpInside)
         logInView.noAccount.addTarget(self, action:#selector(goRegister), for: .touchUpInside)
+        
+        // INDICATOR
+        activityIndicator.frame = CGRect(x: 0, y: view.frame.maxY - 100, width: 30, height: 30)
+        activityIndicator.center.x = view.center.x
+        activityIndicator.color = .white
+        activityIndicator.hidesWhenStopped = true
+        view.addSubview(activityIndicator)
         
     }
     
@@ -62,10 +70,12 @@ class LogInController: UIViewController {
         FirebaseService.shared.querryProfile(filter: FirebaseService.shared.currentUser!.uid) {success, error in
             if success {
                 // CONTINUE TO MAP
+                self.activityIndicator.stopAnimating()
                 let vc = MapController()
                 self.navigationController?.pushViewController(vc, animated: true)
             } else {
                 // ERROR
+                self.activityIndicator.stopAnimating()
                 self.presentUIAlertController(title: "Erreur", message: "Impossible de charger vos informations")
             }
             
@@ -75,6 +85,8 @@ class LogInController: UIViewController {
     
     // LOGIN USER
     @objc func login () {
+        
+        activityIndicator.startAnimating()
         
         FirebaseService.shared.login(mail: logInView.mail.textView.text!, pwd: logInView.password.textView.text!) { success, error in
             if success {

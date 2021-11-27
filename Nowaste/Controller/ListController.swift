@@ -52,6 +52,8 @@ class ListController: UIViewController {
     var sizeForSelectedRow: CGFloat = 60
     var sizeForDefaultRow: CGFloat = 60
     
+    var activityIndicator = UIActivityIndicatorView()
+    
     // MARK: - PREPARE NAVIGATION CONTROLLER
     
     override func viewWillAppear(_ animated: Bool) {
@@ -74,6 +76,7 @@ class ListController: UIViewController {
         profileButton.addTarget(self, action:#selector(profileFunction), for: .touchUpInside)
 
         self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: mapButton),UIBarButtonItem(customView: addButton),UIBarButtonItem(customView: searchButton),UIBarButtonItem(customView: profileButton) ]
+        
         
         // GET DATA AND UPDATE VIEWS
         getProfilesInRadius()
@@ -99,6 +102,12 @@ class ListController: UIViewController {
         searchView.goButton.addTarget(self, action:#selector(searchFunction), for: .touchUpInside)
         searchView.slider.addTarget(self, action: #selector(getProfilesInRadius), for: .touchUpInside)
         
+        // delegate
+        searchView.searchText.delegate = self
+        // gesture recognizer
+        let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:)))
+        self.searchView.addGestureRecognizer(tap)
+        
         // TABLEVIEW
         tableView = UITableView()
         tableView.separatorStyle = .singleLine
@@ -107,7 +116,7 @@ class ListController: UIViewController {
         tableView.frame = CGRect(x: 0,
                                  y: 0,
                                  width: view.frame.width,
-                                 height: view.frame.height)
+                                 height: view.frame.height - 30)
         
         tableView.delegate = self
         tableView.dataSource = self
@@ -115,9 +124,23 @@ class ListController: UIViewController {
         
         self.view.addSubview(tableView)
         
+        // INDICATOR
+        activityIndicator.frame = CGRect(x: 0, y: view.frame.maxY - 30, width: 30, height: 30)
+        activityIndicator.center.x = view.center.x
+        activityIndicator.color = .white
+        activityIndicator.hidesWhenStopped = true
+        view.addSubview(activityIndicator)
+        
     }
     
     //MARK: - ACTIONS
+    
+    // TAP ANYWHERE TO LEAVE SEARCH TEXT
+    @objc func handleTap(_ sender: UITapGestureRecognizer? = nil) {
+        searchView.searchText.resignFirstResponder()
+
+    }
+    
     
     // CREATE NEW AD
     @objc func addFunction(_ sender:UIButton) {
@@ -127,8 +150,7 @@ class ListController: UIViewController {
     
     // GO TO MAP
     @objc func mapFunction(_ sender:UIButton) {
-        let vc = MapController()
-        self.navigationController?.pushViewController(vc, animated: false)
+        self.navigationController?.popViewController(animated: false)
     }
     
     // VIEW USER PROFILE
@@ -138,9 +160,9 @@ class ListController: UIViewController {
     }
     
     // VIEW DETAIL
-    @objc func test(_ sender:UIButton) {
+    @objc func goDetail(_ sender:UIButton) {
         let vc = DetailController()
-        vc.currentAd = AdsFromSortedProfiles[sender.tag - 100]
+        vc.currentAd = adsForSelectedProfile[sender.tag - 100]
         vc.selectedProfile = selectedProfile
         vc.isFavorite = false
         navigationController?.pushViewController(vc, animated: false)
@@ -157,7 +179,7 @@ class ListController: UIViewController {
         }
     }
     
-    @objc func searchFunction(_ sender:UIButton) {
+    @objc func searchFunction() {
         // CLEAN
         selectedRow = nil
         sortedProfiles.removeAll()
@@ -192,6 +214,8 @@ class ListController: UIViewController {
     
     @objc func getProfilesInRadius() {
         
+        activityIndicator.startAnimating()
+        
         let latitude = FirebaseService.shared.profile.latitude
         let longitude = FirebaseService.shared.profile.longitude
         
@@ -224,6 +248,7 @@ class ListController: UIViewController {
                 
             }else{
                 print ("aie")
+                self.activityIndicator.stopAnimating()
             }
             
         }
@@ -235,6 +260,7 @@ class ListController: UIViewController {
         FirebaseService.shared.querryAllAds(filter: profiles) { success,error in
             if success {
                 self.AdsFromSortedProfiles = FirebaseService.shared.ads
+                self.activityIndicator.stopAnimating()
                 self.tableView.reloadData()
             }else{
                 print ("aie")
@@ -298,11 +324,12 @@ extension ListController:UITableViewDataSource {
             for i in 0..<adsForSelectedProfile.count {
                 let buttonToAdd = UIButton()
                 buttonToAdd.contentHorizontalAlignment = .left
-                buttonToAdd.titleLabel?.font = UIFont(name: "Helvetica", size: 12)
+                buttonToAdd.titleLabel?.font = UIFont(name: "Helvetica", size: 18)
+                buttonToAdd.titleLabel?.adjustsFontSizeToFitWidth = true
                 buttonToAdd.setTitle("\(adsForSelectedProfile[i].title)  > ", for: .normal)
                 buttonToAdd.setTitleColor(.white, for: .normal)
                 buttonToAdd.tag = 100 + i
-                buttonToAdd.addTarget(self, action: #selector(test), for: .touchUpInside)
+                buttonToAdd.addTarget(self, action: #selector(goDetail), for: .touchUpInside)
                 buttonToAdd.frame = CGRect(x: cell.cellTitle.frame.minX,
                                          y: cell.cellTitle.frame.maxY + CGFloat(i * 30),
                                          width: cell.frame.width - 40,
@@ -345,6 +372,34 @@ extension ListController:UITableViewDataSource {
 }
 
 extension ListController:UITableViewDelegate{
+    
+}
+
+
+// MARK: - EXTENSION UITEXTFIELD DELEGATE
+
+extension ListController: UITextFieldDelegate {
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField, reason: UITextField.DidEndEditingReason) {
+        if textField.text == "" {
+            searchFunction()
+        }
+    }
+        
+    
+    
+    
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+           if(text == "\n") {
+               textView.resignFirstResponder()
+               return false
+           }
+           return true
+       }
     
 }
 

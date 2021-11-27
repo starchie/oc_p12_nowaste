@@ -47,6 +47,8 @@ class MapController: UIViewController {
     var AdsFromSortedProfiles = [Ad]()
     var selectedProfile:Profile!
     
+    var activityIndicator = UIActivityIndicatorView()
+    
     
     // MARK: - PREPARE NAVIGATION CONTROLLER
     
@@ -169,6 +171,13 @@ class MapController: UIViewController {
         // INIT MESSAGE
         FirebaseService.shared.initMessage(id: FirebaseService.shared.profile.id)
         
+        // INDICATOR
+        activityIndicator.frame = CGRect(x: 0, y: view.frame.maxY - 30, width: 30, height: 30)
+        activityIndicator.center.x = view.center.x
+        activityIndicator.color = .white
+        activityIndicator.hidesWhenStopped = true
+        view.addSubview(activityIndicator)
+        
 
     }
     
@@ -221,6 +230,9 @@ class MapController: UIViewController {
     }
     
     @objc func getProfilesInRadius() {
+        
+        activityIndicator.startAnimating()
+        
         self.mapView.removeAnnotations(self.mapView.annotations)
         
         let latitude = FirebaseService.shared.profile.latitude
@@ -248,6 +260,7 @@ class MapController: UIViewController {
                 self.getAdsFromProfilesInRadius(profiles) // FIND ALL ADS FOR PROFILES FOUND
             }else{
                 print ("aie")
+                self.activityIndicator.stopAnimating()
             }
             
         }
@@ -259,8 +272,10 @@ class MapController: UIViewController {
         FirebaseService.shared.querryAllAds(filter: profiles) { success,error in
             if success {
                 self.AdsFromSortedProfiles = FirebaseService.shared.ads
+                self.activityIndicator.stopAnimating()
             }else{
                 print ("aie")
+                self.activityIndicator.stopAnimating()
             }
             
         }

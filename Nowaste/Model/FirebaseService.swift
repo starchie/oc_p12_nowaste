@@ -181,6 +181,20 @@ class FirebaseService {
         }
     }
     
+    func deleteImage(_ image:String, completionHandler: @escaping ((Bool, String? ) -> Void)){
+        let imageRef = storage.reference().child("\(image)")
+        
+        // Delete the file
+        imageRef.delete { error in
+            guard error == nil else {
+                completionHandler(false,error?.localizedDescription)
+                return
+                
+            }
+            completionHandler(true,nil)
+        }
+    }
+    
     
     //MARK: - AUTHENTICATION
     

@@ -112,7 +112,7 @@ class DetailController: UIViewController {
         favoriteButton.addTarget(self, action:#selector(toggleFavorite), for: .touchUpInside)
         
         trashButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "trash")
-        trashButton.addTarget(self, action:#selector(deleteFromSource), for: .touchUpInside)
+        trashButton.addTarget(self, action:#selector(deleteAd), for: .touchUpInside)
         
         if isFavorite {
             favoriteButton.setBackgroundImage(UIImage(systemName: "star.fill"), for: .normal)
@@ -161,7 +161,7 @@ class DetailController: UIViewController {
         presentUIAlertController(title: "Info", message: "Recipe deleted")
     }
     
-    @objc func deleteFromSource(){
+    @objc func deleteAd(){
         let id = currentAd.id
         FirebaseService.shared.deleteAd(id:id) {
             success, error in
@@ -171,6 +171,18 @@ class DetailController: UIViewController {
                     self.presentUIAlertController(title: "error", message: error!)
                 }
             }
+    }
+    
+    func deleteImageFromCloud() {
+        FirebaseService.shared.deleteImage(currentAd.imageURL) {
+            success, error in
+            if success {
+                self.presentUIAlertController(title: "Suppression", message: "post supprimé avec succés")
+            }else {
+                self.presentUIAlertController(title: "Erreur", message: "Une erreur est survenue")
+                
+            }
+        }
     }
     
     // IF WE DELETE AN AD, CHANGE AD COUNTER IN PROFILE
@@ -183,7 +195,7 @@ class DetailController: UIViewController {
         
         FirebaseService.shared.updateProfile(user: FirebaseService.shared.currentUser!.uid, field: "activeAds", by: value){success,error in
              if success {
-                 self.presentUIAlertController(title: "Suppression", message: "post supprimé avec succés")
+                 self.deleteImageFromCloud()
              }else {
                  self.presentUIAlertController(title: "Enregistrement", message: error!)
              }
