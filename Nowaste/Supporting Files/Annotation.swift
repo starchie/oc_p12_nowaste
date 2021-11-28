@@ -1,6 +1,6 @@
 //
 //  Annotation.swift
-//  iOSFundamental
+//  iNowaste
 //
 //  Created by Gilles Sagot on 17/10/2021.
 

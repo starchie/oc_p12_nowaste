@@ -1,6 +1,6 @@
 //
 //  NavigationController.swift
-//  Reciplease
+//  Nowaste
 //
 //  Created by Gilles Sagot on 24/08/2021.
 

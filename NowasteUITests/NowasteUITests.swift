@@ -53,19 +53,20 @@ class NowasteUITests: XCTestCase {
     
     func testUINavigation() throws {
         
+        
         let app = XCUIApplication()
         let connexionStaticText = app/*@START_MENU_TOKEN@*/.staticTexts["Connexion"]/*[[".buttons[\"Connexion\"].staticTexts[\"Connexion\"]",".staticTexts[\"Connexion\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/
         connexionStaticText.tap()
         connexionStaticText.tap()
         
         let nowasteMapNavigationBar = app.navigationBars["Nowaste.Map"]
-        nowasteMapNavigationBar.buttons["person"].tap()
+        nowasteMapNavigationBar.buttons["personCircle"].tap()
         app.navigationBars["Nowaste.Profile"].buttons["Back"].tap()
-        nowasteMapNavigationBar.buttons["magnifyingglass"].tap()
-        nowasteMapNavigationBar.buttons["plus"].tap()
+        nowasteMapNavigationBar.buttons["magnifyingGlassCircle"].tap()
+        nowasteMapNavigationBar.buttons["plusCircle"].tap()
         app.navigationBars["Nowaste.Ad"].buttons["Back"].tap()
-        nowasteMapNavigationBar.buttons["list.bullet"].tap()
-        app.navigationBars["Nowaste.List"].buttons["map"].tap()
+        nowasteMapNavigationBar.buttons["listCircle"].tap()
+      
       
         
     }

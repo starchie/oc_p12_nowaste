@@ -1,6 +1,6 @@
 //
 //  Profile.swift
-//  Barter
+//  Nowaste
 //
 //  Created by Gilles Sagot on 05/10/2021.
 

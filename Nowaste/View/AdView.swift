@@ -1,6 +1,6 @@
 //
 //  DetailView.swift
-//  Testing
+//  Nowaste
 //
 //  Created by Gilles Sagot on 25/10/2021.
 

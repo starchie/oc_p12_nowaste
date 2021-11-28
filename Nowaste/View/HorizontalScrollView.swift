@@ -1,6 +1,6 @@
 //
 //  HorizontalScrollView.swift
-//  Testing
+//  Nowaste
 //
 //  Created by Gilles Sagot on 24/10/2021.
 

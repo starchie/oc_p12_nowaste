@@ -1,6 +1,6 @@
 //
 //  FirebaseService.swift
-//  Barter
+//  Nowaste
 //
 //  Created by Gilles Sagot on 10/10/2021.
 

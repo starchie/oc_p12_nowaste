@@ -1,6 +1,6 @@
 //
 //  RegisterController.swift
-//  iOSFundamental
+//  Nowaste
 //
 //  Created by Gilles Sagot on 19/10/2021.
 

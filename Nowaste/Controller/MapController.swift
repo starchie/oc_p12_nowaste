@@ -42,7 +42,6 @@ class MapController: UIViewController {
     var listView = UIScrollView()
     var pageControl = UIPageControl()
     
-    // DATA
     var sortedProfiles = [Profile]()
     var AdsFromSortedProfiles = [Ad]()
     var selectedProfile:Profile!
@@ -105,9 +104,14 @@ class MapController: UIViewController {
         searchView = SearchView(frame: view.frame)
         view.addSubview(searchView)
         searchView.isHidden = true
-        
-        searchView.goButton.addTarget(self, action:#selector(searchFunction), for: .touchUpInside)
+        searchView.goButton.addTarget(self, action:#selector(searchThisWordInAds), for: .touchUpInside)
         searchView.slider.addTarget(self, action: #selector(getProfilesInRadius), for: .touchUpInside)
+        
+        // SEARCHVIEW DELEGATE TEXT
+        searchView.searchText.delegate = self
+        // SEARCHVIEW GESTURE RECOGNIZER
+        let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:)))
+        self.searchView.addGestureRecognizer(tap)
 
         // MAP INIT
         mapView = MapView(frame: CGRect(x: 0, y: 0, width: view.frame.width, height: view.frame.height))
@@ -176,6 +180,12 @@ class MapController: UIViewController {
     }
     
     //MARK: - ACTIONS
+    
+    // TAP ANYWHERE TO LEAVE SEARCH TEXT
+    @objc func handleTap(_ sender: UITapGestureRecognizer? = nil) {
+        searchView.searchText.resignFirstResponder()
+
+    }
     
     // CREATE NEW AD
     @objc func addFunction(_ sender:UIButton) {
@@ -280,7 +290,7 @@ class MapController: UIViewController {
         
     }
     
-    @objc func searchFunction(_ sender:UIButton) {
+    @objc func searchThisWordInAds() {
         // CLEAN
         sortedProfiles.removeAll()
         mapView.removeAnnotations(mapView.annotations)
@@ -462,9 +472,30 @@ extension MapController : UIScrollViewDelegate{
         pageControl.currentPage = Int(pageNumber)
     }
     
-    
-    
+}
 
+extension MapController: UITextFieldDelegate {
+    
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        
+    }
+    
+    func textFieldDidEndEditing(_ textField: UITextField, reason: UITextField.DidEndEditingReason) {
+        if textField.text == "" {
+            searchThisWordInAds()
+        }
+    }
+        
+    
+    
+    
+    func textView(_ textView: UITextView, shouldChangeTextIn range: NSRange, replacementText text: String) -> Bool {
+           if(text == "\n") {
+               textView.resignFirstResponder()
+               return false
+           }
+           return true
+       }
     
 }
 

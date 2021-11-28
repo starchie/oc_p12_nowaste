@@ -215,7 +215,11 @@ class DetailController: UIViewController {
         FirebaseService.shared.deleteImage(currentAd.imageURL) {
             success, error in
             if success {
-                self.presentUIAlertController(title: "Suppression", message: "post supprimé avec succés")
+                let ac = UIAlertController(title: "Suppression", message: "post supprimé avec succés", preferredStyle: .alert)
+                ac.addAction(UIAlertAction(title: "OK", style: .cancel, handler: { action in
+                    self.navigationController?.popViewController(animated: true)
+                }))
+                self.present(ac, animated: true, completion: nil)
             }else {
                 self.presentUIAlertController(title: "Erreur", message: "Une erreur est survenue")
                 

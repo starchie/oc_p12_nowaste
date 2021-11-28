@@ -39,7 +39,7 @@ class ListController: UIViewController {
     // SEARCH VIEW
     var searchView = SearchView()
     
-    // DATA
+
     var sortedProfiles = [Profile]()
     var AdsFromSortedProfiles = [Ad]()
     var distancesForSortedProfiles = [Double]()

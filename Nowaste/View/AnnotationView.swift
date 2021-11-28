@@ -1,6 +1,6 @@
 //
 //  AnnotationView.swift
-//  Testing
+//  Nowaste
 //
 //  Created by Gilles Sagot on 23/10/2021.
 

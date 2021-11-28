@@ -1,6 +1,6 @@
 //
 //  IntroController.swift
-//  iOSFundamental
+//  Nowaste
 //
 //  Created by Gilles Sagot on 18/10/2021.
 

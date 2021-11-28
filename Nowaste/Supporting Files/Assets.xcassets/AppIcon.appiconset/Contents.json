@@ -1,41 +1,49 @@
 {
   "images" : [
     {
+      "filename" : "nowaste_40.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "20x20"
     },
     {
+      "filename" : "nowaste_60.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "20x20"
     },
     {
+      "filename" : "nowaste_58.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "29x29"
     },
     {
+      "filename" : "nowaste_87.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "29x29"
     },
     {
+      "filename" : "nowaste_80.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "40x40"
     },
     {
+      "filename" : "nowaste_120.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "40x40"
     },
     {
+      "filename" : "nowaste@2x.png",
       "idiom" : "iphone",
       "scale" : "2x",
       "size" : "60x60"
     },
     {
+      "filename" : "nowaste_180.png",
       "idiom" : "iphone",
       "scale" : "3x",
       "size" : "60x60"
@@ -56,16 +64,19 @@
       "size" : "29x29"
     },
     {
+      "filename" : "nowaste_58-1.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "29x29"
     },
     {
+      "filename" : "nowaste_40-1.png",
       "idiom" : "ipad",
       "scale" : "1x",
       "size" : "40x40"
     },
     {
+      "filename" : "nowaste_80-1.png",
       "idiom" : "ipad",
       "scale" : "2x",
       "size" : "40x40"
@@ -86,6 +97,7 @@
       "size" : "83.5x83.5"
     },
     {
+      "filename" : "nowaste_1024.png",
       "idiom" : "ios-marketing",
       "scale" : "1x",
       "size" : "1024x1024"
