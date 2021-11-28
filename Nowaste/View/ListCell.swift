@@ -99,8 +99,8 @@ class ListCell: UITableViewCell {
     
     // MARK: - LAYOUT PROFILE LINE
     
-    func layoutFirstLine (image:UIImage ,title:String, distance:String){
-        imageProfile.image = image
+    func layoutFirstLine (title:String, distance:String){
+        
         
         cellTitle.text = title
         cellTitle.sizeToFit()
@@ -119,6 +119,10 @@ class ListCell: UITableViewCell {
                                  height: 30)
         
         
+    }
+    
+    func changeImage (image:UIImage){
+        imageProfile.image = image
     }
     
     // MARK: - ANIMATION

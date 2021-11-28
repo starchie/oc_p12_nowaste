@@ -24,6 +24,8 @@ class CardView: UIView {
         imageProfile.tintColor = .white
         imageProfile.image = UIImage(systemName: "person.circle.fill")
         imageProfile.contentMode = .scaleAspectFit
+        imageProfile.clipsToBounds = true
+        
         nameProfile.backgroundColor = .clear
         nameProfile.adjustsFontSizeToFitWidth = true
         nameProfile.text = "pseudo"
@@ -38,6 +40,10 @@ class CardView: UIView {
     
         self.addSubview(hStack)
         
+    }
+    
+    override func layoutSubviews() {
+        imageProfile.layer.cornerRadius = imageProfile.frame.width/2
     }
     
     

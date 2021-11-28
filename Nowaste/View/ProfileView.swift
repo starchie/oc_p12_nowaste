@@ -51,7 +51,11 @@ class ProfileView: UIView {
         userName.text = "user name"
         userName.font = UIFont(name: "Helvetica-Bold", size: 21)
         userName.textColor = .white
-        userName.frame = CGRect(x: imageProfile.frame.maxX + 10, y: imageProfile.frame.midY - 15, width: 300, height: 30)
+        userName.adjustsFontSizeToFitWidth = true
+        userName.frame = CGRect(x: imageProfile.frame.maxX + 10,
+                                y: imageProfile.frame.midY - 15,
+                                width: self.frame.width - userName.frame.maxX,
+                                height: 30)
         
         
         self.addSubview(imageProfile)

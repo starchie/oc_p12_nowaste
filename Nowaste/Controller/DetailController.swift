@@ -75,7 +75,7 @@ class DetailController: UIViewController {
         detailView.itemTitle.text = currentAd.title
         detailView.itemDescription.text = currentAd.description
         detailView.countView.text = String(currentAd.likes)
-        detailView.card.nameProfile.text = selectedProfile.userName
+        detailView.card.userName.text = selectedProfile.userName
         detailView.contactButton.addTarget(self, action:#selector(sendMail), for: .touchUpInside)
         
         // HIDE THIS IF AD IS FROM CURRENT USER
@@ -91,6 +91,17 @@ class DetailController: UIViewController {
                 
             }else {
                 self.presentUIAlertController(title: "erreur", message: error!)
+            }
+            
+        }// End Closure
+        
+        // GET IMAGE FROM PROFILE
+        FirebaseService.shared.loadImage(selectedProfile.imageURL) { success,error,image in
+            if success {
+                self.detailView.card.imageProfile.image = UIImage(data: image!)
+                
+            }else {
+                self.detailView.card.imageProfile.image = UIImage(named: "personCircle")
             }
             
         }// End Closure

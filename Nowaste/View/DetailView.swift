@@ -35,7 +35,7 @@ class DetailView: UIView {
     var vStack:UIStackView!
     var hStack:UIStackView!
     var contactButton:UIButton!
-    var card:CardView!
+    var card:ProfileView!
     var countView: UILabel!
     var countImageView: UIButton!
     var bg: UIView!
@@ -97,7 +97,7 @@ class DetailView: UIView {
         itemDescription.font = UIFont(name: "Helvetica", size: 18)
         self.addSubview(itemDescription)
         
-        card = CardView(frame: CGRect(x: bg.frame.midX - (bg.frame.height / 2),
+        card = ProfileView(frame: CGRect(x: bg.frame.midX - (bg.frame.height / 2),
                                       y: 10,
                                       width: bg.frame.height,
                                       height: bg.frame.height / 2) )

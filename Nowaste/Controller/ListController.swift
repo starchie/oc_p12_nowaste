@@ -339,21 +339,11 @@ extension ListController:UITableViewDataSource {
         let text = sortedProfiles[indexPath.row].userName
         let distance = distancesForSortedProfiles[indexPath.row]
         let distanceText = "à " + String(round(distance)) + " m"
-       
-        // GET PROFILE IMAGE
-        FirebaseService.shared.loadImage(sortedProfiles[indexPath.row].imageURL) { success, error, data in
-            if success {
-                let cellImage = UIImage(data: data!) ?? UIImage()
-                cell.layoutFirstLine(image: cellImage, title: text, distance: distanceText)
-            }else {
-                // DEFAULT IMAGE
-                let cellImage = UIImage(named: "annotationBlue") ?? UIImage()
-                cell.layoutFirstLine(image: cellImage, title: text, distance: distanceText)
-               
-            }
-            
-        }
+        cell.layoutFirstLine(title: text, distance: distanceText)
+        let cellImage = UIImage(named: "annotationBlue") ?? UIImage()
+        cell.changeImage(image: cellImage)
 
+   
         // IF SELECTED ROW DISPLAY ADS FOR SELECTED USER
         if indexPath.row == selectedRow{
             
