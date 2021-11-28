@@ -139,7 +139,7 @@ class RegisterController: UIViewController {
                 geohash = FirebaseService.shared.locationToHash(location: location!)
                 self.saveUser(coordinate: coordinate, geohash: geohash)
             }else{
-                self.presentUIAlertController(title: "Adress", message: "Can't find your location, please verify your adress.")
+                self.presentUIAlertController(title: "Adresse", message: "Impossible de trouver votre adresse, merci de réessayer")
                 self.activityIndicator.stopAnimating()
                 self.registerView.register.isEnabled = true
             }

@@ -78,7 +78,7 @@
 /* End PBXContainerItemProxy section */
 
 /* Begin PBXFileReference section */
-		CA476879274D46FC0029A23E /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoreDataManager.swift; path = Nowaste/Model/CoreDataManager.swift; sourceTree = SOURCE_ROOT; };
+		CA476879274D46FC0029A23E /* CoreDataManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; name = CoreDataManager.swift; path = Nowaste/Model/CoreData/CoreDataManager.swift; sourceTree = SOURCE_ROOT; };
 		CA47687B274D48530029A23E /* FavoriteAd.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteAd.swift; sourceTree = "<group>"; };
 		CA47687D274D485A0029A23E /* FavoriteMessage.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteMessage.swift; sourceTree = "<group>"; };
 		CA47687F274D48600029A23E /* FavoriteProfile.swift */ = {isa = PBXFileReference; fileEncoding = 4; lastKnownFileType = sourcecode.swift; path = FavoriteProfile.swift; sourceTree = "<group>"; };
@@ -186,12 +186,9 @@
 				CA4AE325272B475900C444D8 /* View */,
 				CA4AE31A272B44F200C444D8 /* Controller */,
 				CA4AE315272B37B500C444D8 /* Model */,
-				CA4AE2FF272B2EE000C444D8 /* Assets.xcassets */,
 				CA4AE301272B2EE000C444D8 /* LaunchScreen.storyboard */,
 				CA4AE2FC272B2EDD00C444D8 /* Main.storyboard */,
-				CA4AE2F6272B2EDD00C444D8 /* AppDelegate.swift */,
-				CA9B4C8B274450FF0025012E /* ContainerManager.swift */,
-				CA4AE2F8272B2EDD00C444D8 /* SceneDelegate.swift */,
+				CAC0BAD92752F9FA00CB6BFA /* Supporting Files */,
 				CA4AE304272B2EE000C444D8 /* Info.plist */,
 				CA4AE313272B30B400C444D8 /* GoogleService-Info.plist */,
 			);
@@ -201,15 +198,9 @@
 		CA4AE315272B37B500C444D8 /* Model */ = {
 			isa = PBXGroup;
 			children = (
-				CA4AE32C272BFDDF00C444D8 /* Annotation.swift */,
-				CA47687F274D48600029A23E /* FavoriteProfile.swift */,
-				CA47687D274D485A0029A23E /* FavoriteMessage.swift */,
-				CA47687B274D48530029A23E /* FavoriteAd.swift */,
-				CA9B4C8827444F250025012E /* Nowaste.xcdatamodeld */,
-				CA476879274D46FC0029A23E /* CoreDataManager.swift */,
-				CA4AE311272B2FB700C444D8 /* FirebaseService.swift */,
-				CA4AE316272B380100C444D8 /* Ad.swift */,
-				CA4AE318272B38A200C444D8 /* Profile.swift */,
+				CAC0BADC2752FB9300CB6BFA /* CoreData */,
+				CAC0BADB2752FB6300CB6BFA /* Services */,
+				CAC0BADA2752FB2900CB6BFA /* Structures */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -269,6 +260,47 @@
 				CA9B4C8F274541710025012E /* CoreDataManagerTests.swift */,
 			);
 			path = NowasteTests;
+			sourceTree = "<group>";
+		};
+		CAC0BAD92752F9FA00CB6BFA /* Supporting Files */ = {
+			isa = PBXGroup;
+			children = (
+				CA4AE32C272BFDDF00C444D8 /* Annotation.swift */,
+				CA4AE2FF272B2EE000C444D8 /* Assets.xcassets */,
+				CA9B4C8B274450FF0025012E /* ContainerManager.swift */,
+				CA4AE2F8272B2EDD00C444D8 /* SceneDelegate.swift */,
+				CA4AE2F6272B2EDD00C444D8 /* AppDelegate.swift */,
+			);
+			path = "Supporting Files";
+			sourceTree = "<group>";
+		};
+		CAC0BADA2752FB2900CB6BFA /* Structures */ = {
+			isa = PBXGroup;
+			children = (
+				CA4AE318272B38A200C444D8 /* Profile.swift */,
+				CA4AE316272B380100C444D8 /* Ad.swift */,
+			);
+			path = Structures;
+			sourceTree = "<group>";
+		};
+		CAC0BADB2752FB6300CB6BFA /* Services */ = {
+			isa = PBXGroup;
+			children = (
+				CA4AE311272B2FB700C444D8 /* FirebaseService.swift */,
+			);
+			path = Services;
+			sourceTree = "<group>";
+		};
+		CAC0BADC2752FB9300CB6BFA /* CoreData */ = {
+			isa = PBXGroup;
+			children = (
+				CA47687F274D48600029A23E /* FavoriteProfile.swift */,
+				CA476879274D46FC0029A23E /* CoreDataManager.swift */,
+				CA9B4C8827444F250025012E /* Nowaste.xcdatamodeld */,
+				CA47687B274D48530029A23E /* FavoriteAd.swift */,
+				CA47687D274D485A0029A23E /* FavoriteMessage.swift */,
+			);
+			path = CoreData;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
