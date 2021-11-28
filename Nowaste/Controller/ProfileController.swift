@@ -65,7 +65,8 @@ class ProfileController: UIViewController {
                 self.profileView.imageProfile.image = UIImage(data: image!)
                 
             }else {
-                self.presentUIAlertController(title: "erreur", message: error!)
+                print(error ?? "")
+                self.profileView.imageProfile.image = UIImage(named: "annotationBlue")
             }
             
         }

@@ -43,7 +43,7 @@ class NavigationButton: UIButton {
         self.init(frame: frame)
         
         self.frame = frame
-        self.setBackgroundImage(UIImage(systemName: image), for: .normal)
+        self.setBackgroundImage(UIImage(named: image), for: .normal)
         self.layer.cornerRadius = self.frame.width / 2
         self.tintColor = .init(white: 1.0, alpha: 1.0)
     }

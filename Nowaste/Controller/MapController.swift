@@ -30,10 +30,10 @@ import SwiftUI
 class MapController: UIViewController {
     
     // TOP NAV BUTTONS
-    var addButton:NavigationButton!
-    var listButton:NavigationButton!
-    var searchButton:NavigationButton!
-    var profileButton:NavigationButton!
+    var addButton = NavigationButton()
+    var listButton = NavigationButton()
+    var searchButton = NavigationButton()
+    var profileButton = NavigationButton()
     
     // VIEWS
     var mapView = MapView()
@@ -49,6 +49,11 @@ class MapController: UIViewController {
     
     var activityIndicator = UIActivityIndicatorView()
     
+    // THIS CONTROLLER HAS A LOT OF DELEGATE FUNCTIONS
+    // MAP DELEGATE TO UPDATE ANNOTATIONS
+    // SCROLL DELAGATE TO DISPLAY ADS WHEN ANNOTATION IS SELECTED
+    // TEXT DELEGATE
+    
     
     // MARK: - PREPARE NAVIGATION CONTROLLER
     
@@ -59,37 +64,33 @@ class MapController: UIViewController {
         nc.currentState = .map
   
         // // NAVIGATION BUTTONS
-        addButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "plus.circle")
+        addButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "plusCircle")
         addButton.addTarget(self, action:#selector(addFunction), for: .touchUpInside)
         
-        listButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "list.bullet.circle")
+        listButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "listCircle")
         listButton.addTarget(self, action:#selector(listFunction), for: .touchUpInside)
 
-        searchButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "magnifyingglass.circle")
+        searchButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "magnifyingGlassCircle")
         searchButton.addTarget(self, action:#selector(displaySearchToggle), for: .touchUpInside)
         
-        profileButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "person.circle")
+        profileButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "personCircle")
         profileButton.addTarget(self, action:#selector(profileFunction), for: .touchUpInside)
 
         self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: listButton),UIBarButtonItem(customView: addButton),UIBarButtonItem(customView: searchButton), UIBarButtonItem(customView: profileButton) ]
         
 
         // GET ALL USER ON THE MAP FROM CURRENT LOCATION
+        // PROFILE SHOULD NOT BE NIL AS WE CHECK IN PREVIOUS CONTROLLER (REGISTER AND LOGIN)
         if FirebaseService.shared.profile != nil {
             getProfilesInRadius()
             listView.isHidden = true
             pageControl.isHidden = true
             dynamicView.animReturnToStart()
         
-            
+            // WATCH IF MESSAGE IS DIFFERENT FROM LAST TIME
             isNewMessage ()
         }
-        
-        
-
     
-        
- 
     }
 
 
@@ -97,7 +98,6 @@ class MapController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        // Do any additional setup after loading the view.
         
         self.overrideUserInterfaceStyle = .dark
         
@@ -124,13 +124,9 @@ class MapController: UIViewController {
         
         
         // PLACE CAMERA - QUERRY USER LOCATION -
-        
- 
-                self.mapView.location = CLLocationCoordinate2D(latitude: FirebaseService.shared.profile.latitude, longitude: FirebaseService.shared.profile.longitude)
+        self.mapView.location = CLLocationCoordinate2D(latitude: FirebaseService.shared.profile.latitude, longitude: FirebaseService.shared.profile.longitude)
                 
-    
-        
-        // DYNAMIC VIEW
+        // DYNAMIC VIEW ANIMATION
         let width: CGFloat = view.frame.width
         let height: CGFloat = 200
         
@@ -140,8 +136,7 @@ class MapController: UIViewController {
        
         view.addSubview(dynamicView)
         
-        
-        // LIST
+        // LIST SCROLL VIEW TO DISPLAY ADS FROM USERS
         listView = UIScrollView()
         listView.isPagingEnabled = true
         listView.delegate = self;
@@ -153,25 +148,23 @@ class MapController: UIViewController {
         view.addSubview(listView)
         
         
-        // PAGE CONTROL
+        // PAGE CONTROL TO KNOW HOW MANY ADS IN LIST
         pageControl = UIPageControl()
         pageControl.frame = CGRect(x: view.frame.midX - 100, y: view.frame.maxY - 50, width: 200, height: 20)
         view.addSubview(pageControl)
         self.pageControl.isHidden = true
         
         
-        
         // INIT MESSAGE
         FirebaseService.shared.initMessage(id: FirebaseService.shared.profile.id)
         
-        // INDICATOR
+        // ACTIVITY INDICATOR
         activityIndicator.frame = CGRect(x: 0, y: view.frame.maxY - 30, width: 30, height: 30)
         activityIndicator.center.x = view.center.x
         activityIndicator.color = .white
         activityIndicator.hidesWhenStopped = true
         view.addSubview(activityIndicator)
         
-
     }
     
     //MARK: -  ALERT CONTROLLER
@@ -210,10 +203,10 @@ class MapController: UIViewController {
         vc.isFavorite = false
         vc.selectedProfile = selectedProfile
         navigationController?.pushViewController(vc, animated: false)
-        
+
     }
     
-    //HIDE UNHIDE SEARCH VIEW
+    // TOGGLE SEARCH VIEW
     @objc func displaySearchToggle(_ sender:UIButton) {
         if searchView.isHidden {
             searchView.animPlay()
@@ -223,19 +216,23 @@ class MapController: UIViewController {
     }
     
     @objc func getProfilesInRadius() {
+        // WE CANT DOWNLAD ALL THE DATA FROM FIREBASE SO WE SELECT ALL PROFILES
+        // AND THEIR ADS IN RADIUS FROM USER LOCATION
         
+        // IT CAN TAKE SOME TIME
         activityIndicator.startAnimating()
         
         self.mapView.removeAnnotations(self.mapView.annotations)
         
-        
+        // GET CURRENT LOCATION
         let latitude = FirebaseService.shared.profile.latitude
         let longitude = FirebaseService.shared.profile.longitude
-        
+        // RADIUS
         let radiusInM:Double = Double(searchView.slider.value * 1000 * 10) // 10 km
         let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         
         searchView.searchDistanceLabel.text = "\(round(radiusInM) / 1000) km"
+        // CALL FIREBASE MODEL FUNCTION :
         FirebaseService.shared.getGeoHash(center: center, radiusInM: radiusInM){ success,error in
             if success {
                 var profiles = [String]()
@@ -248,12 +245,20 @@ class MapController: UIViewController {
                     let customAnnotation = Annotation(with: profile)
                     self.mapView.addAnnotation(customAnnotation)
                 }
-                print ("profiles : \(profiles.count)")
-                guard profiles.count > 0 else {return}
-                self.getAdsFromProfilesInRadius(profiles) // FIND ALL ADS FOR PROFILES FOUND
+
+                if profiles.count == 0 {
+                    self.sortedProfiles = []
+                    self.AdsFromSortedProfiles = []
+                    self.presentUIAlertController(title: "Nowaste", message: "Il n'y a personne dans les alentours. ")
+                } else if profiles.count == 1{
+                    self.presentUIAlertController(title: "Nowaste", message: "Il n'y a que vous dans les alentours. ")
+                }else{
+                    self.getAdsFromProfilesInRadius(profiles) // FIND ALL ADS FOR PROFILES FOUND
+                }
+                
             }else{
-                print ("aie")
                 self.activityIndicator.stopAnimating()
+                self.presentUIAlertController(title: "Error", message: error!)
             }
             
         }
@@ -267,8 +272,8 @@ class MapController: UIViewController {
                 self.AdsFromSortedProfiles = FirebaseService.shared.ads
                 self.activityIndicator.stopAnimating()
             }else{
-                print ("aie")
                 self.activityIndicator.stopAnimating()
+                self.presentUIAlertController(title: "Error", message: error!)
             }
             
         }

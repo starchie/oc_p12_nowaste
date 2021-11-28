@@ -31,13 +31,13 @@ class ListController: UIViewController {
     // MARK: VARIABLES
     
     // TOP NAV BUTTONS
-    var addButton: NavigationButton!
-    var mapButton: NavigationButton!
-    var searchButton: NavigationButton!
-    var profileButton: NavigationButton!
+    var addButton = NavigationButton()
+    var mapButton = NavigationButton()
+    var searchButton = NavigationButton()
+    var profileButton = NavigationButton()
     
     // SEARCH VIEW
-    var searchView:SearchView!
+    var searchView = SearchView()
     
     // DATA
     var sortedProfiles = [Profile]()
@@ -47,8 +47,8 @@ class ListController: UIViewController {
     var adsForSelectedProfile = [Ad]()
     
     // TABLEVIEW
-    var tableView: UITableView!
-    var selectedRow: Int!
+    var tableView = UITableView()
+    var selectedRow:Int!
     var sizeForSelectedRow: CGFloat = 60
     var sizeForDefaultRow: CGFloat = 60
     
@@ -63,16 +63,16 @@ class ListController: UIViewController {
         nc.currentState = .list
         
         // NAVIGATION BUTTONS
-        addButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "plus.circle")
+        addButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "plusCircle")
         addButton.addTarget(self, action:#selector(addFunction), for: .touchUpInside)
     
-        mapButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image:"map.circle")
+        mapButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image:"mapCircle")
         mapButton.addTarget(self, action:#selector(mapFunction), for: .touchUpInside)
      
-        searchButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30),image: "magnifyingglass.circle")
+        searchButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30),image: "magnifyingGlassCircle")
         searchButton.addTarget(self, action:#selector(displaySearchToggle), for: .touchUpInside)
         
-        profileButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30),image:"person.circle")
+        profileButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30),image:"personCircle")
         profileButton.addTarget(self, action:#selector(profileFunction), for: .touchUpInside)
 
         self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: mapButton),UIBarButtonItem(customView: addButton),UIBarButtonItem(customView: searchButton),UIBarButtonItem(customView: profileButton) ]
@@ -88,22 +88,23 @@ class ListController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        // SET BACKGROUND
         view.backgroundColor = UIColor(red: 37/255, green: 47/255, blue: 66/255, alpha: 1.0)
         
         // SEARCHVIEW
         searchView = SearchView(frame: view.frame)
         view.addSubview(searchView)
         searchView.isHidden = true
-        searchView.goButton.addTarget(self, action:#selector(searchFunction), for: .touchUpInside)
+        searchView.goButton.addTarget(self, action:#selector(searchThisWordInAds), for: .touchUpInside)
         searchView.slider.addTarget(self, action: #selector(getProfilesInRadius), for: .touchUpInside)
         
-        // delegate
+        // SEARCHVIEW DELEGATE TEXT
         searchView.searchText.delegate = self
-        // gesture recognizer
+        // SEARCHVIEW GESTURE RECOGNIZER
         let tap = UITapGestureRecognizer(target: self, action: #selector(self.handleTap(_:)))
         self.searchView.addGestureRecognizer(tap)
         
-        // TABLEVIEW
+        // PREPARE TABLEVIEW
         tableView = UITableView()
         tableView.separatorStyle = .singleLine
         tableView.separatorColor = .init(white: 1.0, alpha: 0.1)
@@ -119,13 +120,21 @@ class ListController: UIViewController {
         
         self.view.addSubview(tableView)
         
-        // INDICATOR
+        // ACTIVITY INDICATOR
         activityIndicator.frame = CGRect(x: 0, y: view.frame.maxY - 30, width: 30, height: 30)
         activityIndicator.center.x = view.center.x
         activityIndicator.color = .white
         activityIndicator.hidesWhenStopped = true
         view.addSubview(activityIndicator)
         
+    }
+    
+    //MARK: -  ALERT CONTROLLER
+    
+    private func presentUIAlertController(title:String, message:String) {
+        let ac = UIAlertController(title: title, message: message, preferredStyle: .alert)
+        ac.addAction(UIAlertAction(title: "OK", style: .cancel, handler: nil))
+        present(ac, animated: true, completion: nil)
     }
     
     //MARK: - ACTIONS
@@ -135,7 +144,6 @@ class ListController: UIViewController {
         searchView.searchText.resignFirstResponder()
 
     }
-    
     
     // CREATE NEW AD
     @objc func addFunction(_ sender:UIButton) {
@@ -163,7 +171,7 @@ class ListController: UIViewController {
         navigationController?.pushViewController(vc, animated: false)
     }
     
-    //HIDE UNHIDE SEARCH VIEW
+    // TOGGLE DISPLAY SEARCH VIEW
     @objc func displaySearchToggle(_ sender:UIButton) {
         if searchView.isHidden {
             searchView.animPlay()
@@ -174,18 +182,24 @@ class ListController: UIViewController {
         }
     }
     
-    @objc func searchFunction() {
+    @objc func searchThisWordInAds() {
         // CLEAN
         selectedRow = nil
         sortedProfiles.removeAll()
-        // GET
-        // IF SEARCH HAS NOTHING -> RESET
+        
+        // THIS FUNCTION WORKS WITHOUT FIREBASE.
+        // IT SEARCHS IN PROFILES AND ADS FROM MODEL ALREADY DOWNLOAD WITH SEARCHBYRADIUS FUNCTION
+        
+        // FIRST CASE:
+        // IF SEARCH TEXT IS EMPTY -> RETURN EVERYTHING
         if searchView.searchText.text == "" {
             sortedProfiles = FirebaseService.shared.profiles
             distancesForSortedProfiles = FirebaseService.shared.distances
             
-            // AVOID PROFILES WITH ANY AD
+            // WE WILL NOT DISPLAY PROFIL WITH ANY AD IN THE TABLEVIEW
+            // SO CALL FUNCTION FROM MODEL TO DELETE :
             FirebaseService.shared.removeProfileIfNoAd(self.sortedProfiles, distances: self.distancesForSortedProfiles){ resultProfiles,resultDistances in
+                // UPDATE PROFILES BUT ALSO DISTANCES
                 self.sortedProfiles = resultProfiles
                 self.distancesForSortedProfiles = resultDistances
             }
@@ -193,10 +207,13 @@ class ListController: UIViewController {
             // UPDATE TABLE
             tableView.reloadData()
         }
+        // SECOND CASE:
+        // IF SERACH TEXT NOT EMPTY :
         else {
-            // FIND
+            // SEARCH IF THERE IS A MATCH WITH MODEL FUNCTION
+            // IF THERE IS, THIS FUNCTION WILL RETURN AN ARRAY WITH ALL PROFILE UID
             let uid = FirebaseService.shared.searchAdsByKeyWord(searchView.searchText.text ?? "", array: FirebaseService.shared.ads)
-            
+            // THEN UPDATE PROFILE ARRAY WITH ANOTHER MODEL FUNCTION
             FirebaseService.shared.getProfilesfromUIDList(uid, arrayProfiles: FirebaseService.shared.profiles, arrayDistances: FirebaseService.shared.distances) { profiles, distances in
                 sortedProfiles = profiles
                 distancesForSortedProfiles = distances
@@ -210,25 +227,29 @@ class ListController: UIViewController {
     
     
     @objc func getProfilesInRadius() {
+        // WE CANT DOWNLAD ALL THE DATA FROM FIREBASE SO WE SELECT ALL PROFILES
+        // AND THEIR ADS IN RADIUS FROM USER LOCATION
         
+        // IT CAN TAKE SOME TIME
         activityIndicator.startAnimating()
         
+        // GET CURRENT LOCATION
         let latitude = FirebaseService.shared.profile.latitude
         let longitude = FirebaseService.shared.profile.longitude
-        
+        // RADIUS
         let radiusInM:Double = Double(searchView.slider.value * 1000 * 10) // 10 km
         let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         
         searchView.searchDistanceLabel.text = "\(round(radiusInM) / 1000) km"
-        
+        // CALL FIREBASE MODEL FUNCTION :
         FirebaseService.shared.getGeoHash(center: center, radiusInM: radiusInM){ success,error in
             if success {
                 var profiles = [String]()
-                
+                // UPDATE ARRAYS
                 self.sortedProfiles = FirebaseService.shared.profiles // ARRAY WITH PROFILES
                 self.distancesForSortedProfiles = FirebaseService.shared.distances // ARRAY WITH DISTANCES
                 
-                // AVOID PROFILES WITH ANY AD
+                // AVOID PROFILES WITH ANY AD. WE DON'T WANT TO DISPLAY THEM IN LIST
                 FirebaseService.shared.removeProfileIfNoAd(self.sortedProfiles, distances: self.distancesForSortedProfiles){ resultProfiles,resultDistances in
                     self.sortedProfiles = resultProfiles
                     self.distancesForSortedProfiles = resultDistances
@@ -238,11 +259,18 @@ class ListController: UIViewController {
                 for profile in self.sortedProfiles {
                     profiles.append(profile.id)
                 }
+                // IF NOBODY : UPDATE AND SHOW MESSAGE
                 if profiles.count == 0 {
                     self.sortedProfiles = []
                     self.AdsFromSortedProfiles = []
                     self.tableView.reloadData()
                     self.activityIndicator.stopAnimating()
+                    self.presentUIAlertController(title: "Nowaste", message: "Il n'y a personne dans les alentours. ")
+                } else if profiles.count == 1 {
+                    self.tableView.reloadData()
+                    self.activityIndicator.stopAnimating()
+                    self.presentUIAlertController(title: "Nowaste", message: "Il n'y a que vous dans les alentours. ")
+                // IF SOMEONE : GET ADS
                 }else {
                     self.selectedRow = nil // NEED TO RESET TABLE VIEW - NO PROFILE SELECTED
                     self.getAdsFromProfilesInRadius(profiles) // FIND ALL ADS FOR PROFILES FOUND
@@ -250,8 +278,8 @@ class ListController: UIViewController {
                 
                 
             }else{
-                print ("aie")
                 self.activityIndicator.stopAnimating()
+                self.presentUIAlertController(title: "Error", message: error!)
             }
             
         }
@@ -259,20 +287,22 @@ class ListController: UIViewController {
     }
     
     func getAdsFromProfilesInRadius (_ profiles:[String]) {
-        
+        // WE HAVE A LIST OF PROFILES THEN GET ALL ADS FROM THEM
         FirebaseService.shared.querryAllAds(filter: profiles) { success,error in
             if success {
+                // UPDATE
                 self.AdsFromSortedProfiles = FirebaseService.shared.ads
                 self.activityIndicator.stopAnimating()
                 self.tableView.reloadData()
             }else{
-                print ("aie")
+                self.activityIndicator.stopAnimating()
+                self.presentUIAlertController(title: "Error", message: error!)
             }
             
         }
         
     }
-    
+    // ANIMATION
     func anim (frame: CGRect) {
         UIView.animate(withDuration: 0.5, delay: 0,usingSpringWithDamping: 0.3, initialSpringVelocity: 0.4, options: [.curveLinear], animations: {
             self.tableView.frame = frame
@@ -310,12 +340,13 @@ extension ListController:UITableViewDataSource {
         let distance = distancesForSortedProfiles[indexPath.row]
         let distanceText = "à " + String(round(distance)) + " m"
        
-        
+        // GET PROFILE IMAGE
         FirebaseService.shared.loadImage(sortedProfiles[indexPath.row].imageURL) { success, error, data in
             if success {
                 let cellImage = UIImage(data: data!) ?? UIImage()
                 cell.layoutFirstLine(image: cellImage, title: text, distance: distanceText)
             }else {
+                // DEFAULT IMAGE
                 let cellImage = UIImage(named: "annotationBlue") ?? UIImage()
                 cell.layoutFirstLine(image: cellImage, title: text, distance: distanceText)
                
@@ -392,7 +423,7 @@ extension ListController: UITextFieldDelegate {
     
     func textFieldDidEndEditing(_ textField: UITextField, reason: UITextField.DidEndEditingReason) {
         if textField.text == "" {
-            searchFunction()
+            searchThisWordInAds()
         }
     }
         

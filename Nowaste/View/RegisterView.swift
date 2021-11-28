@@ -72,6 +72,7 @@ class RegisterView: UIScrollView {
         userName = FormView(frame: CGRect(x: 0, y: imageProfile.frame.maxY, width: 200, height: 30),text: "Surnom")
         mail = FormView(frame: CGRect(x: 0, y: imageProfile.frame.maxY, width: 200, height: 30),text: "Mail")
         password = FormView(frame: CGRect(x: 0, y: imageProfile.frame.maxY, width: 200, height: 30),text: "Mot De Passe")
+        password.textView.isSecureTextEntry = true
         street = FormView(frame: CGRect(x: 0, y: imageProfile.frame.maxY, width: 200, height: 30),text: "Adresse")
         code = FormView(frame: CGRect(x: 0, y: imageProfile.frame.maxY, width: 200, height: 30),text: "Code")
         city = FormView(frame: CGRect(x: 0, y: imageProfile.frame.maxY, width: 200, height: 30),text: "Ville")

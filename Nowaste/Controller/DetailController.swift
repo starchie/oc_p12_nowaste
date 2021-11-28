@@ -29,16 +29,20 @@ import Firebase
 class DetailController: UIViewController {
     
  
-    var currentAd: Ad!
-    var detailView:DetailView!
-    var favoriteButton:NavigationButton!
-    var trashButton:NavigationButton!
+    var currentAd:Ad!
+    var detailView = DetailView()
+    var favoriteButton = NavigationButton()
+    var trashButton = NavigationButton()
     var isFavorite = false
     var isUserCreation = false
-    var dynamicView: DynamicView!
-    var selectedProfile: Profile!
+    var dynamicView = DynamicView()
+    var selectedProfile:Profile!
 
-
+    // THIS CONTROLLER IS USED WITH DIFFERENT STATES :
+    // DISPLAY AN AD : SO USER CAN ADD TO FAVORITE AND / OR SEND EMAIL
+    // DISPLAY A FAVORITE ADD : USER CAN DELETE FROM HIS FAVORITES
+    // DISPLAY AN AD FROM CURRENT USER : SO HIDE MAIL AND FAVORITE
+    // COME FROM HIS PROFILE AND WANT TO DELETE FROM SOURCE HIS AD : SO DISPLAY TRASH
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -47,6 +51,7 @@ class DetailController: UIViewController {
         let nc = navigationController as! NavigationController
         nc.currentState = .detail
         
+        // PREPARE NAVIGATION BUTTONS
         prepareNavigationButton()
         
         self.navigationItem.rightBarButtonItems = [UIBarButtonItem(customView: favoriteButton),UIBarButtonItem(customView: trashButton)]
@@ -72,6 +77,12 @@ class DetailController: UIViewController {
         detailView.countView.text = String(currentAd.likes)
         detailView.card.nameProfile.text = selectedProfile.userName
         detailView.contactButton.addTarget(self, action:#selector(sendMail), for: .touchUpInside)
+        
+        // HIDE THIS IF AD IS FROM CURRENT USER
+        if selectedProfile.id == FirebaseService.shared.currentUser?.uid {
+            detailView.contactButton.isHidden = true
+            favoriteButton.isHidden = true
+        }
 
         // GET IMAGE FROM AD
         FirebaseService.shared.loadImage(currentAd.imageURL) { success,error,image in
@@ -98,6 +109,7 @@ class DetailController: UIViewController {
     
     //MARK: -  ACTIONS
     
+    // NAVIGATION STATE
     func prepareNavigationButton () {
         // BUTTONS
         favoriteButton = NavigationButton(frame: CGRect(x:0, y:0, width:30, height:30), image: "star")
@@ -107,9 +119,9 @@ class DetailController: UIViewController {
         trashButton.addTarget(self, action:#selector(deleteAd), for: .touchUpInside)
         
         if isFavorite {
-            favoriteButton.setBackgroundImage(UIImage(systemName: "star.fill"), for: .normal)
+            favoriteButton.setBackgroundImage(UIImage(named:"starFill"), for: .normal)
         }else {
-            favoriteButton.setBackgroundImage(UIImage(systemName: "star"), for: .normal)
+            favoriteButton.setBackgroundImage(UIImage(named: "star"), for: .normal)
         }
         
         if isUserCreation {
@@ -123,17 +135,21 @@ class DetailController: UIViewController {
         
     }
     
+    // SEND MAIL
     @objc func sendMail() {
+        // UPDATE MESSAGE
         FirebaseService.shared.sendMessage(to: selectedProfile.id, senderName: FirebaseService.shared.profile.userName, for: currentAd.title) {success, error in
             if success {
+                // check if ad already exist
                 if CoreDataManager.shared.findAd(id: self.currentAd.id) {
                     CoreDataManager.shared.deleteAd(id: self.currentAd.id)
                 }
-                
+                // UPDATE FIELD 'LIKES' FOR THIS AD AS USER SENT EMAIL...
                 self.addLike ()
                 
+                // SAVE TO COREDATA FAVORITE WITH MAIL TRUE
                 CoreDataManager.shared.saveAdToFavorite (userUID: self.currentAd.addedByUser, id: self.currentAd.id, title: self.currentAd.title, description: self.currentAd.description, imageURL: self.currentAd.imageURL, date: self.currentAd.dateField, likes: self.currentAd.likes, profile: self.selectedProfile, contact: true)
-                
+                // INFORM USER
                 self.presentUIAlertController(title: "Info", message: " Vous avez envoyé un mail à \(self.selectedProfile.userName), vous pouvez retrouver cette annonce dans vos favoris. Merci d'utiliser Nowaste :)")
             }
             else {
@@ -144,6 +160,7 @@ class DetailController: UIViewController {
 
     }
     
+    // FUNC TO UPDATE FIELD 'LIKES' FOR THIS AD
     func addLike () {
         let value = FieldValue.increment(Int64(1))
         
@@ -158,22 +175,28 @@ class DetailController: UIViewController {
         
     }
     
+    // FUNC TO SAVE TO FAVORITE WITH MAIL FALSE
     func addToFavorite() {
+        
+        // Check if ad already exist
         if CoreDataManager.shared.findAd(id: self.currentAd.id) {
             presentUIAlertController(title: "Info", message: "Annonce déjà dans vos favoris.")
             return
         }
+        // Add ad
         CoreDataManager.shared.saveAdToFavorite (userUID: currentAd.addedByUser, id: currentAd.id, title: currentAd.title, description: currentAd.description, imageURL: currentAd.imageURL, date: currentAd.dateField, likes: currentAd.likes, profile: selectedProfile, contact: false)
 
         presentUIAlertController(title: "Info", message: "Annonce enregistrée")
         
     }
-        
+    
+    // FUNC DELETE FROM FAVORITE
     func deleteFromFavorite() {
         CoreDataManager.shared.deleteAd(id: currentAd.id)
         presentUIAlertController(title: "Info", message: "Annonce supprimée")
     }
     
+    // AD WAS CREATED BY USER SO HE CAN DELETE IT
     @objc func deleteAd(){
         let id = currentAd.id
         FirebaseService.shared.deleteAd(id:id) {
@@ -181,11 +204,13 @@ class DetailController: UIViewController {
                 if success {
                     self.updateActiveAdsForUser()
                 } else{
+                    // INFORM USER THAT IT'S DONE
                     self.presentUIAlertController(title: "error", message: error!)
                 }
             }
     }
     
+    // DELETE AD AND ALSO IMAGE FROM CLOUD
     func deleteImageFromCloud() {
         FirebaseService.shared.deleteImage(currentAd.imageURL) {
             success, error in
@@ -215,8 +240,8 @@ class DetailController: UIViewController {
          }
      }
     
+    // TOGGLE FAVORITE ADD TO COREDATA OR DELETE FROM COREDATA
     @objc func toggleFavorite() {
-        // Attempt to customize navigation controller...
         
         if isFavorite {
             favoriteButton.setBackgroundImage(UIImage(systemName: "star"), for: .normal)
