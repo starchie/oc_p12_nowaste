@@ -293,9 +293,9 @@ class MapController: UIViewController {
     @objc func searchThisWordInAds() {
         // CLEAN
         sortedProfiles.removeAll()
-        mapView.removeAnnotations(mapView.annotations)
+     
         // GET
-        // IF SEARCH HAS NOTHING -> RESET
+        // IF SEARCH TEXT HAS NOTHING -> RESET
         if searchView.searchText.text == "" {
             sortedProfiles = FirebaseService.shared.profiles
             for  profile in sortedProfiles {
@@ -304,14 +304,23 @@ class MapController: UIViewController {
             }
         }else {
             let uids = FirebaseService.shared.searchAdsByKeyWord(searchView.searchText.text ?? "", array: AdsFromSortedProfiles)
-            FirebaseService.shared.getProfilesfromUIDList(uids, arrayProfiles: FirebaseService.shared.profiles, arrayDistances: FirebaseService.shared.distances) { profiles, distances in
-                sortedProfiles = profiles
+            if uids.isEmpty {
+                presentUIAlertController(title: "Recherche", message: "Aucun resultat trouvé")
+                return
             }
-            // UPDATE
-            for  profile in sortedProfiles {
-                let customAnnotation = Annotation(with: profile)
-                self.mapView.addAnnotation(customAnnotation)
+            else {
+                mapView.removeAnnotations(mapView.annotations)
+                FirebaseService.shared.getProfilesfromUIDList(uids, arrayProfiles: FirebaseService.shared.profiles, arrayDistances: FirebaseService.shared.distances) { profiles, distances in
+                    sortedProfiles = profiles
+                }
+                // UPDATE
+                for  profile in sortedProfiles {
+                    let customAnnotation = Annotation(with: profile)
+                    self.mapView.addAnnotation(customAnnotation)
+                }
+    
             }
+        
             
         }// End else
     

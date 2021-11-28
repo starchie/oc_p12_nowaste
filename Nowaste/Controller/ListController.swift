@@ -213,6 +213,10 @@ class ListController: UIViewController {
             // SEARCH IF THERE IS A MATCH WITH MODEL FUNCTION
             // IF THERE IS, THIS FUNCTION WILL RETURN AN ARRAY WITH ALL PROFILE UID
             let uid = FirebaseService.shared.searchAdsByKeyWord(searchView.searchText.text ?? "", array: FirebaseService.shared.ads)
+            if uid.isEmpty {
+                presentUIAlertController(title: "Recherche", message: "Aucun resultat trouvé")
+                return
+            }else {
             // THEN UPDATE PROFILE ARRAY WITH ANOTHER MODEL FUNCTION
             FirebaseService.shared.getProfilesfromUIDList(uid, arrayProfiles: FirebaseService.shared.profiles, arrayDistances: FirebaseService.shared.distances) { profiles, distances in
                 sortedProfiles = profiles
@@ -221,6 +225,7 @@ class ListController: UIViewController {
             
             // UPDATE TABLE
             tableView.reloadData()
+            }
         }
     
     }
