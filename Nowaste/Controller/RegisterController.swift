@@ -183,7 +183,10 @@ class RegisterController: UIViewController {
     
     // 3 SAVE IMAGE PROFILE TO STORAGE
     func saveImageProfile(){
-        FirebaseService.shared.saveImage(PNG: (registerView.imageProfile.image?.pngData())!, location: "images/\(FirebaseService.shared.currentUser!.uid)/profil_img.png"){ success,error in
+        
+        let imageToSave = asImage(view: registerView.imageProfile)
+        
+        FirebaseService.shared.saveImage(PNG: (imageToSave.pngData())!, location: "images/\(FirebaseService.shared.currentUser!.uid)/profil_img.png"){ success,error in
             if success {
                 self.goMap()
             }else{
@@ -195,6 +198,15 @@ class RegisterController: UIViewController {
         }
 
     }
+    
+    // DON'T WANT BIG DATA
+    func asImage(view:UIView) -> UIImage {
+        let renderer = UIGraphicsImageRenderer(bounds: view.bounds)
+        return renderer.image { rendererContext in
+            view.layer.render(in: rendererContext.cgContext)
+        }
+    }
+    
     
     
     // Move Keyboard automatically

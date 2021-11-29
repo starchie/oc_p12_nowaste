@@ -242,7 +242,7 @@ class ListController: UIViewController {
         let latitude = FirebaseService.shared.profile.latitude
         let longitude = FirebaseService.shared.profile.longitude
         // RADIUS
-        let radiusInM:Double = Double(searchView.slider.value * 1000 * 10) // 10 km
+        let radiusInM:Double = Double(searchView.slider.value * 1000 * 4) // 4 km
         let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
         
         searchView.searchDistanceLabel.text = "\(round(radiusInM) / 1000) km"
@@ -270,12 +270,6 @@ class ListController: UIViewController {
                     self.AdsFromSortedProfiles = []
                     self.tableView.reloadData()
                     self.activityIndicator.stopAnimating()
-                    self.presentUIAlertController(title: "Nowaste", message: "Il n'y a personne dans les alentours. ")
-                } else if profiles.count == 1 {
-                    self.tableView.reloadData()
-                    self.activityIndicator.stopAnimating()
-                    self.presentUIAlertController(title: "Nowaste", message: "Il n'y a que vous dans les alentours. ")
-                // IF SOMEONE : GET ADS
                 }else {
                     self.selectedRow = nil // NEED TO RESET TABLE VIEW - NO PROFILE SELECTED
                     self.getAdsFromProfilesInRadius(profiles) // FIND ALL ADS FOR PROFILES FOUND
