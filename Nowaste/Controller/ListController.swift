@@ -339,8 +339,7 @@ extension ListController:UITableViewDataSource {
         let distance = distancesForSortedProfiles[indexPath.row]
         let distanceText = "à " + String(round(distance)) + " m"
         cell.layoutFirstLine(title: text, distance: distanceText)
-        let cellImage = UIImage(named: "annotationBlue") ?? UIImage()
-        cell.changeImage(image: cellImage)
+        cell.changeImage(image:  UIImage(named: "annotationBlue") ?? UIImage() )
 
    
         // IF SELECTED ROW DISPLAY ADS FOR SELECTED USER

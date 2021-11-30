@@ -53,11 +53,14 @@ class FirebaseService {
     
     //MARK: - GEO HASH
     
+    // TRANSFORM COORDINATES IN STRING LIKE "FF2ZZ33"
+    
     func locationToHash (location: CLLocationCoordinate2D) -> String{
         let hash = GFUtils.geoHash(forLocation: location)
         return hash
     }
     
+    // FIND USER IN RADIUS DIRECTLY ON SERVER THANKS TO GEO HASH (COMPARE VALUES WITH OTHER)
     func getGeoHash (center: CLLocationCoordinate2D, radiusInM: Double, completionHandler: @escaping ((Bool, String? ) -> Void) ) {
         self.profiles.removeAll()
         self.distances.removeAll()
@@ -77,7 +80,7 @@ class FirebaseService {
         }
      
         for query in queries {
-            //query.getDocuments(completion: getDocumentsCompletion)
+            
             query.getDocuments(completion: { (querySnapshot, err) in
                     
                                 if let err = err {
@@ -137,7 +140,7 @@ class FirebaseService {
     
     func saveImage(PNG: Data, location:String, completionHandler: @escaping ((Bool, String? ) -> Void)) {
         
-        // Create a reference to the file you want to upload
+        // Create a reference to the file to upload
         let imageRef = storage.reference().child(location)
         
         let uploadTask = imageRef.putData(PNG, metadata: nil) { (metadata, error) in
@@ -208,8 +211,8 @@ class FirebaseService {
         
     }
     
-    // LOGOUT
     /*
+    // LOGOUT
     func logout(completionHandler: @escaping ((Bool, String? ) -> Void)){
         do {
             try Auth.auth().signOut()
@@ -220,6 +223,7 @@ class FirebaseService {
         completionHandler(true,nil)
     }
     */
+    
     // REGISTER
     func register(mail:String, pwd:String, completionHandler: @escaping ((Bool, String? ) -> Void)) {
         Auth.auth().createUser(withEmail: mail, password: pwd) { (result, error) in
@@ -235,8 +239,7 @@ class FirebaseService {
     
     //MARK: - USER PROFILE
     
-    // SAVE
-    
+    // SAVE PROFILE
     func saveProfile (documentName:String, userName:String,id:String, date:Double, latitude:Double, longitude:Double, imageURL:String, activeAds: Int, geohash: String, completionHandler: @escaping ((Bool, String? ) -> Void)){
         
         db.collection("users").document("\(documentName)").setData(["userName":userName,"id":id, "dateField":date, "latitude":latitude, "longitude":longitude, "imageURL":imageURL, "activeAds":activeAds, "geohash":geohash]) { error in
@@ -249,8 +252,7 @@ class FirebaseService {
         
     }
     
-    // UPDATE
-    
+    // UPDATE PROFILE (CHANGE A FIELD BY SOME VALUE)
     func updateProfile (user:String, field:String, by value:Any, completionHandler: @escaping ((Bool, String? ) -> Void)){
         db.collection("users").document("\(user)").updateData(["\(field)": value]) { error in
             guard error == nil else {
@@ -262,7 +264,7 @@ class FirebaseService {
         
     }
     
-    // GET ONE USER
+    // GET ONE USER (SEARCH BY HIS UID)
     func querryProfile(filter:String, completionHandler: @escaping ((Bool, String? ) -> Void)){
         let selection:Query = db.collection("users").whereField("id", isEqualTo: filter)
        
@@ -301,7 +303,7 @@ class FirebaseService {
         }
     }
     
-    // GET ADS FROM A CURRENT USER
+    // GET ADS FROM A CURRENT USER (USED IN PROFILE)
     func querryAds(filter:String, completionHandler: @escaping ((Bool, String? ) -> Void)){
         let selection:Query = db.collection("ads").whereField("addedByUser", isEqualTo: filter)
         selection.getDocuments { (querySnapshot, error) in
@@ -318,7 +320,7 @@ class FirebaseService {
         }
     }
     
-    // GET ADS FROM ARRAY OF USERS
+    // GET ADS FROM ARRAY OF USERS (USED WHEN WE HAVE ALL PROFILES IN RADIUS)
     func querryAllAds(filter:[String], completionHandler: @escaping ((Bool, String? ) -> Void)){
 
             let selection:Query = db.collection("ads").whereField("addedByUser", in: filter)
@@ -339,6 +341,7 @@ class FirebaseService {
         
     }
     
+    // UPDATE AD ( WHEN YOU SENT AN EMAIL ADD A LIKE TO THE AD)
     func updateAd (ad:String, field:String, by value:Any, completionHandler: @escaping ((Bool, String? ) -> Void)){
         db.collection("ads").document("\(ad)").updateData(["\(field)": value]) { error in
             guard error == nil else {
@@ -377,6 +380,7 @@ class FirebaseService {
         
     }
     
+    // IF MESSAGE CHANGES : POP MESSAGE ALERT
     func watchMessage (id:String, completionHandler: @escaping ((Bool, String?, [String:Any]? ) -> Void)){
         let selection = db.collection("message").document("\(id)_message")
         selection.getDocument { (querySnapshot, error) in
@@ -388,6 +392,7 @@ class FirebaseService {
                 completionHandler(false, error?.localizedDescription, nil)
                 return
             }
+            // RETURN FALSE UNTIL AD TITLE CHANGE
             if querySnapshot.data()!["ad"] as! String != self.lastMessageTitle {
                 completionHandler(true, nil, querySnapshot.data() )
                 self.lastMessageTitle = querySnapshot.data()!["ad"] as! String
@@ -399,6 +404,7 @@ class FirebaseService {
         
     }
     
+    // WHEN MAIL IS SENT CREATE / CHANGE THE MESSAGE IN FIREBASE
     func sendMessage (to uid:String, senderName: String, for ad:String, completionHandler: @escaping ((Bool, String? ) -> Void)){
         db.collection("message").document("\(uid)_message").setData(["to": uid, "senderName": senderName, "ad":ad]) { error in
             guard error == nil  else {

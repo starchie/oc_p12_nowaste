@@ -139,7 +139,7 @@ class FirebaseServiceTests: XCTestCase {
             expectation.fulfill()
             
         })
-        self.wait(for: [expectation], timeout: 1)
+        self.wait(for: [expectation], timeout: 10)
   
     }
      
@@ -160,7 +160,7 @@ class FirebaseServiceTests: XCTestCase {
             expectation.fulfill()
             
         })
-        self.wait(for: [expectation], timeout: 1)
+        self.wait(for: [expectation], timeout: 10)
   
     }
     
@@ -179,7 +179,7 @@ class FirebaseServiceTests: XCTestCase {
             expectation.fulfill()
             
         })
-        self.wait(for: [expectation], timeout: 1)
+        self.wait(for: [expectation], timeout: 10)
   
     }
     
@@ -199,7 +199,7 @@ class FirebaseServiceTests: XCTestCase {
             expectation.fulfill()
             
         })
-        self.wait(for: [expectation], timeout: 2)
+        self.wait(for: [expectation], timeout: 10)
   
     }
     
@@ -217,7 +217,7 @@ class FirebaseServiceTests: XCTestCase {
             expectation.fulfill()
             
         })
-        self.wait(for: [expectation], timeout: 2)
+        self.wait(for: [expectation], timeout: 10)
   
     }
     
@@ -235,7 +235,7 @@ class FirebaseServiceTests: XCTestCase {
             expectation.fulfill()
             
         })
-        self.wait(for: [expectation], timeout: 2)
+        self.wait(for: [expectation], timeout: 10)
   
     }
     
@@ -256,11 +256,12 @@ class FirebaseServiceTests: XCTestCase {
             expectation.fulfill()
             
         })
-        self.wait(for: [expectation], timeout: 1)
+        self.wait(for: [expectation], timeout: 10)
     }
     
+    
     // TODO HERE ...
-    func test_F5_FirestoreWhenQuerryAnAdThenShouldSucess() throws {
+    func test_F4_FirestoreWhenQuerryAnAdThenShouldSucess() throws {
        // given
         let userUID = "UserIdCreatedByFirebase"
         
@@ -273,7 +274,24 @@ class FirebaseServiceTests: XCTestCase {
             expectation.fulfill()
             
         })
-        self.wait(for: [expectation], timeout: 1)
+        self.wait(for: [expectation], timeout: 10)
+  
+    }
+   
+    func test_F5_FirestoreWhenUpdateAnAdThenShouldSucess() throws {
+       // given
+        let adUID = "AdIdCreatedByApp"
+        let value = FieldValue.increment(Int64(1))
+        // when
+        let expectation = XCTestExpectation(description: "Wait for queue change.")
+        FirebaseService.shared.updateAd(ad:adUID , field: "likes", by: value, completionHandler: { (success, error) in
+            
+        // Then
+            XCTAssertTrue(success)
+            expectation.fulfill()
+            
+        })
+        self.wait(for: [expectation], timeout: 10)
   
     }
 
@@ -306,10 +324,47 @@ class FirebaseServiceTests: XCTestCase {
             
                 
             })
-        self.wait(for: [expectation], timeout: 1)
+        self.wait(for: [expectation], timeout: 10)
 
            
     }
+    
+    func test_F8_GivenUserWhenSentMessageThenShouldCreateFileOnServer() throws {
+       let uid = "UserIdCreatedByFirebase"
+        // when
+        let expectation = XCTestExpectation(description: "Wait for queue change.")
+        FirebaseService.shared.sendMessage(to: uid, senderName: "Sender", for: "Ad Title"){ (success, error) in
+            
+            // Then
+                XCTAssertTrue(success)
+                expectation.fulfill()
+            
+                
+            }
+        self.wait(for: [expectation], timeout: 10)
+
+           
+    }
+    
+    func test_F9_GivenUserWhenMessageChangeThenShouldReturnTrue() throws {
+        // Given
+        let uid = "UserIdCreatedByFirebase"
+        FirebaseService.shared.lastMessageTitle = ""
+        // when
+        let expectation = XCTestExpectation(description: "Wait for queue change.")
+        FirebaseService.shared.watchMessage(id: uid) { success, error ,result  in
+            
+            // Then
+            XCTAssertTrue(success)
+            expectation.fulfill()
+            
+            
+        }
+        self.wait(for: [expectation], timeout: 10)
+        
+        
+    }
+    
     
     
     
@@ -331,7 +386,7 @@ class FirebaseServiceTests: XCTestCase {
             
                 
             })
-        self.wait(for: [expectation], timeout: 1)
+        self.wait(for: [expectation], timeout: 10)
 
            
     }
@@ -351,12 +406,42 @@ class FirebaseServiceTests: XCTestCase {
             
                 
             })
-        self.wait(for: [expectation], timeout: 1)
-
+        self.wait(for: [expectation], timeout: 10)
+        
+        // LAST TEST IN FirebaseServiceTests
+        // WE CAN DELETE FOR NEXT UNIT TESTS LAUNCH
+        DeleteUser()
            
     }
     
     
+    // Log out
+    /*
+    func test_Z0_uthWhenSignOutThenShouldSucess() throws {
+        // when
+        let expectation = XCTestExpectation(description: "Wait for queue change.")
+        FirebaseService.shared.logout( completionHandler:{ (success, error) in
+            
+        // Then
+            XCTAssertTrue(success)
+            expectation.fulfill()
+            
+        })
+        self.wait(for: [expectation], timeout: 10)
+    
+    }
+    */
+    
+    func DeleteUser(){
+        let user = Auth.auth().currentUser
+        if user?.email == "test@nowaste.com"{
+            user?.delete { error in
+                print(" 🔴 User deleted for next test")
+          
+            }
+            
+        }
+    }
 
     
     

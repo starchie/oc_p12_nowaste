@@ -52,11 +52,12 @@ class NowasteUITests: XCTestCase {
 
     
     func testUINavigation() throws {
-        
-        
+
         let app = XCUIApplication()
         let connexionStaticText = app/*@START_MENU_TOKEN@*/.staticTexts["Connexion"]/*[[".buttons[\"Connexion\"].staticTexts[\"Connexion\"]",".staticTexts[\"Connexion\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/
         connexionStaticText.tap()
+        app/*@START_MENU_TOKEN@*/.staticTexts["Pas encore de compte nowaste ? Inscrivez-vous"]/*[[".buttons[\"Pas encore de compte nowaste ? Inscrivez-vous\"].staticTexts[\"Pas encore de compte nowaste ? Inscrivez-vous\"]",".staticTexts[\"Pas encore de compte nowaste ? Inscrivez-vous\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.tap()
+        app/*@START_MENU_TOKEN@*/.buttons["Déjà inscrit ? Connectez-vous"]/*[[".scrollViews.buttons[\"Déjà inscrit ? Connectez-vous\"]",".buttons[\"Déjà inscrit ? Connectez-vous\"]"],[[[-1,1],[-1,0]]],[0]]@END_MENU_TOKEN@*/.staticTexts["Déjà inscrit ? Connectez-vous"].tap()
         connexionStaticText.tap()
         
         let nowasteMapNavigationBar = app.navigationBars["Nowaste.Map"]
@@ -66,9 +67,8 @@ class NowasteUITests: XCTestCase {
         nowasteMapNavigationBar.buttons["plusCircle"].tap()
         app.navigationBars["Nowaste.Ad"].buttons["Back"].tap()
         nowasteMapNavigationBar.buttons["listCircle"].tap()
-      
-      
-        
+        app.navigationBars["Nowaste.List"].buttons["mapCircle"].tap()
+    
     }
     
     

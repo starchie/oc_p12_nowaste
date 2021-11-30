@@ -124,7 +124,7 @@ class CoreDataManager {
     //MARK: - GET PROFILE
     
     func returnProfile (from ad:String)-> [Profile]{
-        // Request Ingredient
+        // Request Profile
     
         let filter = ad
         let predicate = NSPredicate(format: "ad.id = %@", filter)
@@ -145,7 +145,7 @@ class CoreDataManager {
     //MARK: - GET MESSAGE
     
     func returnMessage (from ad:String)-> Bool{
-        // Request Ingredient
+        // Request Message 
     
         let filter = ad
         let predicate = NSPredicate(format: "ad.id = %@", filter)
