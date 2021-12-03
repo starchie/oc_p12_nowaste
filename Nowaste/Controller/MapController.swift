@@ -45,6 +45,7 @@ class MapController: UIViewController {
     var sortedProfiles = [Profile]()
     var AdsFromSortedProfiles = [Ad]()
     var selectedProfile:Profile!
+    var adsForSelectedProfile = [Ad]()
     var once:Int = 0
     
     var activityIndicator = UIActivityIndicatorView()
@@ -210,7 +211,7 @@ class MapController: UIViewController {
     @objc func didTapScrollView(_ tap: UITapGestureRecognizer) {
         let index = tap.view!.tag
         let vc = DetailController()
-        vc.currentAd = FirebaseService.shared.ads[index]
+        vc.currentAd = adsForSelectedProfile[index]
         vc.isFavorite = false
         vc.selectedProfile = selectedProfile
         navigationController?.pushViewController(vc, animated: false)
@@ -227,106 +228,74 @@ class MapController: UIViewController {
     }
     
     @objc func getProfilesInRadius() {
-        // WE CANT DOWNLAD ALL THE DATA FROM FIREBASE SO WE SELECT ALL PROFILES
-        // AND THEIR ADS IN RADIUS FROM USER LOCATION
-        
-        // IT CAN TAKE SOME TIME
+        // We don't want to delete all data from firebase but only users in selected radius
         activityIndicator.startAnimating()
-        
-        self.mapView.removeAnnotations(self.mapView.annotations)
-        
-        // GET CURRENT LOCATION
+        // Get current location
         let latitude = FirebaseService.shared.profile.latitude
         let longitude = FirebaseService.shared.profile.longitude
-        // RADIUS
+        // Radius to search in
         let radiusInM:Double = Double(searchView.slider.value * 1000 * 4) // 4 km
         let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        
         searchView.searchDistanceLabel.text = "\(round(radiusInM) / 1000) km"
+
         // CALL FIREBASE MODEL FUNCTION :
         FirebaseService.shared.getGeoHash(center: center, radiusInM: radiusInM){ success,error in
             if success {
-                var profiles = [String]()
-                
+                // Update
                 self.sortedProfiles = FirebaseService.shared.profiles // ARRAY WITH PROFILES
-            
-                // GET ALL UID AS STRING
-                for profile in self.sortedProfiles {
-                    profiles.append(profile.id)
-                    let customAnnotation = Annotation(with: profile)
-                    self.mapView.addAnnotation(customAnnotation)
-                }
-
-                if profiles.count == 0 {
-                    self.sortedProfiles = []
-                    self.AdsFromSortedProfiles = []
-                    self.activityIndicator.stopAnimating()
-                }else if profiles.count == 1{
-                    self.activityIndicator.stopAnimating()
+                self.updateAnnotations (profiles: self.sortedProfiles)
+                // Case only the user
+                if self.sortedProfiles.count == 1{
                     self.presentUIAlertController(title: "Nowaste", message: "Il n'y a personne dans les alentours.Mais vous pouvez commencer à partager sur Nowaste. ")
-                }else{
-                    self.getAdsFromProfilesInRadius(profiles) // FIND ALL ADS FOR PROFILES FOUND
+                // Else We found someone in radius
+                }else if self.sortedProfiles.count > 1{
+                    self.getAdsFromProfilesInRadius(self.sortedProfiles) // FIND ALL ADS FOR PROFILES FOUND
                 }
-                
             }else{
-                self.activityIndicator.stopAnimating()
                 self.presentUIAlertController(title: "Error", message: error!)
             }
             
         }
- 
+        self.activityIndicator.stopAnimating()
     }
     
-    func getAdsFromProfilesInRadius (_ profiles:[String]) {
-
+    func getAdsFromProfilesInRadius (_ profiles:[Profile]) {
+        activityIndicator.startAnimating()
+        
         FirebaseService.shared.querryAllAds(filter: profiles) { success,error in
             if success {
                 self.AdsFromSortedProfiles = FirebaseService.shared.ads
-                self.activityIndicator.stopAnimating()
             }else{
-                self.activityIndicator.stopAnimating()
                 self.presentUIAlertController(title: "Error", message: error!)
             }
             
         }
         
+        self.activityIndicator.stopAnimating()
     }
     
     @objc func searchThisWordInAds() {
-        // CLEAN
-        sortedProfiles.removeAll()
-     
-        // GET
-        // IF SEARCH TEXT HAS NOTHING -> RESET
-        if searchView.searchText.text == "" {
-            sortedProfiles = FirebaseService.shared.profiles
-            for  profile in sortedProfiles {
-                let customAnnotation = Annotation(with: profile)
-                self.mapView.addAnnotation(customAnnotation)
-            }
-        }else {
-            let uids = FirebaseService.shared.searchAdsByKeyWord(searchView.searchText.text ?? "", array: AdsFromSortedProfiles)
-            if uids.isEmpty {
-                presentUIAlertController(title: "Recherche", message: "Aucun resultat trouvé")
-                return
-            }
-            else {
-                mapView.removeAnnotations(mapView.annotations)
-                FirebaseService.shared.getProfilesfromUIDList(uids, arrayProfiles: FirebaseService.shared.profiles, arrayDistances: FirebaseService.shared.distances) { profiles, distances in
-                    sortedProfiles = profiles
-                }
-                // UPDATE
-                for  profile in sortedProfiles {
-                    let customAnnotation = Annotation(with: profile)
-                    self.mapView.addAnnotation(customAnnotation)
-                }
-    
-            }
         
-            
-        }// End else
+        FirebaseService.shared.returnProfileWithAdThatContainsTheWord(searchView.searchText.text ?? ""){
+            success, resultProfiles, resultDistances in
+                
+            if success {
+                sortedProfiles = resultProfiles
+            }else {
+                presentUIAlertController(title: "Recherche", message: "Aucun resultat trouvé")
+            }
+            updateAnnotations(profiles: sortedProfiles)
+        }
+    }
     
-    }// End func
+    func updateAnnotations (profiles: [Profile]) {
+        self.mapView.removeAnnotations(self.mapView.annotations)
+        // update
+        for  profile in sortedProfiles {
+        let customAnnotation = Annotation(with: profile)
+        mapView.addAnnotation(customAnnotation)
+        }
+    }
     
     func isNewMessage () {
         print("search for new message")
@@ -341,8 +310,6 @@ class MapController: UIViewController {
     }
 
 }
-
-
 
 
 // MARK: EXTENSION MAP DELEGATE
@@ -392,34 +359,32 @@ extension MapController: MKMapViewDelegate {
     
         let annotation = view.annotation as! Annotation
         guard annotation.profile?.activeAds ?? 0 > 0 else {return}
+        
         selectedProfile = annotation.profile
-       
-        FirebaseService.shared.querryAds(filter: annotation.profile!.id) {success,error in
-            if success {
-                // CREATE LIST SUBVIEWS
-                self.listView.isHidden = false
-                self.dynamicView.isHidden = false
-                self.dynamicView.animInit()
-                self.pageControl.isHidden = false
-                self.pageControl.numberOfPages = FirebaseService.shared.ads.count
-                self.pageControl.currentPage = 0
-                
-                for subView in self.listView.subviews{
-                    subView.removeFromSuperview()
-                }
-                
-                if self.listView.subviews.count < FirebaseService.shared.ads.count {
-                    while let view = self.listView.viewWithTag(0) {
-                        view.tag = 1000
-                    }
-
-                }
-                self.setupList()
-            }else{
-                print("can't present controller ")
+        let uid = annotation.profile?.id
+        
+        adsForSelectedProfile = FirebaseService.shared.searchAdsFromProfile(uid: uid!, array: FirebaseService.shared.ads)
+        
+        // prepare views
+        
+        self.listView.isHidden = false
+        self.dynamicView.isHidden = false
+        self.dynamicView.animInit()
+        self.pageControl.isHidden = false
+        self.pageControl.numberOfPages = adsForSelectedProfile.count
+        self.pageControl.currentPage = 0
+        
+        for subView in self.listView.subviews{
+            subView.removeFromSuperview()
+        }
+        
+        if self.listView.subviews.count < adsForSelectedProfile.count {
+            while let view = self.listView.viewWithTag(0) {
+                view.tag = 1000
             }
             
         }
+        self.setupList()
         
     }
 
@@ -436,11 +401,11 @@ extension MapController : UIScrollViewDelegate{
         self.listView.setContentOffset(.zero, animated: false)
         self.listView.reloadInputViews()
         
-        for i in FirebaseService.shared.ads.indices {
+        for i in adsForSelectedProfile.indices {
             
             // CREATE VIEW
             let scrollView = HorizontalScrollView(frame: listView.bounds)
-            let ad = FirebaseService.shared.ads[i]
+            let ad = adsForSelectedProfile[i]
             
             scrollView.itemTitle.text = ad.title
             scrollView.itemDate.text = FirebaseService.shared.getDate(dt:ad.dateField)
@@ -465,7 +430,7 @@ extension MapController : UIScrollViewDelegate{
         
         let horizontalPadding: CGFloat = 40
         
-        for i in FirebaseService.shared.ads.indices {
+        for i in adsForSelectedProfile.indices {
             let imageView = listView.viewWithTag(i) as! HorizontalScrollView
             imageView.frame = CGRect(
                 x: CGFloat(i) * itemWidth + CGFloat(i+1) * horizontalPadding - 20,
@@ -474,7 +439,7 @@ extension MapController : UIScrollViewDelegate{
                 height: itemHeight)
         }
         
-        listView.contentSize = CGSize(width: CGFloat(FirebaseService.shared.ads.count) * (itemWidth + horizontalPadding) + horizontalPadding, height:  0)
+        listView.contentSize = CGSize(width: CGFloat(adsForSelectedProfile.count) * (itemWidth + horizontalPadding) + horizontalPadding, height:  0)
 
     }
     

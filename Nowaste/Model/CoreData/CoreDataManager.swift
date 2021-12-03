@@ -146,18 +146,19 @@ class CoreDataManager {
     
     func returnMessage (from ad:String)-> Bool{
         // Request Message 
-    
+        
         let filter = ad
         let predicate = NSPredicate(format: "ad.id = %@", filter)
         let requestMessage: NSFetchRequest<FavoriteMessage> = FavoriteMessage.fetchRequest()
-    
+        
         requestMessage.predicate = predicate
         guard let resultMessage = try? CoreDataManager.shared.viewContext.fetch(requestMessage) else {return false}
         if resultMessage.first == nil {
             return false
-        }else{
-            return resultMessage.first!.sent
         }
+        
+        return resultMessage.first!.sent
+        
     }
     
     

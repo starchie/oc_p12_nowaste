@@ -116,6 +116,67 @@ class FirebaseServiceTests: XCTestCase {
         
     }
     
+    func testWhenSearchAWordThenItShouldReturnProfileWhoHasTheSearch () {
+        //Given
+        let snapshots: [String:Any] = ["addedByUser":"User234","dateField":1637936047.251909 , "title": "Carottes", "imageURL":"https://openclassrooms.com" , "description":"plein de carottes" , "likes":1 , "id":"1234"]
+        let newAd = Ad(snapshot: snapshots)
+        FirebaseService.shared.ads = [newAd!]
+        let userProfile = Profile(snapshot: ["id": "User234", "userName": "Richard", "dateField": 123.5, "activeAds": 0, "imageURL":"https://image.com","latitude": 12.4, "longitude": 12.4, "geohash":"ff4CC33" ])
+        FirebaseService.shared.profiles = [userProfile!]
+        FirebaseService.shared.distances = [220.0]
+        
+        //When
+        FirebaseService.shared.returnProfileWithAdThatContainsTheWord("car") {
+            success, resultProfiles, resultDistances in
+            
+            //then
+                XCTAssertTrue(resultProfiles.count == 1)
+        }
+  
+    }
+    
+    func testWhenSearchAWordThenItShouldReturnFalse () {
+        //Given
+        let snapshots: [String:Any] = ["addedByUser":"User234","dateField":1637936047.251909 , "title": "Carottes", "imageURL":"https://openclassrooms.com" , "description":"plein de carottes" , "likes":1 , "id":"1234"]
+        let newAd = Ad(snapshot: snapshots)
+        FirebaseService.shared.ads = [newAd!]
+        let userProfile = Profile(snapshot: ["id": "User234", "userName": "Richard", "dateField": 123.5, "activeAds": 0, "imageURL":"https://image.com","latitude": 12.4, "longitude": 12.4, "geohash":"ff4CC33" ])
+        FirebaseService.shared.profiles = [userProfile!]
+        FirebaseService.shared.distances = [220.0]
+        
+        //When
+        FirebaseService.shared.returnProfileWithAdThatContainsTheWord("pomm") {
+            success, resultProfiles, resultDistances in
+            
+            //then
+                XCTAssertFalse(success)
+        }
+  
+    }
+    
+    func testWhenSearchNothingThenItShouldReturnAll () {
+        //Given
+        let snapshots: [String:Any] = ["addedByUser":"User234","dateField":1637936047.251909 , "title": "Carottes", "imageURL":"https://openclassrooms.com" , "description":"plein de carottes" , "likes":1 , "id":"1234"]
+        let newAd = Ad(snapshot: snapshots)
+        FirebaseService.shared.ads = [newAd!]
+        let userProfile = Profile(snapshot: ["id": "User234", "userName": "Richard", "dateField": 123.5, "activeAds": 0, "imageURL":"https://image.com","latitude": 12.4, "longitude": 12.4, "geohash":"ff4CC33" ])
+        FirebaseService.shared.profiles = [userProfile!]
+        FirebaseService.shared.distances = [220.0]
+        
+        //When
+        FirebaseService.shared.returnProfileWithAdThatContainsTheWord("") {
+            success, resultProfiles, resultDistances in
+            
+            //then
+                XCTAssertTrue(success)
+        }
+  
+    }
+    
+    /*
+    ///// FIREBASE TESTS
+    */
+    
     
     // TESTS FIREBASE : NEED LOCAL FIREBASE EMULATOR
     // RULES FOR STORAGE AND FIRESTORE SET FOR TESTS :

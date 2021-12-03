@@ -321,23 +321,37 @@ class FirebaseService {
     }
     
     // GET ADS FROM ARRAY OF USERS (USED WHEN WE HAVE ALL PROFILES IN RADIUS)
-    func querryAllAds(filter:[String], completionHandler: @escaping ((Bool, String? ) -> Void)){
-
-            let selection:Query = db.collection("ads").whereField("addedByUser", in: filter)
-            selection.getDocuments { (querySnapshot, error) in
-                guard let querySnapshot = querySnapshot, error == nil else {
-                    completionHandler(false, error?.localizedDescription)
-                    return
-                }
-                
-                self.ads.removeAll()
-                for document in querySnapshot.documents {
-                    let newAd = Ad(snapshot: document.data())
-                    self.ads.append(newAd!)
-                }
-                completionHandler(true, nil)
-                
+    func querryAllAds(filter:[Profile], completionHandler: @escaping ((Bool, String? ) -> Void)){
+        
+        var profileId = [String]()
+        
+        for item in filter {
+            profileId.append(item.id)
+        }
+        
+        guard profileId.count > 0 else {
+            ads = []
+            print ("no need to search")
+            completionHandler(true, nil)
+            return
+            
+        }
+            
+        let selection:Query = db.collection("ads").whereField("addedByUser", in: profileId)
+        selection.getDocuments { (querySnapshot, error) in
+            guard let querySnapshot = querySnapshot, error == nil else {
+                completionHandler(false, error?.localizedDescription)
+                return
             }
+            
+            self.ads.removeAll()
+            for document in querySnapshot.documents {
+                let newAd = Ad(snapshot: document.data())
+                self.ads.append(newAd!)
+            }
+            completionHandler(true, nil)
+            
+        }
         
     }
     
@@ -418,6 +432,53 @@ class FirebaseService {
     
     
     //MARK: - UTILS
+    
+    func returnProfileWithAdThatContainsTheWord(_ word:String,
+                                                completionHandler: (Bool,[Profile],[Double])->Void ){
+        var profilesToReturn = [Profile]()
+        var distanceToReturn = [Double]()
+        
+        // If Nothing in search, We return everything because We guess an error
+        if word == "" {
+            print("nothing to search")
+            profilesToReturn = profiles
+            distanceToReturn = distances
+            
+        // Else the word exist, so we can search
+        }else {
+            let SearchInAds = searchAdsByKeyWord(word, array: ads)
+            getProfilesfromUIDList(SearchInAds, arrayProfiles: profiles, arrayDistances: distances) { resultProfiles, resultDistances in
+                
+                profilesToReturn = resultProfiles
+                distanceToReturn = resultDistances
+                
+            }
+            
+            
+        }
+
+        switch profilesToReturn.count {
+            
+        case 0:
+            let success = false
+            print("it s 0")
+            completionHandler(success,profilesToReturn,distanceToReturn)
+            break
+        default:
+            print("found")
+            let success = true
+            completionHandler(success,profilesToReturn,distanceToReturn)
+            break
+            
+        }
+    
+        
+       
+    }
+    
+    
+    
+    
     
     // RETURN DELTATIME FROM DOUBLE TO READABLE STRING
     func getDate(dt: Double) -> String {

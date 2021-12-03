@@ -183,74 +183,39 @@ class ListController: UIViewController {
     }
     
     @objc func searchThisWordInAds() {
-        // CLEAN
         selectedRow = nil
-        sortedProfiles.removeAll()
         
-        // THIS FUNCTION WORKS WITHOUT FIREBASE.
-        // IT SEARCHS IN PROFILES AND ADS FROM MODEL ALREADY DOWNLOAD WITH SEARCHBYRADIUS FUNCTION
-        
-        // FIRST CASE:
-        // IF SEARCH TEXT IS EMPTY -> RETURN EVERYTHING
-        if searchView.searchText.text == "" {
-            sortedProfiles = FirebaseService.shared.profiles
-            distancesForSortedProfiles = FirebaseService.shared.distances
-            
-            // WE WILL NOT DISPLAY PROFIL WITH ANY AD IN THE TABLEVIEW
-            // SO CALL FUNCTION FROM MODEL TO DELETE :
-            FirebaseService.shared.removeProfileIfNoAd(self.sortedProfiles, distances: self.distancesForSortedProfiles){ resultProfiles,resultDistances in
-                // UPDATE PROFILES BUT ALSO DISTANCES
-                self.sortedProfiles = resultProfiles
-                self.distancesForSortedProfiles = resultDistances
-            }
-
-            // UPDATE TABLE
-            tableView.reloadData()
-        }
-        // SECOND CASE:
-        // IF SERACH TEXT NOT EMPTY :
-        else {
-            // SEARCH IF THERE IS A MATCH WITH MODEL FUNCTION
-            // IF THERE IS, THIS FUNCTION WILL RETURN AN ARRAY WITH ALL PROFILE UID
-            let uid = FirebaseService.shared.searchAdsByKeyWord(searchView.searchText.text ?? "", array: FirebaseService.shared.ads)
-            if uid.isEmpty {
-                presentUIAlertController(title: "Recherche", message: "Aucun resultat trouvé")
-                return
+        FirebaseService.shared.returnProfileWithAdThatContainsTheWord(searchView.searchText.text ?? ""){
+            success, resultProfiles, resultDistances in
+                
+            if success {
+                sortedProfiles = resultProfiles
+                distancesForSortedProfiles = resultDistances
             }else {
-            // THEN UPDATE PROFILE ARRAY WITH ANOTHER MODEL FUNCTION
-            FirebaseService.shared.getProfilesfromUIDList(uid, arrayProfiles: FirebaseService.shared.profiles, arrayDistances: FirebaseService.shared.distances) { profiles, distances in
-                sortedProfiles = profiles
-                distancesForSortedProfiles = distances
+                presentUIAlertController(title: "Recherche", message: "Aucun resultat trouvé")
             }
-            
-            // UPDATE TABLE
             tableView.reloadData()
-            }
         }
-    
     }
+
     
     
     @objc func getProfilesInRadius() {
-        // WE CANT DOWNLAD ALL THE DATA FROM FIREBASE SO WE SELECT ALL PROFILES
-        // AND THEIR ADS IN RADIUS FROM USER LOCATION
-        
-        // IT CAN TAKE SOME TIME
+        // We don't want to delete all data from firebase but only users in selected radius
         activityIndicator.startAnimating()
-        
-        // GET CURRENT LOCATION
+        // Get current location
         let latitude = FirebaseService.shared.profile.latitude
         let longitude = FirebaseService.shared.profile.longitude
-        // RADIUS
+        // Radius to search in
         let radiusInM:Double = Double(searchView.slider.value * 1000 * 4) // 4 km
         let center = CLLocationCoordinate2D(latitude: latitude, longitude: longitude)
-        
         searchView.searchDistanceLabel.text = "\(round(radiusInM) / 1000) km"
+        
         // CALL FIREBASE MODEL FUNCTION :
         FirebaseService.shared.getGeoHash(center: center, radiusInM: radiusInM){ success,error in
             if success {
-                var profiles = [String]()
                 // UPDATE ARRAYS
+                self.selectedRow = nil // NEED TO RESET TABLE VIEW WITH NO PROFILE SELECTED
                 self.sortedProfiles = FirebaseService.shared.profiles // ARRAY WITH PROFILES
                 self.distancesForSortedProfiles = FirebaseService.shared.distances // ARRAY WITH DISTANCES
                 
@@ -259,33 +224,21 @@ class ListController: UIViewController {
                     self.sortedProfiles = resultProfiles
                     self.distancesForSortedProfiles = resultDistances
                 }
-
-                // GET ALL UID AS STRING
-                for profile in self.sortedProfiles {
-                    profiles.append(profile.id)
-                }
-                // IF NOBODY : UPDATE AND SHOW MESSAGE
-                if profiles.count == 0 {
-                    self.sortedProfiles = []
+               
+                if self.sortedProfiles.count > 0 {
+                    self.getAdsFromProfilesInRadius(self.sortedProfiles) // FIND ALL ADS FOR PROFILES 
+                }else {
                     self.AdsFromSortedProfiles = []
                     self.tableView.reloadData()
-                    self.activityIndicator.stopAnimating()
-                }else {
-                    self.selectedRow = nil // NEED TO RESET TABLE VIEW - NO PROFILE SELECTED
-                    self.getAdsFromProfilesInRadius(profiles) // FIND ALL ADS FOR PROFILES FOUND
                 }
-                
-                
             }else{
-                self.activityIndicator.stopAnimating()
                 self.presentUIAlertController(title: "Error", message: error!)
             }
-            
         }
-        
+        self.activityIndicator.stopAnimating()
     }
     
-    func getAdsFromProfilesInRadius (_ profiles:[String]) {
+    func getAdsFromProfilesInRadius (_ profiles:[Profile]) {
         // WE HAVE A LIST OF PROFILES THEN GET ALL ADS FROM THEM
         FirebaseService.shared.querryAllAds(filter: profiles) { success,error in
             if success {
@@ -301,6 +254,7 @@ class ListController: UIViewController {
         }
         
     }
+     
     // ANIMATION
     func anim (frame: CGRect) {
         UIView.animate(withDuration: 0.5, delay: 0,usingSpringWithDamping: 0.3, initialSpringVelocity: 0.4, options: [.curveLinear], animations: {
